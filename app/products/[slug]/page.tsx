@@ -92,7 +92,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </nav>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter lg:gap-16">
-              <ImageGallery stone={stone} productName={product.name} />
+              <ImageGallery
+                stone={stone}
+                productName={product.name}
+                images={product.images?.map((image) => ({ url: image.imageUrl, alt: image.alt }))}
+              />
 
               <div className="flex flex-col">
                 <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">

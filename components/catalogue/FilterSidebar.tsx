@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
-import { CATALOGUE_SIZES } from "@/lib/products/mockProducts";
 import type { ProductCategory, ProductFilters, ProductFinish } from "@/types/product";
 
 const CATEGORY_OPTIONS: ProductCategory[] = [
@@ -20,6 +19,10 @@ const FINISH_OPTIONS: ProductFinish[] = ["Polished", "Honed", "Matte", "Leathere
 type FilterSidebarProps = {
   filters: ProductFilters;
   resultCount: number;
+  /** Sizes actually present in the current catalogue (task 5 — fetched
+   *  server-side so the filter never offers a size that matches zero
+   *  live products). */
+  sizes: string[];
 };
 
 /**
@@ -33,7 +36,7 @@ type FilterSidebarProps = {
  * mobile "FILTERS" button that opens a bottom-sheet drawer (brief's explicit
  * mobile decision — not a horizontal scroll row).
  */
-export function FilterSidebar({ filters, resultCount }: FilterSidebarProps) {
+export function FilterSidebar({ filters, resultCount, sizes }: FilterSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -124,7 +127,7 @@ export function FilterSidebar({ filters, resultCount }: FilterSidebarProps) {
       />
       <FilterGroup
         label="Size"
-        options={[...CATALOGUE_SIZES]}
+        options={sizes}
         active={filters.size ?? []}
         onToggle={(value) => toggleValue("size", value)}
       />

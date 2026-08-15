@@ -1,19 +1,20 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 /**
- * Server-side Supabase client for Server Actions / Route Handlers.
- * Returns null — not a thrown error — when the project isn't configured
- * yet (brief section 23: Supabase is installed but intentionally not
- * connected until real credentials exist), so callers degrade gracefully
- * instead of crashing. Once NEXT_PUBLIC_SUPABASE_URL and
- * NEXT_PUBLIC_SUPABASE_ANON_KEY are set (see .env.local.example), this
- * starts returning a real client with zero code changes elsewhere.
+ * Server-side Supabase client for Server Components, Server Actions, and
+ * Route Handlers. Returns null — not a thrown error — when the project
+ * isn't configured, so callers (catalogue reads, the enquiry form) degrade
+ * gracefully instead of crashing. Uses the publishable key (Supabase's
+ * current replacement for the legacy "anon" key) deliberately, not the
+ * secret key: every caller of this client only needs what RLS already
+ * grants publicly (read products/product_images, insert enquiries), so
+ * there's no reason to run with service-role-equivalent privileges.
  */
 export function getSupabaseServerClient(): SupabaseClient | null {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!url || !anonKey) return null;
+  if (!url || !publishableKey) return null;
 
-  return createClient(url, anonKey);
+  return createClient(url, publishableKey);
 }

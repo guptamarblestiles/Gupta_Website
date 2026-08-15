@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { FilterSidebar } from "@/components/catalogue/FilterSidebar";
 import { ProductGrid } from "@/components/catalogue/ProductGrid";
 import { Pagination } from "@/components/catalogue/Pagination";
-import { getProducts } from "@/lib/products/queries";
+import { getAvailableSizes, getProducts } from "@/lib/products/queries";
 import type { ProductCategory, ProductFilters, ProductFinish } from "@/types/product";
 
 const CATALOGUE_TITLE = "Catalogue";
@@ -82,7 +82,10 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   );
   const page = Number.isFinite(requestedPage) ? Math.max(1, requestedPage) : 1;
 
-  const { products, total } = await getProducts(filters, page, PAGE_SIZE);
+  const [{ products, total }, sizes] = await Promise.all([
+    getProducts(filters, page, PAGE_SIZE),
+    getAvailableSizes(),
+  ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
@@ -104,7 +107,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             </div>
 
             <div className="lg:flex lg:items-start lg:gap-gutter">
-              <FilterSidebar filters={filters} resultCount={total} />
+              <FilterSidebar filters={filters} resultCount={total} sizes={sizes} />
               <div className="flex-1 flex flex-col">
                 {/* Visually hidden — TileCard's product names are h3s, so
                     the grid needs an h2 between them and the h1 above to
