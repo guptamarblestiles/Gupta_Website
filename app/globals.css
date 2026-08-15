@@ -1,26 +1,130 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * D R Traders — Design Tokens
+ *
+ * Reconciled from four independently-generated Stitch prototypes (homepage,
+ * catalogue, product detail), which each defined slightly different hex
+ * values for the same semantic names. This file is now the single source
+ * of truth — every component should reference these tokens, not hardcoded
+ * Tailwind grays.
+ *
+ * Two palettes:
+ *  - Light palette (bg-background, text-on-surface, ...): used everywhere —
+ *    catalogue, product pages, and the majority of the homepage.
+ *  - Hero palette (bg-hero, text-hero-foreground, ...): used only inside the
+ *    dark cinematic hero section, per the brief's "deep cinematic dark
+ *    environment" requirement for the hero, transitioning into the light
+ *    palette on scroll.
+ */
+
+@theme {
+  /* ---- Light palette (default site-wide theme) ---- */
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-variant: #f8f9fa;
+  --color-surface-container: #f5f3f7;
+  --color-on-surface: #1a1a1a;
+  --color-on-surface-variant: #57534e;
+  --color-outline: #d1d5db;
+  --color-outline-variant: #e5e7eb;
+
+  /* Copper accent — reconciled to a single value (was #b87333 / #965500 /
+     #7a4100 across the three prototypes; #b87333 is the one used in the
+     approved homepage hero and the shared .copper-accent utility). */
+  --color-secondary: #b87333;
+  --color-secondary-fixed: #e6a166;
+  --color-secondary-fixed-dim: #d98a4a;
+  --color-on-secondary: #ffffff;
+
+  --color-error: #ba1a1a;
+
+  /* ---- Hero palette (dark cinematic environment, hero section only) ---- */
+  --color-hero-bg: #09090b;
+  --color-hero-surface: #18181b;
+  --color-hero-foreground: #f5f5f4;
+  --color-hero-muted: #a1a1aa;
+  --color-hero-border: #27272a;
+
+  /* ---- Typography ---- */
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: 4.5rem;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 400;
+
+  --text-display-mobile: 3rem;
+  --text-display-mobile--line-height: 1.1;
+  --text-display-mobile--font-weight: 400;
+
+  --text-headline: 2.5rem;
+  --text-headline--line-height: 1.2;
+  --text-headline--font-weight: 400;
+
+  --text-headline-sm: 1.5rem;
+  --text-headline-sm--line-height: 1.4;
+  --text-headline-sm--font-weight: 500;
+
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--letter-spacing: 0.01em;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+
+  --text-label: 0.75rem;
+  --text-label--line-height: 1;
+  --text-label--letter-spacing: 0.15em;
+  --text-label--font-weight: 600;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ---- Layout rhythm utilities (matches the spacing scale agreed during
+   Stitch prototyping: margin-desktop / margin-mobile / section-gap / gutter)
+   Defined as explicit utilities rather than theme spacing tokens so they
+   stay unambiguous across padding, margin and gap use. ---- */
+@utility container-max {
+  max-width: 90rem; /* 1440px */
+  margin-inline: auto;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@utility px-margin {
+  padding-inline: 1.25rem; /* 20px mobile */
+  @media (width >= 768px) {
+    padding-inline: 4rem; /* 64px desktop */
+  }
+}
+@utility py-section-gap {
+  padding-block: 5rem; /* 80px mobile */
+  @media (width >= 768px) {
+    padding-block: 8rem; /* 128px desktop */
+  }
+}
+@utility gap-gutter {
+  gap: 1.5rem; /* 24px mobile */
+  @media (width >= 768px) {
+    gap: 2rem; /* 32px desktop */
   }
 }
 
+@utility copper-accent {
+  color: var(--color-secondary);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-background);
+  color: var(--color-on-surface);
+}
+
+/* Respect reduced-motion preferences site-wide (brief section 32) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
