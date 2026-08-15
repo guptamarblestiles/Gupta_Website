@@ -60,14 +60,18 @@ const STONE_BACKGROUNDS: Record<StoneType, string> = {
 type StoneSwatchProps = {
   stone: StoneType;
   className?: string;
+  /** Merged with the swatch's own backgroundImage — lets callers (e.g. the
+   *  product gallery) scale/pan the same placeholder to simulate distinct
+   *  crops without duplicating the gradient definitions above. */
+  style?: React.CSSProperties;
 };
 
-export function StoneSwatch({ stone, className }: StoneSwatchProps) {
+export function StoneSwatch({ stone, className, style }: StoneSwatchProps) {
   return (
     <div
       aria-hidden="true"
       className={cn("relative overflow-hidden", className)}
-      style={{ backgroundImage: STONE_BACKGROUNDS[stone] }}
+      style={{ backgroundImage: STONE_BACKGROUNDS[stone], ...style }}
     />
   );
 }

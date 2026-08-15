@@ -1,23 +1,7 @@
 import Link from "next/link";
-import { StoneSwatch, type StoneType } from "@/components/ui/StoneSwatch";
-import type { Product, ProductCategory } from "@/types/product";
-
-const CATEGORY_STONE: Record<ProductCategory, StoneType> = {
-  "Marble Slabs": "marble",
-  "Granite Slabs": "granite",
-  "GVT Tiles": "gvt",
-  "Bathroom Tiles": "bathroom",
-};
-
-// A few catalogue slugs reuse the distinct named swatches already approved
-// for the homepage's Featured Collection, so those products look identical
-// wherever they appear. Everything else falls back to its category swatch.
-const NAMED_STONE: Partial<Record<string, StoneType>> = {
-  "honey-onyx": "onyx-honey",
-  "nero-marquina": "nero-marquina",
-  "verde-alpi": "verde-alpi",
-  "statuario-puro": "statuario",
-};
+import { StoneSwatch } from "@/components/ui/StoneSwatch";
+import { getStoneForProduct } from "@/lib/products/stone";
+import type { Product } from "@/types/product";
 
 type TileCardProps = {
   product: Product;
@@ -29,7 +13,7 @@ type TileCardProps = {
  * brief section 18 calls for a single consistent hover treatment site-wide.
  */
 export function TileCard({ product }: TileCardProps) {
-  const stone = NAMED_STONE[product.slug] ?? CATEGORY_STONE[product.category];
+  const stone = getStoneForProduct(product);
 
   return (
     <Link
@@ -46,7 +30,7 @@ export function TileCard({ product }: TileCardProps) {
         </div>
       </div>
       <div className="p-5">
-        <p className="font-body text-label uppercase tracking-widest text-secondary mb-2">
+        <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-2">
           {product.category}
         </p>
         <h3 className="font-display text-headline-sm text-on-surface mb-1">{product.name}</h3>
