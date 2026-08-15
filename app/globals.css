@@ -36,6 +36,13 @@
   --color-secondary-fixed: #e6a166;
   --color-secondary-fixed-dim: #d98a4a;
   --color-on-secondary: #ffffff;
+  /* #b87333 on white is only 3.79:1 — fine for large text/icons/borders,
+     but fails WCAG AA (4.5:1) for the small uppercase text-label kicker
+     copy used sitewide (task 11 accessibility pass). This darker variant
+     (5.9:1 on white) is for that specific case — same hue, still reads as
+     the brand copper, just legible at 12px. Base --color-secondary is
+     unchanged everywhere else. */
+  --color-secondary-strong: #8a5a24;
 
   --color-error: #ba1a1a;
 

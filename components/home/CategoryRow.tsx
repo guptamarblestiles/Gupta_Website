@@ -17,7 +17,7 @@ export function CategoryRow() {
       <section className="bg-background py-section-gap">
         <Container>
           <div className="mb-12 md:mb-16 max-w-2xl">
-            <p className="font-body text-label uppercase tracking-widest text-secondary mb-4">
+            <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">
               The Collection
             </p>
             <h2 className="font-display text-headline md:text-display-mobile text-on-surface">

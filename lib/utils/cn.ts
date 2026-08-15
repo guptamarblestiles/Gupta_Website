@@ -23,6 +23,7 @@ const COLOR_TOKENS = [
   "secondary",
   "secondary-fixed",
   "secondary-fixed-dim",
+  "secondary-strong",
   "on-secondary",
   "error",
   "hero-bg",
