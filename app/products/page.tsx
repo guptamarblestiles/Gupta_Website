@@ -4,13 +4,27 @@ import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { FilterSidebar } from "@/components/catalogue/FilterSidebar";
 import { ProductGrid } from "@/components/catalogue/ProductGrid";
+import { Pagination } from "@/components/catalogue/Pagination";
 import { getProducts } from "@/lib/products/queries";
 import type { ProductCategory, ProductFilters, ProductFinish } from "@/types/product";
 
+const CATALOGUE_TITLE = "Catalogue";
+const CATALOGUE_DESCRIPTION =
+  "Browse D R Traders' full collection of marble slabs, granite slabs, GVT tiles, and bathroom tiles.";
+
 export const metadata: Metadata = {
-  title: "Catalogue",
-  description:
-    "Browse D R Traders' full collection of marble slabs, granite slabs, GVT tiles, and bathroom tiles.",
+  title: CATALOGUE_TITLE,
+  description: CATALOGUE_DESCRIPTION,
+  openGraph: {
+    title: CATALOGUE_TITLE,
+    description: CATALOGUE_DESCRIPTION,
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: CATALOGUE_TITLE,
+    description: CATALOGUE_DESCRIPTION,
+  },
 };
 
 const CATEGORY_VALUES: readonly ProductCategory[] = [
@@ -20,10 +34,28 @@ const CATEGORY_VALUES: readonly ProductCategory[] = [
   "Bathroom Tiles",
 ];
 const FINISH_VALUES: readonly ProductFinish[] = ["Polished", "Honed", "Matte", "Leathered"];
+const PAGE_SIZE = 12;
 
 function toList(value: string | string[] | undefined): string[] {
   if (!value) return [];
   return Array.isArray(value) ? value : [value];
+}
+
+/** Rebuilds the catalogue URL for a given page, preserving every other
+ *  active search param (filters, search) exactly as-is. */
+function buildPageHref(
+  rawParams: Record<string, string | string[] | undefined>,
+  page: number,
+): string {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(rawParams)) {
+    if (key === "page" || !value) continue;
+    if (Array.isArray(value)) value.forEach((v) => query.append(key, v));
+    else query.set(key, value);
+  }
+  if (page > 1) query.set("page", String(page));
+  const qs = query.toString();
+  return qs ? `/products?${qs}` : "/products";
 }
 
 type ProductsPageProps = {
@@ -44,9 +76,14 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     search: typeof params.q === "string" ? params.q : undefined,
   };
 
-  // Pagination (task 8) is a small addition on top of this — request every
-  // matching row now rather than build page controls twice.
-  const { products, total } = await getProducts(filters, 1, 100);
+  const requestedPage = Number.parseInt(
+    typeof params.page === "string" ? params.page : "1",
+    10,
+  );
+  const page = Number.isFinite(requestedPage) ? Math.max(1, requestedPage) : 1;
+
+  const { products, total } = await getProducts(filters, page, PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <>
@@ -55,7 +92,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
         <section className="py-section-gap">
           <Container>
             <div className="mb-10 md:mb-12 max-w-2xl">
-              <p className="mb-4 font-body text-label uppercase tracking-widest text-secondary">
+              <p className="mb-4 font-body text-label uppercase tracking-widest text-secondary-strong">
                 Catalogue
               </p>
               <h1 className="font-display text-headline md:text-display-mobile text-on-surface">
@@ -68,7 +105,19 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
             <div className="lg:flex lg:items-start lg:gap-gutter">
               <FilterSidebar filters={filters} resultCount={total} />
-              <ProductGrid products={products} />
+              <div className="flex-1 flex flex-col">
+                {/* Visually hidden — TileCard's product names are h3s, so
+                    the grid needs an h2 between them and the h1 above to
+                    keep the heading order valid (WCAG 1.3.1 / task 11). */}
+                <h2 className="sr-only">Product Results</h2>
+                <ProductGrid products={products} />
+                <Pagination
+                  page={page}
+                  totalPages={totalPages}
+                  prevHref={page > 1 ? buildPageHref(params, page - 1) : undefined}
+                  nextHref={page < totalPages ? buildPageHref(params, page + 1) : undefined}
+                />
+              </div>
             </div>
           </Container>
         </section>

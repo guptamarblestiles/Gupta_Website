@@ -47,6 +47,7 @@ export function FilterSidebar({ filters, resultCount }: FilterSidebarProps) {
       const params = new URLSearchParams(searchParams.toString());
       if (search) params.set("q", search);
       else params.delete("q");
+      params.delete("page");
       pushParams(params);
     }, 400);
     return () => clearTimeout(timeout);
@@ -75,6 +76,7 @@ export function FilterSidebar({ filters, resultCount }: FilterSidebarProps) {
       ? current.filter((v) => v !== value)
       : [...current, value];
     next.forEach((v) => params.append(key, v));
+    params.delete("page");
     pushParams(params);
   }
 
@@ -131,7 +133,7 @@ export function FilterSidebar({ filters, resultCount }: FilterSidebarProps) {
         <button
           type="button"
           onClick={clearAll}
-          className="self-start font-body text-label uppercase tracking-widest text-secondary transition-colors hover:text-on-surface"
+          className="self-start font-body text-label uppercase tracking-widest text-secondary-strong transition-colors hover:text-on-surface"
         >
           Clear All Filters
         </button>
@@ -151,7 +153,7 @@ export function FilterSidebar({ filters, resultCount }: FilterSidebarProps) {
         >
           <SlidersHorizontal size={16} aria-hidden="true" />
           Filters
-          {activeCount > 0 && <span className="text-secondary">({activeCount})</span>}
+          {activeCount > 0 && <span className="text-secondary-strong">({activeCount})</span>}
         </button>
       </div>
 
