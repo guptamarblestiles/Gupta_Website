@@ -2,12 +2,18 @@
  * Site navbar — a floating glass pill (rounded-full, bg-white/15 +
  * backdrop-blur-xl + border-white/20 on "auto", inset from the viewport
  * edges rather than a full-width bar) sitting in the upper page area with
- * spacing on all sides, like Somany's navbar. Brand animates left ->
- * center + scales up as the user scrolls, via Framer Motion's
- * useScroll/useTransform driving a measured x-offset (recomputed on
- * resize since the offset depends on actual rendered widths, not a fixed
- * value). "light" variant (every other page) is the same floating pill
- * shape in a solid light finish, no scroll animation.
+ * spacing on all sides, like Somany's navbar.
+ *
+ * Two explicit states on the "auto" variant, not a continuous scroll-scrub:
+ *   Initial (scrollY <= SCROLL_THRESHOLD) — logo left, all nav links visible.
+ *   Scrolled (scrollY > SCROLL_THRESHOLD) — nav links fade out, brand
+ *     animates to center + scales up. Each Framer Motion `animate` prop
+ *     below carries its own 300ms transition, so crossing the threshold
+ *     always produces the same smooth animation regardless of scroll speed.
+ * The center-offset itself is still measured (not a fixed px value) since
+ * it depends on the pill's actual rendered width. "light" variant (every
+ * other page) is the same floating pill shape in a solid light finish, no
+ * scroll animation.
  *
  * DEVIATION: the redesign spec's nav list includes "Catalogue" (a PDF
  * showcase page) — that page was explicitly deferred (no PDF files exist
@@ -18,7 +24,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -30,7 +36,8 @@ const NAV_LINKS = [
 ];
 
 const BRAND_NAME = "Gupta Marbles & Tiles";
-const CENTER_SCROLL_RANGE = 240; // px of scroll over which the brand animates to center
+const SCROLL_THRESHOLD = 60; // px scrolled before the navbar flips to its "scrolled" state
+const STATE_TRANSITION = { duration: 0.3, ease: "easeInOut" as const };
 
 type NavbarProps = {
   /**
@@ -46,6 +53,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const brandRef = useRef<HTMLAnchorElement>(null);
   const [centerOffset, setCenterOffset] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     if (variant !== "auto") return;
@@ -61,9 +69,10 @@ export function Navbar({ variant = "light" }: NavbarProps) {
   }, [variant]);
 
   const { scrollY } = useScroll();
-  const brandX = useTransform(scrollY, [0, CENTER_SCROLL_RANGE], [0, centerOffset]);
-  const brandScale = useTransform(scrollY, [0, CENTER_SCROLL_RANGE], [1, 1.15]);
-  const pillOpacity = useTransform(scrollY, [0, CENTER_SCROLL_RANGE], [0.85, 1]);
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    if (variant !== "auto") return;
+    setScrolled(latest > SCROLL_THRESHOLD);
+  });
 
   // Lock body scroll while the mobile menu is open.
   useEffect(() => {
@@ -78,7 +87,8 @@ export function Navbar({ variant = "light" }: NavbarProps) {
   return (
     <div className="fixed top-4 md:top-6 inset-x-0 z-50 flex justify-center px-4">
       <motion.header
-        style={isAuto ? { opacity: pillOpacity } : undefined}
+        animate={isAuto ? { opacity: scrolled ? 1 : 0.85 } : undefined}
+        transition={STATE_TRANSITION}
         className={cn(
           "w-full max-w-5xl rounded-full border transition-colors duration-500",
           isAuto
@@ -90,7 +100,10 @@ export function Navbar({ variant = "light" }: NavbarProps) {
           ref={containerRef}
           className="flex items-center justify-between h-14 md:h-16 px-5 md:px-8"
         >
-          <motion.div style={isAuto ? { x: brandX, scale: brandScale } : undefined}>
+          <motion.div
+            animate={isAuto ? { x: scrolled ? centerOffset : 0, scale: scrolled ? 1.15 : 1 } : undefined}
+            transition={STATE_TRANSITION}
+          >
             <Link
               ref={brandRef}
               href="/"
@@ -103,11 +116,18 @@ export function Navbar({ variant = "light" }: NavbarProps) {
             </Link>
           </motion.div>
 
-          <nav className="hidden md:flex items-center gap-7">
+          <motion.nav
+            animate={isAuto ? { opacity: scrolled ? 0 : 1 } : undefined}
+            transition={STATE_TRANSITION}
+            aria-hidden={isAuto && scrolled}
+            style={isAuto ? { pointerEvents: scrolled ? "none" : "auto" } : undefined}
+            className="hidden md:flex items-center gap-7"
+          >
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
+                tabIndex={isAuto && scrolled ? -1 : undefined}
                 className={cn(
                   "font-body text-label uppercase tracking-widest transition-colors duration-300",
                   isAuto
@@ -118,7 +138,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
                 {link.label}
               </Link>
             ))}
-          </nav>
+          </motion.nav>
 
           <button
             type="button"
