@@ -83,7 +83,7 @@ export function ApplicationsCarousel({ items }: ApplicationsCarouselProps) {
             type="button"
             aria-label="Previous application"
             onClick={() => go(index - 1)}
-            className="text-on-surface-variant transition-colors hover:text-secondary"
+            className="text-on-surface-variant transition-colors hover:text-secondary rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
           >
             <ChevronLeft size={20} />
           </button>
@@ -94,7 +94,7 @@ export function ApplicationsCarousel({ items }: ApplicationsCarouselProps) {
                 type="button"
                 aria-label={`Go to ${item.title}`}
                 onClick={() => go(i)}
-                className={`h-1.5 rounded-full transition-all ${
+                className={`h-1.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${
                   i === index ? "w-6 bg-secondary" : "w-1.5 bg-outline-variant"
                 }`}
               />
@@ -104,7 +104,7 @@ export function ApplicationsCarousel({ items }: ApplicationsCarouselProps) {
             type="button"
             aria-label="Next application"
             onClick={() => go(index + 1)}
-            className="text-on-surface-variant transition-colors hover:text-secondary"
+            className="text-on-surface-variant transition-colors hover:text-secondary rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
           >
             <ChevronRight size={20} />
           </button>

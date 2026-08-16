@@ -271,11 +271,11 @@ function FilterGroup({ label, options, active, onToggle }: FilterGroupProps) {
                 type="checkbox"
                 checked={checked}
                 onChange={() => onToggle(option)}
-                className="sr-only"
+                className="peer sr-only"
               />
               <span
                 className={cn(
-                  "flex h-4 w-4 shrink-0 items-center justify-center border transition-colors",
+                  "flex h-4 w-4 shrink-0 items-center justify-center border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-secondary peer-focus-visible:ring-offset-2",
                   checked
                     ? "border-secondary bg-secondary"
                     : "border-outline-variant group-hover:border-secondary",

@@ -130,7 +130,7 @@ export function TestimonialsCarousel({ items }: { items: Testimonial[] }) {
                 type="button"
                 aria-label="Previous testimonial"
                 onClick={() => setIndex((i) => (i - 1 + items.length) % items.length)}
-                className="text-hero-muted transition-colors hover:text-secondary"
+                className="text-hero-muted transition-colors hover:text-secondary rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
               >
                 <ChevronLeft size={20} />
               </button>
@@ -141,7 +141,7 @@ export function TestimonialsCarousel({ items }: { items: Testimonial[] }) {
                     type="button"
                     aria-label={`Go to testimonial ${i + 1}`}
                     onClick={() => setIndex(i)}
-                    className={`h-1.5 rounded-full transition-all ${
+                    className={`h-1.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${
                       i === index ? "w-6 bg-secondary" : "w-1.5 bg-hero-border"
                     }`}
                   />
@@ -151,7 +151,7 @@ export function TestimonialsCarousel({ items }: { items: Testimonial[] }) {
                 type="button"
                 aria-label="Next testimonial"
                 onClick={() => setIndex((i) => (i + 1) % items.length)}
-                className="text-hero-muted transition-colors hover:text-secondary"
+                className="text-hero-muted transition-colors hover:text-secondary rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
               >
                 <ChevronRight size={20} />
               </button>
