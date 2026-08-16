@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { Hero3DTileLoader } from "./Hero3DTileLoader";
+import { HeroVideoBackground } from "./HeroVideoBackground";
 import { ScrollIndicator } from "./ScrollIndicator";
 
 const fadeUp = {
@@ -18,6 +19,14 @@ const fadeUp = {
 export function HeroSection() {
   return (
     <section className="relative min-h-screen bg-hero-bg overflow-hidden flex items-center pt-32 pb-20 lg:pt-40 lg:pb-28">
+      <HeroVideoBackground />
+      {/* Scrim so headline/copy stay legible over the video; matches hero-bg
+          so it also reads correctly during the poster/reduced-motion fallback. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-hero-bg/70"
+      />
+
       {/* Cinematic spotlight glow behind the tile — kept subtle per brief section 10 */}
       <div
         aria-hidden="true"
