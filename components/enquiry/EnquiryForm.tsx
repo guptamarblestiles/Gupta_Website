@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
 import { enquirySchema } from "@/lib/enquiry/schema";
 import { submitEnquiry } from "@/lib/enquiry/actions";
+import { sendEnquiryEmailJs } from "@/lib/enquiry/emailjs";
 import type { EnquiryInput } from "@/types/product";
 
 type EnquiryFormProps = {
@@ -66,6 +67,7 @@ export function EnquiryForm({ product }: EnquiryFormProps) {
       if (result.status === "success") {
         setBanner({ tone: "success", message: "Thank you — we'll be in touch shortly." });
         setValues({ ...EMPTY_VALUES, productId: product?.id, productName: product?.name });
+        void sendEnquiryEmailJs(values);
         return;
       }
 

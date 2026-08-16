@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@fontsource/inter": "^5.3.0",
     "@fontsource/playfair-display": "^5.3.0",
     "@react-three/drei": "^10.7.8",
