@@ -1,11 +1,13 @@
 /**
- * Site navbar. "auto" variant (homepage only) stays a persistent
- * glassmorphic bar over the hero — never flips to a solid light bar like it
- * used to — and animates the brand wordmark from left-aligned to visually
- * centered as the user scrolls, via Framer Motion's useScroll/useTransform
- * driving a measured x-offset (recomputed on resize since the offset
- * depends on actual rendered widths, not a fixed value). "light" variant
- * (every other page) is unchanged: always solid, no scroll animation.
+ * Site navbar — a floating glass pill (rounded-full, bg-white/15 +
+ * backdrop-blur-xl + border-white/20 on "auto", inset from the viewport
+ * edges rather than a full-width bar) sitting in the upper page area with
+ * spacing on all sides, like Somany's navbar. Brand animates left ->
+ * center + scales up as the user scrolls, via Framer Motion's
+ * useScroll/useTransform driving a measured x-offset (recomputed on
+ * resize since the offset depends on actual rendered widths, not a fixed
+ * value). "light" variant (every other page) is the same floating pill
+ * shape in a solid light finish, no scroll animation.
  *
  * DEVIATION: the redesign spec's nav list includes "Catalogue" (a PDF
  * showcase page) — that page was explicitly deferred (no PDF files exist
@@ -32,9 +34,9 @@ const CENTER_SCROLL_RANGE = 240; // px of scroll over which the brand animates t
 
 type NavbarProps = {
   /**
-   * "auto"  — persistent glassmorphic bar over a dark hero; brand animates
+   * "auto"  — persistent glass pill over a dark hero; brand animates
    *           left -> center as the user scrolls (homepage only).
-   * "light" — always solid/light, no scroll animation (every other page).
+   * "light" — same floating pill, solid light finish, no scroll animation.
    */
   variant?: "auto" | "light";
 };
@@ -61,6 +63,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
   const { scrollY } = useScroll();
   const brandX = useTransform(scrollY, [0, CENTER_SCROLL_RANGE], [0, centerOffset]);
   const brandScale = useTransform(scrollY, [0, CENTER_SCROLL_RANGE], [1, 1.15]);
+  const pillOpacity = useTransform(scrollY, [0, CENTER_SCROLL_RANGE], [0.85, 1]);
 
   // Lock body scroll while the mobile menu is open.
   useEffect(() => {
@@ -73,58 +76,64 @@ export function Navbar({ variant = "light" }: NavbarProps) {
   const isAuto = variant === "auto";
 
   return (
-    <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-colors duration-500",
-        isAuto
-          ? "bg-zinc-950/40 backdrop-blur-md border-b border-white/10"
-          : "bg-background/90 backdrop-blur-xl border-b border-outline-variant/50",
-      )}
-    >
-      <div ref={containerRef} className="container-max px-margin flex items-center justify-between h-16 md:h-20">
-        <motion.div style={isAuto ? { x: brandX, scale: brandScale } : undefined}>
-          <Link
-            ref={brandRef}
-            href="/"
+    <div className="fixed top-4 md:top-6 inset-x-0 z-50 flex justify-center px-4">
+      <motion.header
+        style={isAuto ? { opacity: pillOpacity } : undefined}
+        className={cn(
+          "w-full max-w-5xl rounded-full border transition-colors duration-500",
+          isAuto
+            ? "bg-white/15 backdrop-blur-xl border-white/20"
+            : "bg-background/90 backdrop-blur-xl border-outline-variant/50 shadow-sm",
+        )}
+      >
+        <div
+          ref={containerRef}
+          className="flex items-center justify-between h-14 md:h-16 px-5 md:px-8"
+        >
+          <motion.div style={isAuto ? { x: brandX, scale: brandScale } : undefined}>
+            <Link
+              ref={brandRef}
+              href="/"
+              className={cn(
+                "block font-display text-base md:text-lg tracking-tight transition-colors duration-500 whitespace-nowrap",
+                isAuto ? "text-hero-foreground" : "text-on-surface",
+              )}
+            >
+              {BRAND_NAME}
+            </Link>
+          </motion.div>
+
+          <nav className="hidden md:flex items-center gap-7">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "font-body text-label uppercase tracking-widest transition-colors duration-300",
+                  isAuto
+                    ? "text-hero-muted hover:text-secondary-fixed"
+                    : "text-on-surface-variant hover:text-secondary",
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <button
+            type="button"
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((v) => !v)}
             className={cn(
-              "block font-display text-lg md:text-xl tracking-tight transition-colors duration-500 whitespace-nowrap",
+              "md:hidden flex items-center justify-center p-2 -mr-2 transition-colors duration-300",
               isAuto ? "text-hero-foreground" : "text-on-surface",
             )}
           >
-            {BRAND_NAME}
-          </Link>
-        </motion.div>
-
-        <nav className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "font-body text-label uppercase tracking-widest transition-colors duration-300",
-                isAuto
-                  ? "text-hero-muted hover:text-secondary-fixed"
-                  : "text-on-surface-variant hover:text-secondary",
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        <button
-          type="button"
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileOpen}
-          onClick={() => setMobileOpen((v) => !v)}
-          className={cn(
-            "md:hidden flex items-center justify-center p-2 -mr-2 transition-colors duration-300",
-            isAuto ? "text-hero-foreground" : "text-on-surface",
-          )}
-        >
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-      </div>
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </motion.header>
 
       <AnimatePresence>
         {mobileOpen && (
@@ -134,7 +143,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="md:hidden bg-background border-b border-outline-variant/50 px-margin py-8 flex flex-col gap-6"
+            className="md:hidden absolute top-full mt-3 w-[calc(100%-2rem)] max-w-5xl rounded-3xl border border-outline-variant/50 bg-background/95 backdrop-blur-xl shadow-lg px-6 py-8 flex flex-col gap-6"
           >
             {NAV_LINKS.map((link) => (
               <Link
@@ -149,6 +158,6 @@ export function Navbar({ variant = "light" }: NavbarProps) {
           </motion.nav>
         )}
       </AnimatePresence>
-    </header>
+    </div>
   );
 }
