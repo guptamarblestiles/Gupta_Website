@@ -5,13 +5,16 @@
  * spacing on all sides, like Somany's navbar.
  *
  * Two explicit states on the "auto" variant, not a continuous scroll-scrub:
- *   Initial (scrollY <= SCROLL_THRESHOLD) — logo left, all nav links visible.
- *   Scrolled (scrollY > SCROLL_THRESHOLD) — nav links fade out, brand
- *     animates to center + scales up. Each Framer Motion `animate` prop
- *     below carries its own 300ms transition, so crossing the threshold
- *     always produces the same smooth animation regardless of scroll speed.
- * The center-offset itself is still measured (not a fixed px value) since
- * it depends on the pill's actual rendered width.
+ *   Initial (scrollY <= SCROLL_THRESHOLD) — full-width pill, logo left, all
+ *     nav links visible.
+ *   Scrolled (scrollY > SCROLL_THRESHOLD) — nav links unmount (not just
+ *     fade — removed from layout so they stop taking up width), and the
+ *     pill itself shrinks (`layout` animation) down to hug just the brand,
+ *     which also scales up slightly. Because the pill's wrapper is
+ *     `flex justify-center`, a narrower pill re-centers itself in the
+ *     viewport automatically — no manual x-offset measurement needed.
+ *     Each Framer Motion `animate`/`layout` transition uses the same fixed
+ *     300ms easeInOut, so it feels identical regardless of scroll speed.
  *
  * Separately, `overLight` tracks a much larger threshold (roughly one
  * viewport height, i.e. past the dark hero) and switches the brand/nav
@@ -34,7 +37,7 @@
  */
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X } from "lucide-react";
@@ -62,24 +65,8 @@ type NavbarProps = {
 
 export function Navbar({ variant = "light" }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const brandRef = useRef<HTMLAnchorElement>(null);
-  const [centerOffset, setCenterOffset] = useState(0);
   const [scrolled, setScrolled] = useState(false);
   const [overLight, setOverLight] = useState(false);
-
-  useEffect(() => {
-    if (variant !== "auto") return;
-    function measure() {
-      if (!containerRef.current || !brandRef.current) return;
-      const containerWidth = containerRef.current.offsetWidth;
-      const brandCenterCurrent = brandRef.current.offsetLeft + brandRef.current.offsetWidth / 2;
-      setCenterOffset(containerWidth / 2 - brandCenterCurrent);
-    }
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [variant]);
 
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -101,25 +88,24 @@ export function Navbar({ variant = "light" }: NavbarProps) {
   return (
     <div className="fixed top-4 md:top-6 inset-x-0 z-50 flex justify-center px-4">
       <motion.header
+        layout
         animate={isAuto ? { opacity: scrolled ? 1 : 0.85 } : undefined}
         transition={STATE_TRANSITION}
         className={cn(
-          "w-full max-w-5xl rounded-full border transition-colors duration-500",
+          "rounded-full border transition-colors duration-500",
+          isAuto && scrolled ? "w-fit" : "w-full max-w-5xl",
           isAuto
             ? "bg-white/15 backdrop-blur-xl border-white/20"
             : "bg-background/90 backdrop-blur-xl border-outline-variant/50 shadow-sm",
         )}
       >
-        <div
-          ref={containerRef}
-          className="flex items-center justify-between h-14 md:h-16 px-5 md:px-8"
-        >
+        <div className="flex items-center justify-between h-14 md:h-16 px-5 md:px-8 gap-7">
           <motion.div
-            animate={isAuto ? { x: scrolled ? centerOffset : 0, scale: scrolled ? 1.15 : 1 } : undefined}
+            layout
+            animate={isAuto ? { scale: scrolled ? 1.15 : 1 } : undefined}
             transition={STATE_TRANSITION}
           >
             <Link
-              ref={brandRef}
               href="/"
               className={cn(
                 "block font-display text-base md:text-lg tracking-tight transition-colors duration-500 whitespace-nowrap",
@@ -130,31 +116,35 @@ export function Navbar({ variant = "light" }: NavbarProps) {
             </Link>
           </motion.div>
 
-          <motion.nav
-            animate={isAuto ? { opacity: scrolled ? 0 : 1 } : undefined}
-            transition={STATE_TRANSITION}
-            aria-hidden={isAuto && scrolled}
-            style={isAuto ? { pointerEvents: scrolled ? "none" : "auto" } : undefined}
-            className="hidden md:flex items-center gap-7"
-          >
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                tabIndex={isAuto && scrolled ? -1 : undefined}
-                className={cn(
-                  "font-body text-label uppercase tracking-widest transition-colors duration-300",
-                  isAuto
-                    ? overLight
-                      ? "text-on-surface-variant hover:text-secondary"
-                      : "text-hero-muted hover:text-secondary-fixed"
-                    : "text-on-surface-variant hover:text-secondary",
-                )}
+          <AnimatePresence>
+            {(!isAuto || !scrolled) && (
+              <motion.nav
+                key="desktop-nav"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={STATE_TRANSITION}
+                className="hidden md:flex items-center gap-7"
               >
-                {link.label}
-              </Link>
-            ))}
-          </motion.nav>
+                {NAV_LINKS.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={cn(
+                      "font-body text-label uppercase tracking-widest transition-colors duration-300",
+                      isAuto
+                        ? overLight
+                          ? "text-on-surface-variant hover:text-secondary"
+                          : "text-hero-muted hover:text-secondary-fixed"
+                        : "text-on-surface-variant hover:text-secondary",
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </motion.nav>
+            )}
+          </AnimatePresence>
 
           <button
             type="button"
