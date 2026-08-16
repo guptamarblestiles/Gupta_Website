@@ -1,40 +1,35 @@
 /**
- * Quality/benefit grid. Each card staggers in on scroll (i * 100ms) and the
- * icon gets a small scale+rotate on hover — client component throughout
- * since every card needs its own whileInView/whileHover motion values
- * rather than one shared RevealOnScroll wrapper.
+ * Image-driven Highlights showcase: fetches real room photos server-side
+ * (lib/media/tileImages) and hands off to HighlightsGrid (client) for the
+ * per-card scroll reveal/zoom. Falls back to the plain icon-only card
+ * layout if no images are found, rather than rendering broken images.
  */
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
-import { Award, Gem, Handshake, Wrench } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { getHighlightImages } from "@/lib/media/tileImages";
+import { HighlightsGrid } from "./HighlightsGrid";
 
 const HIGHLIGHTS = [
   {
-    icon: Gem,
     title: "Premium Materials",
     description: "Sourced from trusted quarries and suppliers, selected slab by slab.",
   },
   {
-    icon: Award,
     title: "Certified Quality",
     description: "Durability-tested surfaces that hold up to daily commercial and residential use.",
   },
   {
-    icon: Wrench,
     title: "Custom Solutions",
     description: "Finishes and sizing tailored to your project's exact requirements.",
   },
   {
-    icon: Handshake,
     title: "Expert Support",
     description: "25+ years of industry experience guiding every selection.",
   },
 ];
 
-export function Highlights() {
-  const reduceMotion = useReducedMotion();
+export async function Highlights() {
+  const images = await getHighlightImages();
+  const hasImages = images.length === HIGHLIGHTS.length;
 
   return (
     <section className="bg-background py-section-gap">
@@ -48,32 +43,9 @@ export function Highlights() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
-          {HIGHLIGHTS.map(({ icon: Icon, title, description }, i) => (
-            <motion.div
-              key={title}
-              initial={reduceMotion ? undefined : { opacity: 0, y: 20 }}
-              whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ delay: i * 0.12, duration: 0.6, ease: "easeOut" }}
-              whileHover={{ scale: 1.02, y: -8 }}
-              className="flex flex-col items-start text-left p-8 rounded-lg border-l-4 border-secondary bg-gradient-to-br from-surface-variant to-surface shadow-sm transition-shadow hover:shadow-xl"
-            >
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: 5 }}
-                className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-secondary/10 text-secondary"
-              >
-                <Icon size={28} aria-hidden="true" />
-              </motion.div>
-              <h3 className="font-display text-headline-sm-mobile md:text-headline-sm text-on-surface mb-2">
-                {title}
-              </h3>
-              <p className="font-body text-body text-on-surface-variant leading-relaxed">
-                {description}
-              </p>
-            </motion.div>
-          ))}
-        </div>
+        <HighlightsGrid
+          items={HIGHLIGHTS.map((h, i) => ({ ...h, imageUrl: hasImages ? images[i].imageUrl : undefined }))}
+        />
       </Container>
     </section>
   );
