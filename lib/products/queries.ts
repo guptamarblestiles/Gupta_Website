@@ -251,20 +251,6 @@ export async function getRelatedProducts(product: Product, limit = 4): Promise<P
   return [...related, ...(otherRows ?? []).map(rowToProduct)];
 }
 
-/**
- * Every product, unfiltered except for an optional name/code/category
- * search term — backs /tiles (the plain "browse everything" page, as
- * opposed to /products' filter-sidebar catalogue). Thin wrapper around
- * getProducts so the two pages share one query implementation.
- */
-export async function getAllProducts(
-  search: string | undefined,
-  page: number,
-  pageSize: number,
-): Promise<PaginatedProducts> {
-  return getProducts({ search }, page, pageSize);
-}
-
 function getRelatedFromMock(product: Product, limit: number): Product[] {
   const sameCategory = MOCK_PRODUCTS.filter(
     (candidate) => candidate.id !== product.id && candidate.category === product.category,
