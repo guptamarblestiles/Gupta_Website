@@ -17,7 +17,7 @@ export function CtaBand() {
           <p className="font-body text-label uppercase tracking-widest text-secondary mb-4">
             Get Started
           </p>
-          <h2 className="font-display text-headline md:text-display-mobile text-hero-foreground mb-6 max-w-2xl">
+          <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-hero-foreground mb-6 max-w-2xl">
             Begin Your Vision
           </h2>
           <p className="font-body text-body-lg text-hero-muted max-w-xl mb-10 leading-relaxed">

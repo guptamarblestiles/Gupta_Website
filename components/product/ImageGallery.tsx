@@ -41,7 +41,7 @@ export function ImageGallery({ stone, productName, images }: ImageGalleryProps) 
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
-            priority
+            preload
           />
         </div>
 

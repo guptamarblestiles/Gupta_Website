@@ -102,7 +102,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">
                   {product.category}
                 </p>
-                <h1 className="font-display text-headline md:text-display-mobile text-on-surface mb-4">
+                <h1 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface mb-4">
                   {product.name}
                 </h1>
                 <p className="font-body text-body-lg text-on-surface-variant mb-8">
@@ -139,7 +139,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <p className="mb-4 font-body text-label uppercase tracking-widest text-secondary-strong">
                   Enquire
                 </p>
-                <h2 className="font-display text-headline md:text-display-mobile text-on-surface">
+                <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface">
                   Interested in {product.name}?
                 </h2>
                 <p className="mt-4 font-body text-body-lg text-on-surface-variant">
@@ -161,7 +161,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">
                     Related Selections
                   </p>
-                  <h2 className="font-display text-headline md:text-display-mobile text-on-surface">
+                  <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface">
                     You May Also Consider
                   </h2>
                 </div>

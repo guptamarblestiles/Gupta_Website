@@ -53,33 +53,68 @@
   --color-hero-muted: #a1a1aa;
   --color-hero-border: #27272a;
 
-  /* ---- Typography ---- */
+  /* ---- Typography ----
+   * Three-tier scale approved for the redesign: mobile (<768px) is the
+   * unprefixed default, `md:` is tablet (768-1023px), `lg:` is desktop
+   * (1024px+) — every heading utility below has all three tiers so
+   * components compose them as `text-h1 md:text-h1-tablet lg:text-h1-desktop`.
+   */
   --font-display: "Playfair Display", ui-serif, Georgia, serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  --text-display: 4.5rem;
-  --text-display--line-height: 1.1;
-  --text-display--letter-spacing: -0.02em;
-  --text-display--font-weight: 400;
-
-  --text-display-mobile: 3rem;
+  /* H1 — 48px mobile / 64px tablet / 96px desktop */
+  --text-display-mobile: 3rem; /* 48px */
   --text-display-mobile--line-height: 1.1;
   --text-display-mobile--font-weight: 400;
 
-  --text-headline: 2.5rem;
-  --text-headline--line-height: 1.2;
+  --text-display-tablet: 4rem; /* 64px */
+  --text-display-tablet--line-height: 1.1;
+  --text-display-tablet--font-weight: 400;
+
+  --text-display: 6rem; /* 96px */
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -2px;
+  --text-display--font-weight: 400;
+
+  /* H2 — 32px mobile / 40px tablet / 56px desktop */
+  --text-headline-mobile: 2rem; /* 32px */
+  --text-headline-mobile--line-height: 1.2;
+  --text-headline-mobile--font-weight: 400;
+
+  --text-headline-tablet: 2.5rem; /* 40px */
+  --text-headline-tablet--line-height: 1.2;
+  --text-headline-tablet--font-weight: 400;
+
+  --text-headline: 3.5rem; /* 56px */
+  --text-headline--line-height: 1.15;
   --text-headline--font-weight: 400;
 
-  --text-headline-sm: 1.5rem;
-  --text-headline-sm--line-height: 1.4;
+  /* H3 — 24px mobile / 28px tablet / 32px desktop */
+  --text-headline-sm-mobile: 1.5rem; /* 24px */
+  --text-headline-sm-mobile--line-height: 1.35;
+  --text-headline-sm-mobile--font-weight: 500;
+
+  --text-headline-sm-tablet: 1.75rem; /* 28px */
+  --text-headline-sm-tablet--line-height: 1.3;
+  --text-headline-sm-tablet--font-weight: 500;
+
+  --text-headline-sm: 2rem; /* 32px */
+  --text-headline-sm--line-height: 1.25;
   --text-headline-sm--font-weight: 500;
 
-  --text-body-lg: 1.125rem;
+  /* Body — 16px mobile / 18px desktop, +0.5px letter-spacing per spec */
+  --text-body-lg: 1.125rem; /* 18px */
   --text-body-lg--line-height: 1.6;
-  --text-body-lg--letter-spacing: 0.01em;
+  --text-body-lg--letter-spacing: 0.5px;
 
-  --text-body: 1rem;
+  --text-body: 1rem; /* 16px */
   --text-body--line-height: 1.6;
+  --text-body--letter-spacing: 0.5px;
+
+  /* Caption — 14px, distinct from the uppercase tracking-wide `label`
+     role used for kickers/buttons (kept at 12px, its own approved size). */
+  --text-caption: 0.875rem; /* 14px */
+  --text-caption--line-height: 1.4;
 
   --text-label: 0.75rem;
   --text-label--line-height: 1;
@@ -105,13 +140,22 @@
 @utility py-section-gap {
   padding-block: 5rem; /* 80px mobile */
   @media (width >= 768px) {
-    padding-block: 8rem; /* 128px desktop */
+    padding-block: 6.25rem; /* 100px tablet */
+  }
+  @media (width >= 1024px) {
+    padding-block: 10rem; /* 160px desktop */
   }
 }
 @utility gap-gutter {
-  gap: 1.5rem; /* 24px mobile */
+  gap: 1rem; /* 16px mobile */
   @media (width >= 768px) {
     gap: 2rem; /* 32px desktop */
+  }
+}
+@utility p-card {
+  padding: 1.25rem; /* 20px mobile */
+  @media (width >= 1024px) {
+    padding: 2.5rem; /* 40px desktop */
   }
 }
 

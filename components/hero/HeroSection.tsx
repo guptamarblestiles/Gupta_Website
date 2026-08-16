@@ -17,7 +17,7 @@ const fadeUp = {
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen bg-hero-bg overflow-hidden flex items-center pt-24 pb-20">
+    <section className="relative min-h-screen bg-hero-bg overflow-hidden flex items-center pt-32 pb-20 lg:pt-40 lg:pb-28">
       {/* Cinematic spotlight glow behind the tile — kept subtle per brief section 10 */}
       <div
         aria-hidden="true"
@@ -35,7 +35,7 @@ export function HeroSection() {
             animate="show"
             custom={0}
             variants={fadeUp}
-            className="font-display text-display-mobile md:text-display text-hero-foreground mb-8"
+            className="font-display text-display-mobile md:text-display-tablet lg:text-display text-hero-foreground mb-8"
           >
             Redefining <span className="italic text-secondary">Elegance</span>
           </motion.h1>

@@ -19,7 +19,7 @@ export function TrustStats() {
                 key={stat.label}
                 className={`flex flex-col items-center text-center px-4 ${i < 2 ? "pb-8 md:pb-0" : "pt-8 md:pt-0"}`}
               >
-                <span className="font-display text-headline md:text-display-mobile text-secondary mb-2">
+                <span className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-secondary mb-2">
                   {stat.value}
                 </span>
                 <span className="font-body text-label uppercase tracking-widest text-on-surface-variant">

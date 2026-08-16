@@ -20,7 +20,7 @@ export function ProductGrid({ products }: ProductGridProps) {
   return (
     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-gutter">
       {products.map((product, index) => (
-        <TileCard key={product.id} product={product} priority={index < 4} />
+        <TileCard key={product.id} product={product} preload={index < 4} />
       ))}
     </div>
   );

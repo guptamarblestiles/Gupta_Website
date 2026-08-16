@@ -6,9 +6,10 @@ import type { Product } from "@/types/product";
 
 type TileCardProps = {
   product: Product;
-  /** True for cards in the first visible row — tells next/image to skip
-   *  lazy-loading so the LCP image starts fetching immediately. */
-  priority?: boolean;
+  /** True for cards in the first visible row — preloads the image via a
+   *  <link> in <head> so the LCP image starts fetching immediately
+   *  (Next.js 16: `priority` is deprecated in favor of `preload`). */
+  preload?: boolean;
 };
 
 /**
@@ -19,7 +20,7 @@ type TileCardProps = {
  * data); mock data leaves imageUrl empty, so it falls back to the
  * StoneSwatch placeholder.
  */
-export function TileCard({ product, priority = false }: TileCardProps) {
+export function TileCard({ product, preload = false }: TileCardProps) {
   const stone = getStoneForProduct(product);
 
   return (
@@ -33,7 +34,7 @@ export function TileCard({ product, priority = false }: TileCardProps) {
             src={product.imageUrl}
             alt={product.name}
             fill
-            priority={priority}
+            preload={preload}
             sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
           />
@@ -47,11 +48,11 @@ export function TileCard({ product, priority = false }: TileCardProps) {
           <span className="font-body text-label uppercase tracking-widest text-white">View Details</span>
         </div>
       </div>
-      <div className="p-5">
+      <div className="p-card">
         <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-2">
           {product.category}
         </p>
-        <h3 className="font-display text-headline-sm text-on-surface mb-1">{product.name}</h3>
+        <h3 className="font-display text-headline-sm-mobile md:text-headline-sm-tablet lg:text-headline-sm text-on-surface mb-1">{product.name}</h3>
         <p className="font-body text-body text-on-surface-variant">
           {product.finish} &middot; {product.size}
         </p>

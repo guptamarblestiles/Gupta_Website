@@ -20,7 +20,7 @@ export function FeaturedCollection() {
             <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">
               Featured
             </p>
-            <h2 className="font-display text-headline md:text-display-mobile text-on-surface">
+            <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface">
               The Masterpiece Selection
             </h2>
           </div>
@@ -43,8 +43,8 @@ export function FeaturedCollection() {
                     </span>
                   </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="font-display text-headline-sm text-on-surface mb-1">
+                <div className="p-card">
+                  <h3 className="font-display text-headline-sm-mobile md:text-headline-sm-tablet lg:text-headline-sm text-on-surface mb-1">
                     {stone.name}
                   </h3>
                   <p className="font-body text-body text-on-surface-variant">

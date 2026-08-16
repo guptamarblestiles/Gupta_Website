@@ -20,7 +20,7 @@ export function CategoryRow() {
             <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">
               The Collection
             </p>
-            <h2 className="font-display text-headline md:text-display-mobile text-on-surface">
+            <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface">
               Explore by category
             </h2>
           </div>
@@ -39,7 +39,7 @@ export function CategoryRow() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/0 to-black/0 transition-opacity duration-500 group-hover:opacity-70" />
                 </div>
-                <h3 className="font-display text-headline-sm text-on-surface mb-1">
+                <h3 className="font-display text-headline-sm-mobile md:text-headline-sm-tablet lg:text-headline-sm text-on-surface mb-1">
                   {cat.label}
                 </h3>
                 <p className="font-body text-body text-on-surface-variant mb-3 leading-relaxed">

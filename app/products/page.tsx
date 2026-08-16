@@ -98,7 +98,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
               <p className="mb-4 font-body text-label uppercase tracking-widest text-secondary-strong">
                 Catalogue
               </p>
-              <h1 className="font-display text-headline md:text-display-mobile text-on-surface">
+              <h1 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface">
                 The Full Collection
               </h1>
               <p className="mt-4 font-body text-body-lg text-on-surface-variant">
