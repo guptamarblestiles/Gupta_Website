@@ -1,3 +1,23 @@
+/**
+ * FILTER CONTRACT (Part 3) — read this before touching filter behavior.
+ *
+ * Every option list rendered here (category/finish/size/color/wallOrFloor/
+ * collection) comes from the `facets` prop — distinct values actually
+ * present in the catalogue right now (lib/products/queries.ts's
+ * getFilterFacets) — never a hardcoded list. The real taxonomy comes from
+ * whatever folder names were fed through the Part 2 import and changes as
+ * products are added, so a fixed enum here would silently stop matching
+ * real data (this is exactly what broke when the old hardcoded
+ * "Marble Slabs" / "Polished" etc. lists stopped matching the rebuilt
+ * schema's free-text categories).
+ *
+ * Each facet is a checkbox multi-select; toggling a value adds/removes it
+ * from that key's query param (?category=&finish=&size=&color=&
+ * wallOrFloor=&collection=), which app/products/page.tsx (a Server
+ * Component) reads and passes straight to getProducts — filtering always
+ * happens server-side, never by slicing an already-fetched list. `search`
+ * drives `?q=`, debounced 400ms.
+ */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,37 +26,30 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
-import type { ProductCategory, ProductFilters, ProductFinish } from "@/types/product";
+import type { ProductFilterFacets, ProductFilters } from "@/types/product";
 
-const CATEGORY_OPTIONS: ProductCategory[] = [
-  "Marble Slabs",
-  "Granite Slabs",
-  "GVT Tiles",
-  "Bathroom Tiles",
-];
-const FINISH_OPTIONS: ProductFinish[] = ["Polished", "Honed", "Matte", "Leathered"];
+type FilterKey = "category" | "finish" | "size" | "color" | "wallOrFloor" | "collection";
 
 type FilterSidebarProps = {
   filters: ProductFilters;
   resultCount: number;
-  /** Sizes actually present in the current catalogue (task 5 — fetched
-   *  server-side so the filter never offers a size that matches zero
-   *  live products). */
-  sizes: string[];
+  /** Distinct facet values actually present in the catalogue right now —
+   *  see getFilterFacets in lib/products/queries.ts. */
+  facets: ProductFilterFacets;
 };
 
 /**
- * Category/Finish/Size checkboxes + search, driving the URL search params
- * that app/products/page.tsx (a Server Component) reads to filter the grid
- * server-side. This is the one part of the catalogue that genuinely needs
- * "use client" — router access, a debounced input, and the mobile drawer's
- * open/close state.
+ * Category/Finish/Size/Color/Wall-Floor/Collection checkboxes + search,
+ * driving the URL search params that app/products/page.tsx (a Server
+ * Component) reads to filter the grid server-side. This is the one part of
+ * the catalogue that genuinely needs "use client" — router access, a
+ * debounced input, and the mobile drawer's open/close state.
  *
  * Renders the same filter controls twice: a static desktop sidebar, and a
  * mobile "FILTERS" button that opens a bottom-sheet drawer (brief's explicit
  * mobile decision — not a horizontal scroll row).
  */
-export function FilterSidebar({ filters, resultCount, sizes }: FilterSidebarProps) {
+export function FilterSidebar({ filters, resultCount, facets }: FilterSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -71,7 +84,7 @@ export function FilterSidebar({ filters, resultCount, sizes }: FilterSidebarProp
     router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
   }
 
-  function toggleValue(key: "category" | "finish" | "size", value: string) {
+  function toggleValue(key: FilterKey, value: string) {
     const params = new URLSearchParams(searchParams.toString());
     const current = params.getAll(key);
     params.delete(key);
@@ -92,6 +105,9 @@ export function FilterSidebar({ filters, resultCount, sizes }: FilterSidebarProp
     (filters.category?.length ?? 0) +
     (filters.finish?.length ?? 0) +
     (filters.size?.length ?? 0) +
+    (filters.color?.length ?? 0) +
+    (filters.wallOrFloor?.length ?? 0) +
+    (filters.collection?.length ?? 0) +
     (filters.search ? 1 : 0);
 
   const controls = (
@@ -115,21 +131,39 @@ export function FilterSidebar({ filters, resultCount, sizes }: FilterSidebarProp
 
       <FilterGroup
         label="Category"
-        options={CATEGORY_OPTIONS}
+        options={facets.categories}
         active={filters.category ?? []}
         onToggle={(value) => toggleValue("category", value)}
       />
       <FilterGroup
         label="Finish"
-        options={FINISH_OPTIONS}
+        options={facets.finishes}
         active={filters.finish ?? []}
         onToggle={(value) => toggleValue("finish", value)}
       />
       <FilterGroup
         label="Size"
-        options={sizes}
+        options={facets.sizes}
         active={filters.size ?? []}
         onToggle={(value) => toggleValue("size", value)}
+      />
+      <FilterGroup
+        label="Color"
+        options={facets.colors}
+        active={filters.color ?? []}
+        onToggle={(value) => toggleValue("color", value)}
+      />
+      <FilterGroup
+        label="Wall / Floor"
+        options={facets.wallOrFloors}
+        active={filters.wallOrFloor ?? []}
+        onToggle={(value) => toggleValue("wallOrFloor", value)}
+      />
+      <FilterGroup
+        label="Collection"
+        options={facets.collections}
+        active={filters.collection ?? []}
+        onToggle={(value) => toggleValue("collection", value)}
       />
 
       {activeCount > 0 && (
@@ -221,6 +255,8 @@ type FilterGroupProps = {
 };
 
 function FilterGroup({ label, options, active, onToggle }: FilterGroupProps) {
+  if (options.length === 0) return null;
+
   return (
     <div>
       <p className="mb-3 font-body text-label uppercase tracking-widest text-on-surface-variant">

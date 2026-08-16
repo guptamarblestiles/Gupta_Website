@@ -5,8 +5,8 @@ import { Container } from "@/components/ui/Container";
 import { FilterSidebar } from "@/components/catalogue/FilterSidebar";
 import { ProductGrid } from "@/components/catalogue/ProductGrid";
 import { Pagination } from "@/components/catalogue/Pagination";
-import { getAvailableSizes, getProducts } from "@/lib/products/queries";
-import type { ProductCategory, ProductFilters, ProductFinish } from "@/types/product";
+import { getFilterFacets, getProducts } from "@/lib/products/queries";
+import type { ProductFilters } from "@/types/product";
 
 const CATALOGUE_TITLE = "Catalogue";
 const CATALOGUE_DESCRIPTION =
@@ -27,13 +27,6 @@ export const metadata: Metadata = {
   },
 };
 
-const CATEGORY_VALUES: readonly ProductCategory[] = [
-  "Marble Slabs",
-  "Granite Slabs",
-  "GVT Tiles",
-  "Bathroom Tiles",
-];
-const FINISH_VALUES: readonly ProductFinish[] = ["Polished", "Honed", "Matte", "Leathered"];
 const PAGE_SIZE = 12;
 
 function toList(value: string | string[] | undefined): string[] {
@@ -65,14 +58,16 @@ type ProductsPageProps = {
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {
   const params = await searchParams;
 
+  // No hardcoded whitelist here on purpose (see FILTER CONTRACT in
+  // lib/products/queries.ts) — an unrecognized value just matches zero
+  // rows via .in(...), same as any other filter combo with no results.
   const filters: ProductFilters = {
-    category: toList(params.category).filter((v): v is ProductCategory =>
-      CATEGORY_VALUES.includes(v as ProductCategory),
-    ),
-    finish: toList(params.finish).filter((v): v is ProductFinish =>
-      FINISH_VALUES.includes(v as ProductFinish),
-    ),
+    category: toList(params.category),
+    finish: toList(params.finish),
     size: toList(params.size),
+    color: toList(params.color),
+    wallOrFloor: toList(params.wallOrFloor),
+    collection: toList(params.collection),
     search: typeof params.q === "string" ? params.q : undefined,
   };
 
@@ -82,9 +77,9 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   );
   const page = Number.isFinite(requestedPage) ? Math.max(1, requestedPage) : 1;
 
-  const [{ products, total }, sizes] = await Promise.all([
+  const [{ products, total }, facets] = await Promise.all([
     getProducts(filters, page, PAGE_SIZE),
-    getAvailableSizes(),
+    getFilterFacets(),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -107,7 +102,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
             </div>
 
             <div className="lg:flex lg:items-start lg:gap-gutter">
-              <FilterSidebar filters={filters} resultCount={total} sizes={sizes} />
+              <FilterSidebar filters={filters} resultCount={total} facets={facets} />
               <div className="flex-1 flex flex-col">
                 {/* Visually hidden — TileCard's product names are h3s, so
                     the grid needs an h2 between them and the h1 above to

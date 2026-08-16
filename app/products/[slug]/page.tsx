@@ -43,11 +43,11 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 const SPEC_ROWS: { label: string; value: (product: Product) => string | undefined }[] = [
   { label: "Category", value: (p) => p.category },
-  { label: "Finish", value: (p) => p.finish },
-  { label: "Size", value: (p) => p.size },
-  { label: "Material", value: (p) => p.material },
-  { label: "Origin", value: (p) => p.origin },
-  { label: "Available Finishes", value: (p) => p.availableFinishes },
+  { label: "Finish", value: (p) => p.finish || undefined },
+  { label: "Size", value: (p) => p.size || undefined },
+  { label: "Color", value: (p) => p.color },
+  { label: "Wall / Floor", value: (p) => p.wallOrFloor },
+  { label: "Collection", value: (p) => p.collection },
   { label: "Product Code", value: (p) => p.productCode },
 ];
 

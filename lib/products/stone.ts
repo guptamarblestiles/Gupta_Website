@@ -1,7 +1,13 @@
 import type { StoneType } from "@/components/ui/StoneSwatch";
 import type { Product, ProductCategory } from "@/types/product";
 
-const CATEGORY_STONE: Record<ProductCategory, StoneType> = {
+/** Category is free text now (Part 1 schema rebuild) — real imported
+ *  products (e.g. "16X16 Parking Tiles") won't match any of these old
+ *  showcase category names, so this only matters as a last-resort fallback
+ *  for a product with zero real photos. Defaults to "marble" below rather
+ *  than widening this to Record<string, ...>, which would let a typo'd
+ *  key silently return undefined instead of a visible fallback swatch. */
+const CATEGORY_STONE: Partial<Record<ProductCategory, StoneType>> = {
   "Marble Slabs": "marble",
   "Granite Slabs": "granite",
   "GVT Tiles": "gvt",
@@ -21,5 +27,5 @@ const NAMED_STONE: Partial<Record<string, StoneType>> = {
 /** Shared by TileCard and the product detail gallery so a product's
  *  placeholder swatch is identical everywhere it appears. */
 export function getStoneForProduct(product: Pick<Product, "slug" | "category">): StoneType {
-  return NAMED_STONE[product.slug] ?? CATEGORY_STONE[product.category];
+  return NAMED_STONE[product.slug] ?? CATEGORY_STONE[product.category] ?? "marble";
 }

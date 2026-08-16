@@ -1,13 +1,22 @@
+/**
+ * FILTER CONTRACT (Part 3) — read this before touching filter behavior.
+ *
+ * ProductFilters keys (category/finish/size/color/wallOrFloor/collection)
+ * map 1:1 to `products` columns (wallOrFloor -> wall_or_floor) and are
+ * always applied server-side via `.in(...)`, never filtered client-side
+ * from a full fetched list. Each is a checkbox multi-select in
+ * FilterSidebar, OR'd within a facet and AND'd across facets. `search`
+ * matches name/product_code/category via ilike OR.
+ *
+ * Option lists for every facet come from getFilterFacets() — distinct
+ * values actually present in `products` right now — never a hardcoded
+ * enum, since the real taxonomy (category/finish especially) comes from
+ * whatever folder names were fed through the Part 2 import and will keep
+ * changing as more products are added.
+ */
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { CATALOGUE_SIZES, MOCK_PRODUCTS } from "@/lib/products/mockProducts";
-import type {
-  PaginatedProducts,
-  Product,
-  ProductCategory,
-  ProductFilters,
-  ProductFinish,
-  ProductImage,
-} from "@/types/product";
+import type { PaginatedProducts, Product, ProductFilterFacets, ProductFilters } from "@/types/product";
 
 const DEFAULT_PAGE_SIZE = 24;
 
@@ -17,53 +26,47 @@ type ProductRow = {
   slug: string;
   product_code: string;
   category: string;
-  finish: string;
-  size: string;
-  origin: string | null;
-  material: string | null;
-  available_finishes: string | null;
+  finish: string | null;
+  size: string | null;
+  color: string | null;
+  wall_or_floor: string | null;
+  collection: string | null;
   description: string;
-  image_url: string;
   created_at: string;
   updated_at: string;
+  product_images?: { image_url: string; sort_order: number }[];
 };
 
-type ProductImageRow = {
-  id: string;
-  product_id: string;
-  image_url: string;
-  alt: string;
-  sort_order: number;
-};
-
+/** product_images has no `alt` column — derive it from the product name so
+ *  every image still gets reasonable alt text without a DB round-trip. */
 function rowToProduct(row: ProductRow): Product {
+  const images = [...(row.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order);
+
   return {
     id: row.id,
     name: row.name,
     slug: row.slug,
     productCode: row.product_code,
-    category: row.category as ProductCategory,
-    finish: row.finish as ProductFinish,
-    size: row.size,
-    origin: row.origin ?? undefined,
-    material: row.material ?? undefined,
-    availableFinishes: row.available_finishes ?? undefined,
+    category: row.category,
+    finish: row.finish ?? "",
+    size: row.size ?? "",
+    color: row.color ?? undefined,
+    wallOrFloor: row.wall_or_floor ?? undefined,
+    collection: row.collection ?? undefined,
     description: row.description,
-    imageUrl: row.image_url,
+    imageUrl: images[0]?.image_url ?? "",
+    images: images.map((img, i) => ({
+      id: `${row.id}-${i}`,
+      productId: row.id,
+      imageUrl: img.image_url,
+      alt: row.name,
+      sortOrder: img.sort_order,
+    })),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 }
 
-function rowToProductImage(row: ProductImageRow): ProductImage {
-  return {
-    id: row.id,
-    productId: row.product_id,
-    imageUrl: row.image_url,
-    alt: row.alt,
-    sortOrder: row.sort_order,
-  };
-}
 
 /** PostgREST's `or=(...)` filter syntax treats `,`, `(`, `)` as structural —
  *  strip them from user-typed search input so a stray character can't
@@ -95,10 +98,15 @@ export async function getProducts(
     return getProductsFromMock(filters, safePage, pageSize, start);
   }
 
-  let query = client.from("products").select("*", { count: "exact" });
+  let query = client
+    .from("products")
+    .select("*, product_images(image_url, sort_order)", { count: "exact" });
   if (filters.category?.length) query = query.in("category", filters.category);
   if (filters.finish?.length) query = query.in("finish", filters.finish);
   if (filters.size?.length) query = query.in("size", filters.size);
+  if (filters.color?.length) query = query.in("color", filters.color);
+  if (filters.wallOrFloor?.length) query = query.in("wall_or_floor", filters.wallOrFloor);
+  if (filters.collection?.length) query = query.in("collection", filters.collection);
   if (filters.search?.trim()) {
     const term = sanitizeSearchTerm(filters.search);
     if (term) {
@@ -155,20 +163,43 @@ function getProductsFromMock(
 }
 
 /**
- * Distinct sizes currently in the catalogue — drives the Size filter's
- * option list so it never offers a value that matches zero live products.
- * Falls back to the mock dataset's curated CATALOGUE_SIZES when Supabase
- * isn't configured.
+ * Distinct facet values currently in the catalogue — drives every
+ * FilterSidebar option list so it never offers a value that matches zero
+ * live products (see FILTER CONTRACT above). One query, 234 rows worth of
+ * plain columns; distinct-ing client-side is cheap at this catalogue size
+ * and avoids six separate round-trips. Falls back to the mock dataset's
+ * curated CATALOGUE_SIZES (sizes only) when Supabase isn't configured.
  */
-export async function getAvailableSizes(): Promise<string[]> {
+export async function getFilterFacets(): Promise<ProductFilterFacets> {
   const client = getSupabaseServerClient();
-  if (!client) return [...CATALOGUE_SIZES];
+  if (!client) {
+    return {
+      categories: [],
+      finishes: [],
+      sizes: [...CATALOGUE_SIZES],
+      colors: [],
+      wallOrFloors: [],
+      collections: [],
+    };
+  }
 
-  const { data, error } = await client.from("products").select("size");
+  const { data, error } = await client
+    .from("products")
+    .select("category, finish, size, color, wall_or_floor, collection");
   if (error) throw error;
 
-  const sizes = new Set((data ?? []).map((row) => row.size as string));
-  return [...sizes].sort();
+  const distinct = (values: (string | null)[]) =>
+    [...new Set(values.filter((v): v is string => Boolean(v?.trim())))].sort();
+
+  const rows = data ?? [];
+  return {
+    categories: distinct(rows.map((r) => r.category)),
+    finishes: distinct(rows.map((r) => r.finish)),
+    sizes: distinct(rows.map((r) => r.size)),
+    colors: distinct(rows.map((r) => r.color)),
+    wallOrFloors: distinct(rows.map((r) => r.wall_or_floor)),
+    collections: distinct(rows.map((r) => r.collection)),
+  };
 }
 
 /** Single product lookup for the product detail page, including its
@@ -177,21 +208,15 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
   const client = getSupabaseServerClient();
   if (!client) return MOCK_PRODUCTS.find((product) => product.slug === slug);
 
-  const { data, error } = await client.from("products").select("*").eq("slug", slug).maybeSingle();
+  const { data, error } = await client
+    .from("products")
+    .select("*, product_images(image_url, sort_order)")
+    .eq("slug", slug)
+    .maybeSingle();
   if (error) throw error;
   if (!data) return undefined;
 
-  const product = rowToProduct(data);
-
-  const { data: imageRows, error: imageError } = await client
-    .from("product_images")
-    .select("*")
-    .eq("product_id", product.id)
-    .order("sort_order", { ascending: true });
-  if (imageError) throw imageError;
-
-  product.images = (imageRows ?? []).map(rowToProductImage);
-  return product;
+  return rowToProduct(data);
 }
 
 /**
@@ -206,7 +231,7 @@ export async function getRelatedProducts(product: Product, limit = 4): Promise<P
 
   const { data: sameCategoryRows, error: sameCategoryError } = await client
     .from("products")
-    .select("*")
+    .select("*, product_images(image_url, sort_order)")
     .eq("category", product.category)
     .neq("id", product.id)
     .limit(limit);
@@ -217,7 +242,7 @@ export async function getRelatedProducts(product: Product, limit = 4): Promise<P
 
   const { data: otherRows, error: otherError } = await client
     .from("products")
-    .select("*")
+    .select("*, product_images(image_url, sort_order)")
     .neq("category", product.category)
     .neq("id", product.id)
     .limit(limit - related.length);
