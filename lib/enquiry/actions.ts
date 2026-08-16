@@ -41,7 +41,7 @@ export async function submitEnquiry(input: EnquiryInput): Promise<EnquiryActionR
     return {
       status: "not_configured",
       message:
-        "Online enquiries aren't connected yet. Please reach us directly at enquiries@drtraders.com or +91 00000 00000 in the meantime.",
+        "Online enquiries aren't connected yet. Please reach us directly at enquiries@guptamarblesandtiles.com or +91 00000 00000 in the meantime.",
     };
   }
 

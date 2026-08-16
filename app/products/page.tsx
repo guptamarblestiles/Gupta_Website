@@ -10,7 +10,7 @@ import type { ProductFilters } from "@/types/product";
 
 const CATALOGUE_TITLE = "Catalogue";
 const CATALOGUE_DESCRIPTION =
-  "Browse D R Traders' full collection of marble slabs, granite slabs, GVT tiles, and bathroom tiles.";
+  "Browse Gupta's full collection of marble slabs, granite slabs, GVT tiles, and bathroom tiles.";
 
 export const metadata: Metadata = {
   title: CATALOGUE_TITLE,

@@ -21,7 +21,7 @@ const CATEGORY_LINKS = [
  * Site footer — dark palette (matches CtaBand directly above it so the
  * homepage closes on one continuous dark block) and doubles as the
  * "/#contact" anchor target for the Navbar's Contact link, satisfying
- * brief section 2 objective #9 ("Contact D R Traders").
+ * brief section 2 objective #9 ("Contact Gupta's").
  */
 export function Footer() {
   return (
@@ -30,7 +30,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-16">
           <div className="md:col-span-1">
             <Link href="/" className="font-display text-xl text-hero-foreground tracking-tight">
-              D R TRADERS
+              GUPTA&apos;S
             </Link>
             <p className="mt-4 font-body text-body text-hero-muted leading-relaxed max-w-xs">
               Architectural surfaces designed to transform spaces — curated marble, granite and
@@ -41,7 +41,7 @@ export function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noreferrer noopener"
-                aria-label="D R Traders on Instagram"
+                aria-label="Gupta's on Instagram"
                 className="text-hero-muted transition-colors duration-300 hover:text-secondary"
               >
                 <InstagramIcon size={18} />
@@ -50,7 +50,7 @@ export function Footer() {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noreferrer noopener"
-                aria-label="D R Traders on LinkedIn"
+                aria-label="Gupta's on LinkedIn"
                 className="text-hero-muted transition-colors duration-300 hover:text-secondary"
               >
                 <LinkedinIcon size={18} />
@@ -102,7 +102,7 @@ export function Footer() {
               <li className="flex items-start gap-3">
                 <MapPin size={18} className="text-secondary shrink-0 mt-0.5" aria-hidden="true" />
                 <span className="font-body text-body text-hero-muted">
-                  D R Traders Showroom,
+                  Gupta&apos;s Showroom,
                   <br />
                   Industrial Estate Road, India
                 </span>
@@ -119,10 +119,10 @@ export function Footer() {
               <li className="flex items-center gap-3">
                 <Mail size={18} className="text-secondary shrink-0" aria-hidden="true" />
                 <a
-                  href="mailto:enquiries@drtraders.com"
+                  href="mailto:enquiries@guptamarblesandtiles.com"
                   className="font-body text-body text-hero-muted transition-colors duration-300 hover:text-secondary"
                 >
-                  enquiries@drtraders.com
+                  enquiries@guptamarblesandtiles.com
                 </a>
               </li>
             </ul>
@@ -131,7 +131,7 @@ export function Footer() {
 
         <div className="pt-8 border-t border-hero-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="font-body text-sm text-hero-muted">
-            &copy; {new Date().getFullYear()} D R Traders. All rights reserved.
+            &copy; {new Date().getFullYear()} Gupta&apos;s. All rights reserved.
           </p>
           <p className="font-body text-sm text-hero-muted">Premium Marble &amp; Tile Curation</p>
         </div>

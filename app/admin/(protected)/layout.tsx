@@ -10,7 +10,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <header className="flex items-center justify-between border-b border-neutral-800 px-6 py-4">
         <nav className="flex items-center gap-6 text-sm">
           <Link href="/admin" className="font-medium">
-            D R Traders Admin
+            Gupta&apos;s Admin
           </Link>
           <Link href="/admin" className="text-neutral-400 hover:text-white">
             Products

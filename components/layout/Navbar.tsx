@@ -66,7 +66,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
             isDark ? "text-hero-foreground" : "text-on-surface",
           )}
         >
-          D R TRADERS
+          GUPTA&apos;S
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
