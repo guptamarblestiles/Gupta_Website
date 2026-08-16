@@ -37,8 +37,8 @@ export function HeroVideoBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   if (reduceMotion) {
-    // eslint-disable-next-line @next/next/no-img-element
     return (
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={POSTER}
         alt=""
