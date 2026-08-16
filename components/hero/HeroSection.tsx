@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
-import { Hero3DTileLoader } from "./Hero3DTileLoader";
 import { HeroVideoBackground } from "./HeroVideoBackground";
 import { ScrollIndicator } from "./ScrollIndicator";
 
@@ -27,7 +26,7 @@ export function HeroSection() {
         className="pointer-events-none absolute inset-0 bg-hero-bg/70"
       />
 
-      {/* Cinematic spotlight glow behind the tile — kept subtle per brief section 10 */}
+      {/* Cinematic spotlight glow — kept subtle per brief section 10 */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[900px] max-h-[900px] rounded-full opacity-40 blur-[120px]"
@@ -37,8 +36,8 @@ export function HeroSection() {
         }}
       />
 
-      <Container className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
-        <div className="md:col-span-6 flex flex-col">
+      <Container className="relative z-10">
+        <div className="max-w-2xl flex flex-col">
           <motion.h1
             initial="hidden"
             animate="show"
@@ -74,10 +73,6 @@ export function HeroSection() {
               Get in Touch
             </Button>
           </motion.div>
-        </div>
-
-        <div className="md:col-span-6 h-[420px] md:h-[560px] w-full">
-          <Hero3DTileLoader />
         </div>
       </Container>
 
