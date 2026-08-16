@@ -25,8 +25,8 @@ export async function sendEnquiryEmailJs(input: EnquiryInput): Promise<void> {
       serviceId,
       templateId,
       {
-        from_name: input.name,
-        from_email: input.email,
+        name: input.name,
+        email: input.email,
         phone: input.phone || "—",
         product_name: input.productName || "—",
         message: input.message,
