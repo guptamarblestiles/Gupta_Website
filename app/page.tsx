@@ -14,7 +14,7 @@ export default function HomePage() {
   return (
     <>
       <Navbar variant="auto" />
-      <main>
+      <main id="main-content">
         <HeroSection />
         <ScrollTransition />
         <BusinessOverview />

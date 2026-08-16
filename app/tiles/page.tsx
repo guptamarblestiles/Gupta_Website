@@ -23,7 +23,7 @@ export default async function TilesPage({ searchParams }: TilesPageProps) {
   return (
     <>
       <Navbar variant="light" />
-      <main className="pt-16 md:pt-20">
+      <main id="main-content" className="pt-16 md:pt-20">
         <section className="py-section-gap">
           <Container>
             <div className="mb-10 md:mb-12 max-w-2xl">

@@ -9,6 +9,7 @@ import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { ImageGallery } from "@/components/product/ImageGallery";
 import { TileCard } from "@/components/catalogue/TileCard";
 import { EnquiryForm } from "@/components/enquiry/EnquiryForm";
+import { StickyEnquireBar } from "@/components/product/StickyEnquireBar";
 import { getProductBySlug, getRelatedProducts } from "@/lib/products/queries";
 import { getStoneForProduct } from "@/lib/products/stone";
 import type { Product } from "@/types/product";
@@ -65,7 +66,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   return (
     <>
       <Navbar variant="light" />
-      <main className="pt-16 md:pt-20">
+      <main id="main-content" className="pt-16 md:pt-20 pb-20 md:pb-0">
         <section className="py-section-gap">
           <Container>
             <nav aria-label="Breadcrumb" className="mb-8 md:mb-12">
@@ -176,6 +177,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </RevealOnScroll>
         )}
       </main>
+      <StickyEnquireBar />
       <Footer />
     </>
   );
