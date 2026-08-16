@@ -11,9 +11,21 @@
  *     below carries its own 300ms transition, so crossing the threshold
  *     always produces the same smooth animation regardless of scroll speed.
  * The center-offset itself is still measured (not a fixed px value) since
- * it depends on the pill's actual rendered width. "light" variant (every
- * other page) is the same floating pill shape in a solid light finish, no
- * scroll animation.
+ * it depends on the pill's actual rendered width.
+ *
+ * Separately, `overLight` tracks a much larger threshold (roughly one
+ * viewport height, i.e. past the dark hero) and switches the brand/nav
+ * text from light to dark — the glass pill itself stays translucent
+ * either way, but light-colored text over the page's white content
+ * sections below the hero is invisible without this. Deliberately a
+ * second, independent threshold from SCROLL_THRESHOLD: the nav-fade/
+ * brand-center transition should happen almost immediately on scroll,
+ * while the color swap must wait until the dark hero has actually
+ * scrolled past, or the text would flip to dark while still over the
+ * dark hero image.
+ *
+ * "light" variant (every other page) is the same floating pill shape in
+ * a solid light finish always, no scroll animation.
  *
  * DEVIATION: the redesign spec's nav list includes "Catalogue" (a PDF
  * showcase page) — that page was explicitly deferred (no PDF files exist
@@ -54,6 +66,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
   const brandRef = useRef<HTMLAnchorElement>(null);
   const [centerOffset, setCenterOffset] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const [overLight, setOverLight] = useState(false);
 
   useEffect(() => {
     if (variant !== "auto") return;
@@ -72,6 +85,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (variant !== "auto") return;
     setScrolled(latest > SCROLL_THRESHOLD);
+    setOverLight(latest > window.innerHeight * 0.8);
   });
 
   // Lock body scroll while the mobile menu is open.
@@ -109,7 +123,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
               href="/"
               className={cn(
                 "block font-display text-base md:text-lg tracking-tight transition-colors duration-500 whitespace-nowrap",
-                isAuto ? "text-hero-foreground" : "text-on-surface",
+                isAuto ? (overLight ? "text-on-surface" : "text-hero-foreground") : "text-on-surface",
               )}
             >
               {BRAND_NAME}
@@ -131,7 +145,9 @@ export function Navbar({ variant = "light" }: NavbarProps) {
                 className={cn(
                   "font-body text-label uppercase tracking-widest transition-colors duration-300",
                   isAuto
-                    ? "text-hero-muted hover:text-secondary-fixed"
+                    ? overLight
+                      ? "text-on-surface-variant hover:text-secondary"
+                      : "text-hero-muted hover:text-secondary-fixed"
                     : "text-on-surface-variant hover:text-secondary",
                 )}
               >
@@ -147,7 +163,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
             onClick={() => setMobileOpen((v) => !v)}
             className={cn(
               "md:hidden flex items-center justify-center p-2 -mr-2 transition-colors duration-300",
-              isAuto ? "text-hero-foreground" : "text-on-surface",
+              isAuto ? (overLight ? "text-on-surface" : "text-hero-foreground") : "text-on-surface",
             )}
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
