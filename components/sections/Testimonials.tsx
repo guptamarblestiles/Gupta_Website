@@ -1,18 +1,22 @@
 /**
- * Auto-rotating testimonial carousel (5s interval, pauses on hover), 1
- * card visible on mobile, 2 on tablet, 3 on desktop.
+ * Auto-rotating testimonial carousel (5s interval, pauses on hover): 2
+ * cards side-by-side with a staggered vertical offset on desktop, 1
+ * full-width on mobile. Fades between slides (not a slide/translate) per
+ * the visual redesign brief.
  *
  * PLACEHOLDER CONTENT: these are generic, unattributed-to-any-real-person
- * quotes — no invented customer names or companies. Presenting fabricated
- * testimonials as real reviews from named people would be misleading to
- * site visitors; replace every entry here with a real review (and real
- * attribution) before this section goes live.
+ * quotes — no invented customer names or companies. Avatars show initials
+ * derived from the role label (e.g. "Residential Client" -> "RC"), not a
+ * fabricated person's initials. Presenting fabricated testimonials as real
+ * reviews from named people would be misleading to site visitors; replace
+ * every entry here with a real review (and real attribution) before this
+ * section goes live.
  */
 "use client";
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 
@@ -40,21 +44,25 @@ const TESTIMONIALS = [
 
 const AUTO_ROTATE_MS = 5000;
 
+function initialsFor(role: string): string {
+  return role
+    .split(" ")
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase();
+}
+
 function useVisibleCount() {
   const [count, setCount] = useState(1);
   useEffect(() => {
     const mdQuery = window.matchMedia("(min-width: 768px)");
-    const lgQuery = window.matchMedia("(min-width: 1024px)");
     function update() {
-      setCount(lgQuery.matches ? 3 : mdQuery.matches ? 2 : 1);
+      setCount(mdQuery.matches ? 2 : 1);
     }
     update();
     mdQuery.addEventListener("change", update);
-    lgQuery.addEventListener("change", update);
-    return () => {
-      mdQuery.removeEventListener("change", update);
-      lgQuery.removeEventListener("change", update);
-    };
+    return () => mdQuery.removeEventListener("change", update);
   }, []);
   return count;
 }
@@ -98,22 +106,40 @@ export function Testimonials() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={index}
-                initial={{ opacity: 0, x: 24 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -24 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="flex flex-col md:flex-row gap-gutter items-stretch"
               >
-                {visible.map((t) => (
-                  <div key={t.attribution} className="bg-surface p-card flex flex-col">
-                    <Quote size={22} className="text-secondary mb-4" aria-hidden="true" />
-                    <p className="font-body text-body text-on-surface leading-relaxed mb-6 flex-1">
-                      &ldquo;{t.quote}&rdquo;
+                {visible.map((t, i) => (
+                  <motion.div
+                    key={t.attribution}
+                    style={{ marginTop: i % 2 === 1 ? "1.5rem" : 0 }}
+                    whileHover={{ y: -4 }}
+                    className="flex-1 flex flex-col p-8 bg-surface border border-outline-variant/50 rounded-lg shadow-sm transition-shadow hover:shadow-lg hover:border-secondary/40"
+                  >
+                    <div
+                      aria-hidden="true"
+                      className="mb-4 font-display text-5xl leading-none text-secondary"
+                    >
+                      &ldquo;
+                    </div>
+                    <p className="font-display italic text-lg text-on-surface leading-relaxed mb-6 flex-1">
+                      {t.quote}
                     </p>
-                    <p className="font-body text-label uppercase tracking-widest text-on-surface-variant">
-                      {t.attribution}
-                    </p>
-                  </div>
+                    <div className="flex items-center gap-3 pt-4 border-t border-outline-variant/50">
+                      <div
+                        aria-hidden="true"
+                        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-secondary-fixed to-secondary-strong font-body text-sm font-semibold text-white"
+                      >
+                        {initialsFor(t.attribution)}
+                      </div>
+                      <p className="font-body text-label uppercase tracking-widest text-on-surface-variant">
+                        {t.attribution}
+                      </p>
+                    </div>
+                  </motion.div>
                 ))}
               </motion.div>
             </AnimatePresence>
@@ -129,11 +155,12 @@ export function Testimonials() {
               </button>
               <div className="flex items-center gap-2">
                 {Array.from({ length: pageCount }).map((_, i) => (
-                  <button
+                  <motion.button
                     key={i}
                     type="button"
                     aria-label={`Go to testimonial ${i + 1}`}
                     onClick={() => setIndex(i)}
+                    whileHover={{ scale: 1.2 }}
                     className={`h-1.5 rounded-full transition-all ${
                       i === index ? "w-6 bg-secondary" : "w-1.5 bg-outline-variant"
                     }`}

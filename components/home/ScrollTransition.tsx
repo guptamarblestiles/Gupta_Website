@@ -1,62 +1,77 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { useReducedMotion, motion } from "framer-motion";
 
 /**
- * Brief section 12 — the "Magic Scroll Transition" signature feature.
- * A pinned (sticky) panel whose background and supporting line interpolate
- * from the dark hero palette to the light catalogue palette as the user
- * scrolls through it, so the dark→light handoff reads as one continuous
- * cinematic move rather than a hard cut between two sections.
+ * "Gate opening" quote reveal: a real marble slab photo (Roman White,
+ * already in the live catalogue — not a placeholder) splits down the
+ * middle and slides off-screen the first time this section scrolls into
+ * view, revealing the quote on the dark hero background behind it. A
+ * one-shot `whileInView` reveal, not a continuously scroll-scrubbed
+ * animation (this replaces the previous version's pinned/scroll-linked
+ * dark->light color morph — that mechanic is gone, not just restyled).
  *
- * Reduced-motion users get a short static gradient instead of a pinned,
- * scroll-linked animation (brief section 32).
+ * Reduced-motion users get the quote directly on the dark background,
+ * no marble/slide animation.
  */
+const MARBLE_IMAGE_URL =
+  "https://gvwaqvdhranchtzfgfiu.supabase.co/storage/v1/object/public/tiles/2x4-glossy-d-m-roman-white/image-0.webp";
+
+const GATE_TRANSITION = { duration: 0.9, ease: [0.65, 0, 0.35, 1] as const };
+
 export function ScrollTransition() {
-  const targetRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
-
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start end", "end start"],
-  });
-
-  const background = useTransform(
-    scrollYProgress,
-    [0, 0.55, 1],
-    ["#09090b", "#09090b", "#ffffff"],
-  );
-  const textColor = useTransform(
-    scrollYProgress,
-    [0, 0.55, 1],
-    ["#f5f5f4", "#f5f5f4", "#1a1a1a"],
-  );
-  const textOpacity = useTransform(scrollYProgress, [0.12, 0.32, 0.72, 0.92], [0, 1, 1, 0]);
-  const textY = useTransform(scrollYProgress, [0.12, 0.32], [24, 0]);
 
   if (reduceMotion) {
     return (
-      <section
-        aria-hidden="true"
-        className="h-40 w-full bg-gradient-to-b from-hero-bg to-background"
-      />
+      <section className="flex h-64 w-full items-center justify-center bg-hero-bg px-margin">
+        <p className="font-display text-headline-sm md:text-headline max-w-2xl text-center leading-snug text-hero-foreground">
+          From quarry to craftsmanship — every slab carries the story of the earth it came from.
+        </p>
+      </section>
     );
   }
 
   return (
-    <div ref={targetRef} className="relative h-[160vh]">
-      <motion.section
-        style={{ backgroundColor: background }}
-        className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden"
+    <section className="relative h-screen w-full overflow-hidden bg-hero-bg">
+      <motion.div
+        aria-hidden="true"
+        initial={{ x: "0%" }}
+        whileInView={{ x: "-100%" }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={GATE_TRANSITION}
+        className="absolute inset-y-0 left-0 w-1/2"
+        style={{
+          backgroundImage: `url(${MARBLE_IMAGE_URL})`,
+          backgroundSize: "200% 100%",
+          backgroundPosition: "left center",
+        }}
+      />
+      <motion.div
+        aria-hidden="true"
+        initial={{ x: "0%" }}
+        whileInView={{ x: "100%" }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={GATE_TRANSITION}
+        className="absolute inset-y-0 right-0 w-1/2"
+        style={{
+          backgroundImage: `url(${MARBLE_IMAGE_URL})`,
+          backgroundSize: "200% 100%",
+          backgroundPosition: "right center",
+        }}
+      />
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ delay: 0.3, duration: 0.8 }}
+        className="relative flex h-full w-full items-center justify-center px-margin"
       >
-        <motion.p
-          style={{ color: textColor, opacity: textOpacity, y: textY }}
-          className="font-display text-headline-sm md:text-headline max-w-2xl px-margin text-center leading-snug"
-        >
+        <p className="font-display text-headline-sm md:text-headline max-w-2xl text-center italic leading-snug text-hero-foreground">
           From quarry to craftsmanship — every slab carries the story of the earth it came from.
-        </motion.p>
-      </motion.section>
-    </div>
+        </p>
+      </motion.div>
+    </section>
   );
 }
