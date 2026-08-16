@@ -1,43 +1,66 @@
+/**
+ * Site navbar. "auto" variant (homepage only) stays a persistent
+ * glassmorphic bar over the hero — never flips to a solid light bar like it
+ * used to — and animates the brand wordmark from left-aligned to visually
+ * centered as the user scrolls, via Framer Motion's useScroll/useTransform
+ * driving a measured x-offset (recomputed on resize since the offset
+ * depends on actual rendered widths, not a fixed value). "light" variant
+ * (every other page) is unchanged: always solid, no scroll animation.
+ *
+ * DEVIATION: the redesign spec's nav list includes "Catalogue" (a PDF
+ * showcase page) — that page was explicitly deferred (no PDF files exist
+ * yet), so it's left out of this nav rather than linking to a route that
+ * doesn't exist. Add it back once app/catalogue/page.tsx exists.
+ */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import { Button } from "@/components/ui/Button";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Collection", href: "/products" },
+  { label: "Tiles", href: "/tiles" },
   { label: "About", href: "/#about" },
   { label: "Contact", href: "/#contact" },
 ];
 
+const BRAND_NAME = "Gupta Marbles & Tiles";
+const CENTER_SCROLL_RANGE = 240; // px of scroll over which the brand animates to center
+
 type NavbarProps = {
   /**
-   * "auto"  — starts transparent over a dark hero, switches to a solid
-   *           light bar once the user scrolls past the hero (use on the
-   *           homepage only).
-   * "light" — always solid/light (use on catalogue, product, and every
-   *           other page that doesn't open on a dark hero).
+   * "auto"  — persistent glassmorphic bar over a dark hero; brand animates
+   *           left -> center as the user scrolls (homepage only).
+   * "light" — always solid/light, no scroll animation (every other page).
    */
   variant?: "auto" | "light";
 };
 
 export function Navbar({ variant = "light" }: NavbarProps) {
-  const [scrolled, setScrolled] = useState(variant === "light");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const brandRef = useRef<HTMLAnchorElement>(null);
+  const [centerOffset, setCenterOffset] = useState(0);
 
   useEffect(() => {
     if (variant !== "auto") return;
-
-    const heroHeight = window.innerHeight * 0.8;
-    const onScroll = () => setScrolled(window.scrollY > heroHeight);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    function measure() {
+      if (!containerRef.current || !brandRef.current) return;
+      const containerWidth = containerRef.current.offsetWidth;
+      const brandCenterCurrent = brandRef.current.offsetLeft + brandRef.current.offsetWidth / 2;
+      setCenterOffset(containerWidth / 2 - brandCenterCurrent);
+    }
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
   }, [variant]);
+
+  const { scrollY } = useScroll();
+  const brandX = useTransform(scrollY, [0, CENTER_SCROLL_RANGE], [0, centerOffset]);
+  const brandScale = useTransform(scrollY, [0, CENTER_SCROLL_RANGE], [1, 1.15]);
 
   // Lock body scroll while the mobile menu is open.
   useEffect(() => {
@@ -47,27 +70,30 @@ export function Navbar({ variant = "light" }: NavbarProps) {
     };
   }, [mobileOpen]);
 
-  const isDark = variant === "auto" && !scrolled;
+  const isAuto = variant === "auto";
 
   return (
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-colors duration-500",
-        isDark
-          ? "bg-transparent border-b border-transparent"
+        isAuto
+          ? "bg-zinc-950/40 backdrop-blur-md border-b border-white/10"
           : "bg-background/90 backdrop-blur-xl border-b border-outline-variant/50",
       )}
     >
-      <div className="container-max px-margin flex items-center justify-between h-16 md:h-20">
-        <Link
-          href="/"
-          className={cn(
-            "font-display text-xl md:text-2xl tracking-tight transition-colors duration-500",
-            isDark ? "text-hero-foreground" : "text-on-surface",
-          )}
-        >
-          GUPTA&apos;S
-        </Link>
+      <div ref={containerRef} className="container-max px-margin flex items-center justify-between h-16 md:h-20">
+        <motion.div style={isAuto ? { x: brandX, scale: brandScale } : undefined}>
+          <Link
+            ref={brandRef}
+            href="/"
+            className={cn(
+              "block font-display text-lg md:text-xl tracking-tight transition-colors duration-500 whitespace-nowrap",
+              isAuto ? "text-hero-foreground" : "text-on-surface",
+            )}
+          >
+            {BRAND_NAME}
+          </Link>
+        </motion.div>
 
         <nav className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
@@ -76,8 +102,8 @@ export function Navbar({ variant = "light" }: NavbarProps) {
               href={link.href}
               className={cn(
                 "font-body text-label uppercase tracking-widest transition-colors duration-300",
-                isDark
-                  ? "text-hero-muted hover:text-hero-foreground"
+                isAuto
+                  ? "text-hero-muted hover:text-secondary-fixed"
                   : "text-on-surface-variant hover:text-secondary",
               )}
             >
@@ -86,12 +112,6 @@ export function Navbar({ variant = "light" }: NavbarProps) {
           ))}
         </nav>
 
-        <div className="hidden md:block">
-          <Button href="/products" variant={isDark ? "hero-secondary" : "secondary"} size="default">
-            Catalogue
-          </Button>
-        </div>
-
         <button
           type="button"
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
@@ -99,7 +119,7 @@ export function Navbar({ variant = "light" }: NavbarProps) {
           onClick={() => setMobileOpen((v) => !v)}
           className={cn(
             "md:hidden flex items-center justify-center p-2 -mr-2 transition-colors duration-300",
-            isDark ? "text-hero-foreground" : "text-on-surface",
+            isAuto ? "text-hero-foreground" : "text-on-surface",
           )}
         >
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
@@ -126,9 +146,6 @@ export function Navbar({ variant = "light" }: NavbarProps) {
                 {link.label}
               </Link>
             ))}
-            <Button href="/products" variant="secondary" className="w-full">
-              Catalogue
-            </Button>
           </motion.nav>
         )}
       </AnimatePresence>
