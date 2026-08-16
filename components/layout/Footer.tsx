@@ -113,7 +113,15 @@ export function Footer() {
           <p className="font-body text-sm text-hero-muted">
             &copy; {new Date().getFullYear()} Gupta Marbles &amp; Tiles. All rights reserved.
           </p>
-          <p className="font-body text-sm text-hero-muted">Premium Marble &amp; Tile Curation</p>
+          <div className="flex items-center gap-6">
+            <p className="font-body text-sm text-hero-muted">Premium Marble &amp; Tile Curation</p>
+            <Link
+              href="/admin/login"
+              className="font-body text-sm text-hero-muted/60 transition-colors duration-300 hover:text-secondary"
+            >
+              Admin
+            </Link>
+          </div>
         </div>
       </Container>
     </footer>

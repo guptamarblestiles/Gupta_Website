@@ -2,6 +2,7 @@
 
 import { enquirySchema } from "@/lib/enquiry/schema";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { sendEnquiryNotification } from "@/lib/enquiry/email";
 import { CONTACT_INFO } from "@/lib/contact";
 import type { EnquiryInput } from "@/types/product";
 
@@ -61,6 +62,13 @@ export async function submitEnquiry(input: EnquiryInput): Promise<EnquiryActionR
       message: "Something went wrong submitting your enquiry. Please try again or contact us directly.",
     };
   }
+
+  // Awaited (not fire-and-forget) — on Vercel's serverless model, work
+  // kicked off without awaiting can be cut short once the response is
+  // sent. sendEnquiryNotification catches its own errors internally, so
+  // awaiting it here can't turn a successful submission into an error for
+  // the visitor; the enquiry is already safely stored above either way.
+  await sendEnquiryNotification(parsed.data);
 
   return { status: "success" };
 }
