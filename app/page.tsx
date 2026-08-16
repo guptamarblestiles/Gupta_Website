@@ -2,8 +2,11 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/hero/HeroSection";
 import { ScrollTransition } from "@/components/home/ScrollTransition";
-import { CategoryRow } from "@/components/home/CategoryRow";
-import { FeaturedCollection } from "@/components/home/FeaturedCollection";
+import { BusinessOverview } from "@/components/sections/BusinessOverview";
+import { ApplicationsTiles } from "@/components/sections/ApplicationsTiles";
+import { Highlights } from "@/components/sections/Highlights";
+import { Testimonials } from "@/components/sections/Testimonials";
+import { ContactSection } from "@/components/sections/ContactSection";
 import { TrustStats } from "@/components/home/TrustStats";
 import { CtaBand } from "@/components/home/CtaBand";
 
@@ -14,8 +17,11 @@ export default function HomePage() {
       <main>
         <HeroSection />
         <ScrollTransition />
-        <CategoryRow />
-        <FeaturedCollection />
+        <BusinessOverview />
+        <ApplicationsTiles />
+        <Highlights />
+        <Testimonials />
+        <ContactSection />
         <TrustStats />
         <CtaBand />
       </main>

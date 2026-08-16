@@ -2,6 +2,7 @@
 
 import { enquirySchema } from "@/lib/enquiry/schema";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { CONTACT_INFO } from "@/lib/contact";
 import type { EnquiryInput } from "@/types/product";
 
 export type EnquiryActionResult =
@@ -41,7 +42,7 @@ export async function submitEnquiry(input: EnquiryInput): Promise<EnquiryActionR
     return {
       status: "not_configured",
       message:
-        "Online enquiries aren't connected yet. Please reach us directly at enquiries@guptamarblesandtiles.com or +91 00000 00000 in the meantime.",
+        `Online enquiries aren't connected yet. Please reach us directly at ${CONTACT_INFO.email} or ${CONTACT_INFO.phoneDisplay} in the meantime.`,
     };
   }
 
