@@ -55,9 +55,9 @@ export function Highlights() {
               initial={reduceMotion ? undefined : { opacity: 0, y: 20 }}
               whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{ delay: i * 0.1, duration: 0.6, ease: "easeOut" }}
-              whileHover={{ scale: 1.02 }}
-              className="flex flex-col items-start text-left p-6 rounded-lg border-l-4 border-secondary bg-gradient-to-br from-surface-variant to-surface shadow-sm transition-shadow hover:shadow-lg"
+              transition={{ delay: i * 0.12, duration: 0.6, ease: "easeOut" }}
+              whileHover={{ scale: 1.02, y: -8 }}
+              className="flex flex-col items-start text-left p-8 rounded-lg border-l-4 border-secondary bg-gradient-to-br from-surface-variant to-surface shadow-sm transition-shadow hover:shadow-xl"
             >
               <motion.div
                 whileHover={{ scale: 1.1, rotate: 5 }}

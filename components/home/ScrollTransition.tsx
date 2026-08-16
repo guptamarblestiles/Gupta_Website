@@ -61,17 +61,19 @@ export function ScrollTransition() {
         }}
       />
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: "-100px" }}
-        transition={{ delay: 0.3, duration: 0.8 }}
-        className="relative flex h-full w-full items-center justify-center px-margin"
-      >
-        <p className="font-display text-headline-sm md:text-headline max-w-2xl text-center italic leading-snug text-hero-foreground">
-          From quarry to craftsmanship — every slab carries the story of the earth it came from.
-        </p>
-      </motion.div>
+      <div className="relative flex h-full w-full items-center justify-center px-margin">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ delay: 0.7, duration: 0.8 }}
+          className="max-w-3xl rounded-lg bg-gradient-to-r from-hero-bg/90 to-zinc-900/90 px-8 py-16 backdrop-blur-sm"
+        >
+          <p className="font-display text-headline-sm md:text-headline text-center italic leading-snug text-hero-foreground">
+            From quarry to craftsmanship — every slab carries the story of the earth it came from.
+          </p>
+        </motion.div>
+      </div>
     </section>
   );
 }
