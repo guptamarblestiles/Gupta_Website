@@ -23,7 +23,7 @@ function LoginForm() {
       action={formAction}
       className="w-full max-w-sm space-y-4 rounded-lg border border-neutral-800 bg-neutral-900 p-8"
     >
-      <h1 className="text-lg font-medium text-white">Gupta&apos;s Admin</h1>
+      <h1 className="text-lg font-medium text-white">Gupta Interior Admin</h1>
       <input type="hidden" name="from" value={from} />
       <div className="space-y-1">
         <label htmlFor="password" className="text-sm text-neutral-400">

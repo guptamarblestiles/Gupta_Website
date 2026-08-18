@@ -33,7 +33,7 @@ export default function OpengraphImage() {
             marginBottom: 32,
           }}
         />
-        <div style={{ fontSize: 64, fontWeight: 600, letterSpacing: -1 }}>Gupta Marbles &amp; Tiles</div>
+        <div style={{ fontSize: 64, fontWeight: 600, letterSpacing: -1 }}>Gupta Interior</div>
         <div style={{ fontSize: 28, color: "#a1a1aa", marginTop: 20 }}>
           Architectural Surfaces for Visionary Spaces
         </div>

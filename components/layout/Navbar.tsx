@@ -50,7 +50,7 @@ const NAV_LINKS = [
   { label: "Contact", href: "/#contact" },
 ];
 
-const BRAND_NAME = "Gupta Marbles & Tiles";
+const BRAND_NAME = "Gupta Interior";
 const SCROLL_THRESHOLD = 60; // px scrolled before the navbar flips to its "scrolled" state
 const STATE_TRANSITION = { duration: 0.3, ease: "easeInOut" as const };
 

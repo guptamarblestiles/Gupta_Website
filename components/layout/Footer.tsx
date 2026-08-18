@@ -25,7 +25,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-16">
           <div className="md:col-span-1">
             <Link href="/" className="font-display text-xl text-hero-foreground tracking-tight">
-              Gupta Marbles &amp; Tiles
+              Gupta Interior
             </Link>
             <p className="mt-2 font-body text-sm text-secondary-fixed">By Mayank Gupta</p>
             <p className="mt-4 font-body text-body text-hero-muted leading-relaxed max-w-xs">
@@ -91,7 +91,7 @@ export function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noreferrer noopener"
-                aria-label="Gupta Marbles & Tiles on Instagram"
+                aria-label="Gupta Interior on Instagram"
                 className="text-hero-muted transition-colors duration-300 hover:text-secondary"
               >
                 <InstagramIcon size={18} />
@@ -100,7 +100,7 @@ export function Footer() {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noreferrer noopener"
-                aria-label="Gupta Marbles & Tiles on LinkedIn"
+                aria-label="Gupta Interior on LinkedIn"
                 className="text-hero-muted transition-colors duration-300 hover:text-secondary"
               >
                 <LinkedinIcon size={18} />
@@ -111,7 +111,7 @@ export function Footer() {
 
         <div className="pt-8 border-t border-hero-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="font-body text-sm text-hero-muted">
-            &copy; {new Date().getFullYear()} Gupta Marbles &amp; Tiles. All rights reserved.
+            &copy; {new Date().getFullYear()} Gupta Interior. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <p className="font-body text-sm text-hero-muted">Premium Marble &amp; Tile Curation</p>

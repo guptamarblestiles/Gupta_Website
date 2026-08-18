@@ -1,5 +1,5 @@
 /**
- * Sends an email notification to Gupta's own inbox whenever a new enquiry
+ * Sends an email notification to Gupta Interior's own inbox whenever a new enquiry
  * comes in, via Gmail SMTP (Nodemailer) using an App Password — not the
  * Google account password itself. Requires GMAIL_USER and
  * GMAIL_APP_PASSWORD env vars; if either is unset, this quietly no-ops
@@ -37,7 +37,7 @@ export async function sendEnquiryNotification(input: EnquiryInput): Promise<void
 
   try {
     await transporter.sendMail({
-      from: `"Gupta Marbles & Tiles Website" <${user}>`,
+      from: `"Gupta Interior Website" <${user}>`,
       to: user,
       replyTo: input.email,
       subject: `New enquiry from ${input.name}`,

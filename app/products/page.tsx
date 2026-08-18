@@ -6,7 +6,7 @@ import { CatalogueBrowser } from "@/components/catalogue/CatalogueBrowser";
 
 const CATALOGUE_TITLE = "Catalogue";
 const CATALOGUE_DESCRIPTION =
-  "Browse Gupta's full collection of marble slabs, granite slabs, GVT tiles, and bathroom tiles.";
+  "Browse Gupta Interior's full collection of marble slabs, granite slabs, GVT tiles, and bathroom tiles.";
 
 export const metadata: Metadata = {
   title: CATALOGUE_TITLE,

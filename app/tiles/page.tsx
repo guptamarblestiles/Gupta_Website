@@ -10,7 +10,7 @@ import { CatalogueBrowser } from "@/components/catalogue/CatalogueBrowser";
 
 export const metadata: Metadata = {
   title: "Tiles",
-  description: "Browse every tile in the Gupta Marbles & Tiles collection.",
+  description: "Browse every tile in the Gupta Interior collection.",
 };
 
 type TilesPageProps = {

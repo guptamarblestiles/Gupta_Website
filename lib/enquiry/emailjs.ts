@@ -1,6 +1,6 @@
 /**
  * Client-side email notification via EmailJS — sends directly from the
- * visitor's browser to Gupta's inbox, no server SMTP credentials needed
+ * visitor's browser to Gupta Interior's inbox, no server SMTP credentials needed
  * (unlike lib/enquiry/email.ts's Gmail App Password route, which stays as
  * a fallback). Requires NEXT_PUBLIC_EMAILJS_SERVICE_ID,
  * NEXT_PUBLIC_EMAILJS_TEMPLATE_ID, NEXT_PUBLIC_EMAILJS_PUBLIC_KEY — if any

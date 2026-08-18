@@ -18,20 +18,20 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Gupta's | Architectural Surfaces",
-    template: "%s | Gupta's",
+    default: "Gupta Interior | Architectural Surfaces",
+    template: "%s | Gupta Interior",
   },
   description:
     "Premium marble, granite, and tile surfaces curated for visionary architectural spaces.",
   openGraph: {
-    title: "Gupta's | Architectural Surfaces",
+    title: "Gupta Interior | Architectural Surfaces",
     description:
       "Premium marble, granite, and tile surfaces curated for visionary architectural spaces.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Gupta's | Architectural Surfaces",
+    title: "Gupta Interior | Architectural Surfaces",
     description:
       "Premium marble, granite, and tile surfaces curated for visionary architectural spaces.",
   },
