@@ -3,6 +3,9 @@ import { listCategoriesWithCounts } from "@/lib/admin/categories";
 import { DeleteCategoryButton } from "@/components/admin/DeleteCategoryButton";
 
 export const metadata = { title: "Categories" };
+// Admin data, gated by proxy.ts — never statically prerendered (matches
+// app/admin/(protected)/page.tsx's implicit dynamic behavior).
+export const dynamic = "force-dynamic";
 
 export default async function AdminCategoriesPage() {
   const categories = await listCategoriesWithCounts();

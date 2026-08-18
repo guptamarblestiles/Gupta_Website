@@ -5,6 +5,7 @@ import { ScrollTransition } from "@/components/home/ScrollTransition";
 import { BusinessOverview } from "@/components/sections/BusinessOverview";
 import { ApplicationsTiles } from "@/components/sections/ApplicationsTiles";
 import { Highlights } from "@/components/sections/Highlights";
+import { CatalogueSection } from "@/components/sections/CatalogueSection";
 import { Testimonials } from "@/components/sections/Testimonials";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { TrustStats } from "@/components/home/TrustStats";
@@ -20,6 +21,7 @@ export default function HomePage() {
         <BusinessOverview />
         <ApplicationsTiles />
         <Highlights />
+        <CatalogueSection />
         <Testimonials />
         <ContactSection />
         <TrustStats />
