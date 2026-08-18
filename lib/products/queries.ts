@@ -31,6 +31,9 @@ type ProductRow = {
   color: string | null;
   wall_or_floor: string | null;
   collection: string | null;
+  price: number | null;
+  price_unit: string | null;
+  price_note: string | null;
   description: string;
   created_at: string;
   updated_at: string;
@@ -53,6 +56,9 @@ function rowToProduct(row: ProductRow): Product {
     color: row.color ?? undefined,
     wallOrFloor: row.wall_or_floor ?? undefined,
     collection: row.collection ?? undefined,
+    price: row.price ?? undefined,
+    priceUnit: row.price_unit ?? undefined,
+    priceNote: row.price_note ?? undefined,
     description: row.description,
     imageUrl: images[0]?.image_url ?? "",
     images: images.map((img, i) => ({

@@ -10,6 +10,7 @@ import { ImageGallery } from "@/components/product/ImageGallery";
 import { TileCard } from "@/components/catalogue/TileCard";
 import { EnquiryForm } from "@/components/enquiry/EnquiryForm";
 import { StickyEnquireBar } from "@/components/product/StickyEnquireBar";
+import { PriceDisplay } from "@/components/product/PriceDisplay";
 import { getProductBySlug, getRelatedProducts } from "@/lib/products/queries";
 import { getStoneForProduct } from "@/lib/products/stone";
 import type { Product } from "@/types/product";
@@ -124,6 +125,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     );
                   })}
                 </dl>
+
+                <PriceDisplay
+                  price={product.price}
+                  priceUnit={product.priceUnit}
+                  priceNote={product.priceNote}
+                  className="mb-6 font-body text-body-lg text-on-surface"
+                />
 
                 <Button href="#enquire" variant="primary" size="lg" className="w-full sm:w-auto">
                   Enquire About This Tile

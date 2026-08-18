@@ -33,6 +33,10 @@ export interface Product {
   origin?: string;
   material?: string;
   availableFinishes?: string;
+  /** Optional — absent/null means no price is shown publicly. */
+  price?: number;
+  priceUnit?: string;
+  priceNote?: string;
   description: string;
   imageUrl: string; // primary/thumbnail image — derived from images[0], see rowToProduct
   images?: ProductImage[];

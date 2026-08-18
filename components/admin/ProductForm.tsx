@@ -55,6 +55,34 @@ export function ProductForm({ product }: { product?: AdminProductRow }) {
         <Field label="Wall / Floor" name="wall_or_floor" defaultValue={product?.wall_or_floor} />
         <Field label="Collection" name="collection" defaultValue={product?.collection} />
       </div>
+
+      <div className="space-y-1 rounded border border-neutral-800 p-4">
+        <p className="mb-3 text-sm font-medium text-neutral-300">
+          Pricing <span className="text-neutral-500">(optional — leave blank to hide price)</span>
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="space-y-1">
+            <label htmlFor="price" className="text-sm text-neutral-400">
+              Price (₹)
+            </label>
+            <input
+              id="price"
+              name="price"
+              type="number"
+              min="0"
+              step="0.01"
+              defaultValue={product?.price ?? ""}
+              className="w-full rounded border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm outline-none focus:border-neutral-500"
+            />
+          </div>
+          <Field label="Unit (e.g. per sq. ft.)" name="price_unit" defaultValue={product?.price_unit} />
+          <Field label="Note (optional)" name="price_note" defaultValue={product?.price_note} />
+        </div>
+        <p className="mt-2 text-xs text-neutral-500">
+          Clear the price field and save to remove pricing from the public product page.
+        </p>
+      </div>
+
       <div className="space-y-1">
         <label htmlFor="description" className="text-sm text-neutral-400">
           Description

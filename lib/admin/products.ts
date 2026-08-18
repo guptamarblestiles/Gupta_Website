@@ -23,6 +23,9 @@ export type AdminProductRow = {
   color: string | null;
   wall_or_floor: string | null;
   collection: string | null;
+  price: number | null;
+  price_unit: string | null;
+  price_note: string | null;
   description: string;
   created_at: string;
   updated_at: string;
@@ -72,6 +75,9 @@ export type ProductInput = {
   color?: string;
   wall_or_floor?: string;
   collection?: string;
+  price?: number | null;
+  price_unit?: string | null;
+  price_note?: string | null;
   description?: string;
 };
 

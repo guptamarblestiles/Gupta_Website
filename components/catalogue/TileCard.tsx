@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { StoneSwatch } from "@/components/ui/StoneSwatch";
+import { PriceDisplay } from "@/components/product/PriceDisplay";
 import { getStoneForProduct } from "@/lib/products/stone";
 import type { Product } from "@/types/product";
 
@@ -56,6 +57,12 @@ export function TileCard({ product, preload = false }: TileCardProps) {
         <p className="font-body text-body text-on-surface-variant">
           {product.finish} &middot; {product.size}
         </p>
+        <PriceDisplay
+          price={product.price}
+          priceUnit={product.priceUnit}
+          priceNote={product.priceNote}
+          className="mt-2 font-body text-body text-on-surface"
+        />
       </div>
     </Link>
   );

@@ -15,7 +15,7 @@ export async function loginAction(
   const password = String(formData.get("password") ?? "");
   const from = String(formData.get("from") ?? "/admin");
 
-  if (!checkAdminPassword(password)) {
+  if (!(await checkAdminPassword(password))) {
     return { status: "error", message: "Incorrect password." };
   }
 

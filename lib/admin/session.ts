@@ -41,7 +41,21 @@ export function isValidSessionToken(token: string | undefined | null): boolean {
   return Number.isFinite(expiry) && Date.now() < expiry;
 }
 
-export function checkAdminPassword(candidate: string): boolean {
+/**
+ * Checks a submitted password against the DB-backed admin_auth hash
+ * (lib/admin/passwordAuth.ts). Falls back to the legacy ADMIN_PASSWORD env
+ * var only when no admin_auth row exists yet (e.g. migration applied but
+ * scripts/admin/seedAdminAuth.ts hasn't run) — keeps existing deployments
+ * from being locked out mid-rollout. Once a row exists, the env var is
+ * ignored entirely; password changes only ever touch the database.
+ */
+export async function checkAdminPassword(candidate: string): Promise<boolean> {
+  const { verifyAdminPassword, hasAdminAuthRow } = await import("@/lib/admin/passwordAuth");
+
+  if (await hasAdminAuthRow()) {
+    return verifyAdminPassword(candidate);
+  }
+
   const expected = process.env.ADMIN_PASSWORD;
   if (!expected) return false;
   const a = Buffer.from(candidate);
