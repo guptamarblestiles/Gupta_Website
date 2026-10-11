@@ -6,10 +6,22 @@
  * contact form/info block is a more useful anchor target than the footer.
  */
 import Link from "next/link";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/SocialIcons";
 import { CONTACT_INFO } from "@/lib/contact";
+import { BUSINESS_INFO, socialLinks } from "@/lib/site";
+
+const SOCIAL_ICONS: Record<string, typeof InstagramIcon> = {
+  instagram: InstagramIcon,
+  linkedin: LinkedinIcon,
+};
+
+function iconForLink(url: string) {
+  const host = new URL(url).hostname;
+  const key = Object.keys(SOCIAL_ICONS).find((k) => host.includes(k));
+  return key ? SOCIAL_ICONS[key] : null;
+}
 
 const QUICK_LINKS = [
   { label: "Home", href: "/" },
@@ -79,34 +91,39 @@ export function Footer() {
                   {CONTACT_INFO.email}
                 </a>
               </li>
+              <li className="flex items-start gap-3">
+                <Clock size={18} className="text-secondary shrink-0 mt-0.5" aria-hidden="true" />
+                <span className="font-body text-body text-hero-muted">
+                  {BUSINESS_INFO.openingHours.display}
+                </span>
+              </li>
             </ul>
           </div>
 
-          <div>
-            <p className="font-body text-label uppercase tracking-widest text-hero-foreground mb-5">
-              Follow
-            </p>
-            <div className="flex items-center gap-4">
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label="Gupta Interior on Instagram"
-                className="text-hero-muted transition-colors duration-300 hover:text-secondary"
-              >
-                <InstagramIcon size={18} />
-              </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label="Gupta Interior on LinkedIn"
-                className="text-hero-muted transition-colors duration-300 hover:text-secondary"
-              >
-                <LinkedinIcon size={18} />
-              </a>
+          {socialLinks.length > 0 && (
+            <div>
+              <p className="font-body text-label uppercase tracking-widest text-hero-foreground mb-5">
+                Follow
+              </p>
+              <div className="flex items-center gap-4">
+                {socialLinks.map((url) => {
+                  const Icon = iconForLink(url);
+                  return (
+                    <a
+                      key={url}
+                      href={url}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      aria-label={`Gupta Interior on ${new URL(url).hostname}`}
+                      className="text-hero-muted transition-colors duration-300 hover:text-secondary"
+                    >
+                      {Icon ? <Icon size={18} /> : <span className="text-body">{new URL(url).hostname}</span>}
+                    </a>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="pt-8 border-t border-hero-border flex flex-col sm:flex-row items-center justify-between gap-4">
