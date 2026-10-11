@@ -11,6 +11,7 @@ import { TileCard } from "@/components/catalogue/TileCard";
 import { EnquiryForm } from "@/components/enquiry/EnquiryForm";
 import { StickyEnquireBar } from "@/components/product/StickyEnquireBar";
 import { PriceDisplay } from "@/components/product/PriceDisplay";
+import { DownloadResources } from "@/components/product/DownloadResources";
 import { getProductBySlug, getRelatedProducts } from "@/lib/products/queries";
 import { getStoneForProduct } from "@/lib/products/stone";
 import type { Product } from "@/types/product";
@@ -44,13 +45,17 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 const SPEC_ROWS: { label: string; value: (product: Product) => string | undefined }[] = [
-  { label: "Category", value: (p) => p.category },
-  { label: "Finish", value: (p) => p.finish || undefined },
-  { label: "Size", value: (p) => p.size || undefined },
-  { label: "Color", value: (p) => p.color },
-  { label: "Wall / Floor", value: (p) => p.wallOrFloor },
-  { label: "Collection", value: (p) => p.collection },
   { label: "Product Code", value: (p) => p.productCode },
+  { label: "Category", value: (p) => p.category },
+  { label: "Series", value: (p) => p.series },
+  { label: "Size", value: (p) => p.size || undefined },
+  { label: "Thickness", value: (p) => p.thickness },
+  { label: "Finish", value: (p) => p.finish || undefined },
+  { label: "Material", value: (p) => p.material },
+  { label: "Application", value: (p) => p.application },
+  { label: "Rooms", value: (p) => p.rooms?.join(", ") },
+  { label: "Pattern", value: (p) => p.pattern },
+  { label: "Colour", value: (p) => p.color },
 ];
 
 export default async function ProductPage({ params }: ProductPageProps) {
@@ -125,6 +130,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     );
                   })}
                 </dl>
+
+                <DownloadResources product={product} />
 
                 <PriceDisplay
                   price={product.price}

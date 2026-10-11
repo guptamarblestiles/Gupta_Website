@@ -19,6 +19,16 @@ export interface ProductImage {
   sortOrder: number;
 }
 
+/** The original brand PDF a product was curated from. `fileUrl` is absent
+ *  until the PDF has been uploaded — the UI shows an "unavailable" state. */
+export interface SourcePdf {
+  id: string;
+  title: string;
+  originalFilename: string;
+  fileUrl?: string;
+  fileSizeBytes?: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -30,6 +40,14 @@ export interface Product {
   color?: string;
   wallOrFloor?: string;
   collection?: string;
+  application?: string;
+  rooms?: string[];
+  pattern?: string;
+  thickness?: string;
+  series?: string;
+  finishDetail?: string;
+  sourcePage?: number;
+  sourcePdf?: SourcePdf;
   origin?: string;
   material?: string;
   availableFinishes?: string;
@@ -44,26 +62,44 @@ export interface Product {
   updatedAt: string;
 }
 
-export interface ProductFilters {
-  category?: ProductCategory[];
-  finish?: ProductFinish[];
-  size?: string[];
-  color?: string[];
-  wallOrFloor?: string[];
-  collection?: string[];
-  search?: string;
+/** Every filter group, in sidebar order. Each is OR'd within the group and
+ *  AND'd across groups. Keys are also the URL search-param names. */
+export const FILTER_KEYS = [
+  "application",
+  "rooms",
+  "size",
+  "pattern",
+  "color",
+  "thickness",
+  "category",
+  "series",
+  "finish",
+] as const;
+export type FilterKey = (typeof FILTER_KEYS)[number];
+
+export const FILTER_LABELS: Record<FilterKey, string> = {
+  application: "Application",
+  rooms: "Rooms",
+  size: "Size",
+  pattern: "Pattern",
+  color: "Colour",
+  thickness: "Thickness",
+  category: "Product Category",
+  series: "Series / Collection",
+  finish: "Finish",
+};
+
+export type ProductFilters = Partial<Record<FilterKey, string[]>> & { search?: string };
+
+export interface FacetOption {
+  value: string;
+  /** Products matching every OTHER active filter that have this value. */
+  count: number;
 }
 
-/** Distinct facet values actually present in the catalogue right now —
- *  what drives each FilterSidebar option list. See getFilterFacets. */
-export interface ProductFilterFacets {
-  categories: string[];
-  finishes: string[];
-  sizes: string[];
-  colors: string[];
-  wallOrFloors: string[];
-  collections: string[];
-}
+/** Option list (with live counts) per filter group — what drives each
+ *  FilterSidebar section. See getFilterFacets. */
+export type ProductFilterFacets = Record<FilterKey, FacetOption[]>;
 
 export interface PaginatedProducts {
   products: Product[];
