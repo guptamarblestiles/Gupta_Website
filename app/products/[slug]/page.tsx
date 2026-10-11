@@ -15,6 +15,7 @@ import { DownloadResources } from "@/components/product/DownloadResources";
 import { getProductBySlug, getRelatedProducts } from "@/lib/products/queries";
 import { getStoneForProduct } from "@/lib/products/stone";
 import type { Product } from "@/types/product";
+import { SITE_URL } from "@/lib/site";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -25,21 +26,38 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = await getProductBySlug(slug);
 
   if (!product) {
-    return { title: "Product Not Found" };
+    return {
+      title: "Product Not Found",
+      robots: { index: false, follow: false },
+    };
   }
 
+  const specs = [product.size, product.finish].filter(Boolean).join(", ");
+  const title = `${product.name}${specs ? ` – ${specs}` : ""} | Delhi`;
+  const description = specs
+    ? `${product.name} — ${specs} ${product.category.toLowerCase()} available in Delhi. ${product.description}`.slice(
+        0,
+        155,
+      )
+    : product.description.slice(0, 155);
+  const canonical = `${SITE_URL}/products/${product.slug}`;
+
   return {
-    title: product.name,
-    description: product.description,
+    title,
+    description,
+    alternates: { canonical },
     openGraph: {
-      title: product.name,
-      description: product.description,
+      title,
+      description,
       type: "website",
+      url: canonical,
+      images: product.imageUrl ? [{ url: product.imageUrl }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: product.name,
-      description: product.description,
+      title,
+      description,
+      images: product.imageUrl ? [product.imageUrl] : undefined,
     },
   };
 }
