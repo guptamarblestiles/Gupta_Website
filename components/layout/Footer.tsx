@@ -28,7 +28,7 @@ const QUICK_LINKS = [
   { label: "Home", href: "/" },
   { label: "Tiles", href: "/tiles" },
   { label: "About", href: "/#about" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function Footer() {
