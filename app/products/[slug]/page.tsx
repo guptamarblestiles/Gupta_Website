@@ -15,7 +15,8 @@ import { DownloadResources } from "@/components/product/DownloadResources";
 import { getProductBySlug, getRelatedProducts } from "@/lib/products/queries";
 import { getStoneForProduct } from "@/lib/products/stone";
 import type { Product } from "@/types/product";
-import { SITE_URL } from "@/lib/site";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -87,8 +88,46 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const stone = getStoneForProduct(product);
   const related = await getRelatedProducts(product, 4);
 
+  const productUrl = `${SITE_URL}/products/${product.slug}`;
+  const additionalProperty = [
+    product.size && { "@type": "PropertyValue", name: "Size", value: product.size },
+    product.finish && { "@type": "PropertyValue", name: "Finish", value: product.finish },
+  ].filter(Boolean);
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: product.images?.length
+      ? product.images.map((image) => image.imageUrl)
+      : [product.imageUrl],
+    sku: product.productCode,
+    category: product.category,
+    url: productUrl,
+    brand: { "@type": "Brand", name: SITE_NAME },
+    ...(additionalProperty.length ? { additionalProperty } : {}),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Catalogue", item: `${SITE_URL}/products` },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: product.category,
+        item: `${SITE_URL}/products?category=${encodeURIComponent(product.category)}`,
+      },
+      { "@type": "ListItem", position: 3, name: product.name, item: productUrl },
+    ],
+  };
+
   return (
     <>
+      <JsonLd data={productJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       <Navbar variant="light" />
       <main id="main-content" className="pt-16 md:pt-20 pb-20 md:pb-0">
         <section className="py-section-gap">
