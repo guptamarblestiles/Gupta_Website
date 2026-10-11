@@ -4,7 +4,25 @@
 
 export const SITE_NAME = "Gupta Interior";
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const PRODUCTION_SITE_URL = "https://www.guptainterior.in";
+
+function resolveSiteUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  const url = raw ? raw.replace(/\/+$/, "") : PRODUCTION_SITE_URL;
+
+  // The sitemap, robots.txt, canonicals, and JSON-LD all derive from this
+  // value — if it silently resolves to localhost in a production build,
+  // every one of those gets submitted to Google wrong. Fail loudly instead.
+  if (process.env.NODE_ENV === "production" && url.includes("localhost")) {
+    throw new Error(
+      "NEXT_PUBLIC_SITE_URL must not be localhost in production — set it in Vercel's environment variables (expected https://www.guptainterior.in).",
+    );
+  }
+
+  return url;
+}
+
+export const SITE_URL = resolveSiteUrl();
 
 export const BUSINESS_INFO = {
   name: SITE_NAME,

@@ -12,6 +12,8 @@ Every URL in production's `sitemap.xml`, `robots.txt`'s `Sitemap:` line, and eve
 
 **Fix:** set `NEXT_PUBLIC_SITE_URL` in the Vercel project's Environment Variables (Production) to the real serving host — see the host-canonicalization finding below for which host that should be — then redeploy. This is a Vercel dashboard change, not a code change, and is **not something I can do from here**; flagging as the top-priority manual step before Search Console submission.
 
+**Status: fixed in this PR (feat/search-console).** `lib/site.ts` now falls back to `https://www.guptainterior.in` (not localhost) when `NEXT_PUBLIC_SITE_URL` is unset, and the production build now fails loudly if the resolved site URL ever contains `localhost`. The user is setting `NEXT_PUBLIC_SITE_URL=https://www.guptainterior.in` in Vercel and redeploying separately — this record is kept as-is to document what was found.
+
 ## 🚨 Host canonicalization is inconsistent with the `www`-less assumption
 
 ```
@@ -22,6 +24,8 @@ https://www.guptainterior.in       → 200 (this is what actually serves the sit
 ```
 
 The site's real canonical host is **`www.guptainterior.in`**, not the bare `guptainterior.in` that `lib/site.ts`/`SITE_URL` assumed throughout the prior SEO work. `NEXT_PUBLIC_SITE_URL` must be set to `https://www.guptainterior.in` (with `www`) to match what Vercel actually serves — otherwise canonicals will point at a URL that itself redirects, which is valid but wasteful and inconsistent with the sitemap. Alternatively, reconfigure Vercel's domain settings to make the bare apex the primary domain and redirect `www` → apex instead, if that's the preferred host. Either is fine; they just need to match. **This needs a decision from you, then a Vercel config/env change.**
+
+**Status: fixed in this PR.** `www.guptainterior.in` is now the production fallback in `lib/site.ts`, matching the host confirmed above.
 
 ## Task 1 — Page-by-page verification table
 
