@@ -9,7 +9,7 @@ import { CONTACT_INFO } from "@/lib/contact";
 import { BUSINESS_INFO, SITE_URL } from "@/lib/site";
 
 const canonical = `${SITE_URL}/contact`;
-const title = "Contact Gupta Interior | Showroom in Mangolpur Kalan, Delhi";
+const title = "Contact Us – Showroom in Mangolpur Kalan, Delhi";
 const description =
   "Visit Gupta Interior's showroom in Mangolpur Kalan, Rohini, Delhi. Call, email, or get directions for marble, granite, and tile enquiries.";
 

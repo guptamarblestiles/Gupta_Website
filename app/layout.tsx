@@ -22,6 +22,7 @@ export const metadata: Metadata = {
   },
   description:
     "Premium marble, granite, and tile surfaces curated for visionary architectural spaces.",
+  alternates: { canonical: "/" },
   openGraph: {
     title: "Gupta Interior | Architectural Surfaces",
     description:

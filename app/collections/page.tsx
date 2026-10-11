@@ -6,7 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { COLLECTIONS } from "@/lib/collections";
 import { SITE_URL } from "@/lib/site";
 
-const TITLE = "Tile Collections in Delhi | Gupta Interior";
+const TITLE = "Tile Collections in Delhi";
 const DESCRIPTION =
   "Browse Gupta Interior's tile collections by application and finish — wall, floor, porcelain, glossy, and matt tiles in Delhi.";
 

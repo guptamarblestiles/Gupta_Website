@@ -38,7 +38,7 @@ export const COLLECTIONS: CollectionDef[] = [
     slug: "wall-tiles",
     name: "Wall Tiles",
     h1: "Wall Tiles in Delhi",
-    metaTitle: "Wall Tiles in Delhi | Gupta Interior",
+    metaTitle: "Wall Tiles in Delhi",
     metaDescription:
       "Shop wall tiles in Delhi at Gupta Interior, Mangolpur Kalan — glossy, satin and carved finishes in 300x600mm and more.",
     filters: { application: ["Wall"] },
@@ -76,7 +76,7 @@ Browse the wall tiles below, or visit our Delhi showroom to see finishes and siz
     slug: "floor-tiles",
     name: "Floor Tiles",
     h1: "Floor Tiles in Delhi",
-    metaTitle: "Floor Tiles in Delhi | Gupta Interior",
+    metaTitle: "Floor Tiles in Delhi",
     metaDescription:
       "Floor tiles in Delhi from Gupta Interior, Mangolpur Kalan — durable glossy and matt finishes for homes, shops and parking areas.",
     filters: { application: ["Floor"] },
@@ -114,7 +114,7 @@ Come by our Delhi showroom to see and feel the floor tile finishes before commit
     slug: "porcelain-tiles",
     name: "Porcelain Tiles",
     h1: "Porcelain Tiles in Delhi",
-    metaTitle: "Porcelain Tiles in Delhi | Gupta Interior",
+    metaTitle: "Porcelain Tiles in Delhi",
     metaDescription:
       "Porcelain tiles in Delhi at Gupta Interior, Mangolpur Kalan — dense, low-porosity tiles for floors and walls that see heavy use.",
     filters: { category: ["Porcelain Tiles"] },
@@ -152,7 +152,7 @@ Visit our Delhi showroom to see the porcelain range and get guidance on which fi
     slug: "glossy-finish-tiles",
     name: "Glossy Finish Tiles",
     h1: "Glossy Finish Tiles in Delhi",
-    metaTitle: "Glossy Finish Tiles in Delhi | Gupta Interior",
+    metaTitle: "Glossy Finish Tiles in Delhi",
     metaDescription:
       "Glossy finish tiles in Delhi from Gupta Interior, Mangolpur Kalan — reflective, easy-clean tiles for walls and floors.",
     filters: { finish: ["Glossy"] },
@@ -190,7 +190,7 @@ Our glossy range covers a wide mix of sizes and series — come to the showroom 
     slug: "matt-finish-tiles",
     name: "Matt Finish Tiles",
     h1: "Matt Finish Tiles in Delhi",
-    metaTitle: "Matt Finish Tiles in Delhi | Gupta Interior",
+    metaTitle: "Matt Finish Tiles in Delhi",
     metaDescription:
       "Matt finish tiles in Delhi at Gupta Interior, Mangolpur Kalan — slip-resistant, low-glare tiles for floors and walls.",
     filters: { finish: ["Matt", "Matte"] },
