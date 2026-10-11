@@ -1,15 +1,17 @@
-/** robots.txt — everything crawlable except /admin/*, plus a pointer to
- *  the sitemap. */
+/** robots.txt — everything crawlable except /admin/* and filter/search/
+ *  pagination query-string variants of /products and /tiles (those are
+ *  noindex,follow in their own metadata too — see app/products/page.tsx
+ *  and app/tiles/page.tsx — this just keeps crawl budget off them as
+ *  well), plus a pointer to the sitemap. */
 import type { MetadataRoute } from "next";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+import { SITE_URL } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: "/admin/",
+      disallow: ["/admin/", "/products?*", "/tiles?*"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

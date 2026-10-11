@@ -6,11 +6,12 @@
  * without a `product` so it renders as a plain general enquiry form.
  * Now the "/#contact" anchor target (previously the footer).
  */
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { EnquiryForm } from "@/components/enquiry/EnquiryForm";
 import { CONTACT_INFO } from "@/lib/contact";
+import { BUSINESS_INFO } from "@/lib/site";
 
 export function ContactSection() {
   return (
@@ -51,6 +52,12 @@ export function ContactSection() {
                 >
                   {CONTACT_INFO.email}
                 </a>
+              </li>
+              <li className="flex items-start gap-4">
+                <Clock size={20} className="text-secondary shrink-0 mt-0.5" aria-hidden="true" />
+                <span className="font-body text-body text-on-surface-variant leading-relaxed">
+                  {BUSINESS_INFO.openingHours.display}
+                </span>
               </li>
             </ul>
 

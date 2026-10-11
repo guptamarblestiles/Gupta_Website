@@ -15,6 +15,7 @@ import { getProducts } from "@/lib/products/queries";
 export const metadata: Metadata = {
   title: "Tile Visualizer",
   description: "See Gupta Interior tiles warped onto real room presets before you buy.",
+  alternates: { canonical: "/visualizer" },
 };
 
 export default async function VisualizerPage() {

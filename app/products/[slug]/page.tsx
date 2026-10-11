@@ -15,6 +15,8 @@ import { DownloadResources } from "@/components/product/DownloadResources";
 import { getProductBySlug, getRelatedProducts } from "@/lib/products/queries";
 import { getStoneForProduct } from "@/lib/products/stone";
 import type { Product } from "@/types/product";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
+import { JsonLd } from "@/components/seo/JsonLd";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -25,21 +27,38 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = await getProductBySlug(slug);
 
   if (!product) {
-    return { title: "Product Not Found" };
+    return {
+      title: "Product Not Found",
+      robots: { index: false, follow: false },
+    };
   }
 
+  const specs = [product.size, product.finish].filter(Boolean).join(", ");
+  const title = `${product.name}${specs ? ` – ${specs}` : ""} | Delhi`;
+  const description = specs
+    ? `${product.name} — ${specs} ${product.category.toLowerCase()} available in Delhi. ${product.description}`.slice(
+        0,
+        155,
+      )
+    : product.description.slice(0, 155);
+  const canonical = `${SITE_URL}/products/${product.slug}`;
+
   return {
-    title: product.name,
-    description: product.description,
+    title,
+    description,
+    alternates: { canonical },
     openGraph: {
-      title: product.name,
-      description: product.description,
+      title,
+      description,
       type: "website",
+      url: canonical,
+      images: product.imageUrl ? [{ url: product.imageUrl }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: product.name,
-      description: product.description,
+      title,
+      description,
+      images: product.imageUrl ? [product.imageUrl] : undefined,
     },
   };
 }
@@ -69,8 +88,46 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const stone = getStoneForProduct(product);
   const related = await getRelatedProducts(product, 4);
 
+  const productUrl = `${SITE_URL}/products/${product.slug}`;
+  const additionalProperty = [
+    product.size && { "@type": "PropertyValue", name: "Size", value: product.size },
+    product.finish && { "@type": "PropertyValue", name: "Finish", value: product.finish },
+  ].filter(Boolean);
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description: product.description,
+    image: product.images?.length
+      ? product.images.map((image) => image.imageUrl)
+      : [product.imageUrl],
+    sku: product.productCode,
+    category: product.category,
+    url: productUrl,
+    brand: { "@type": "Brand", name: SITE_NAME },
+    ...(additionalProperty.length ? { additionalProperty } : {}),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Catalogue", item: `${SITE_URL}/products` },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: product.category,
+        item: `${SITE_URL}/products?category=${encodeURIComponent(product.category)}`,
+      },
+      { "@type": "ListItem", position: 3, name: product.name, item: productUrl },
+    ],
+  };
+
   return (
     <>
+      <JsonLd data={productJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       <Navbar variant="light" />
       <main id="main-content" className="pt-16 md:pt-20 pb-20 md:pb-0">
         <section className="py-section-gap">

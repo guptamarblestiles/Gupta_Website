@@ -7,15 +7,34 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { CatalogueBrowser } from "@/components/catalogue/CatalogueBrowser";
+import { catalogueCanonicalMetadata } from "@/lib/seo/catalogueMetadata";
 
-export const metadata: Metadata = {
-  title: "Tiles",
-  description: "Browse every tile in the Gupta Interior collection.",
-};
+const TILES_TITLE = "Tiles in Delhi – GVT, Bathroom & Wall Tiles";
+const TILES_DESCRIPTION =
+  "Every tile in the Gupta Interior Delhi collection: GVT, bathroom, and wall tiles in a range of sizes and finishes.";
 
 type TilesPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+export async function generateMetadata({ searchParams }: TilesPageProps): Promise<Metadata> {
+  const params = await searchParams;
+  return {
+    title: TILES_TITLE,
+    description: TILES_DESCRIPTION,
+    openGraph: {
+      title: TILES_TITLE,
+      description: TILES_DESCRIPTION,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: TILES_TITLE,
+      description: TILES_DESCRIPTION,
+    },
+    ...catalogueCanonicalMetadata("/tiles", params),
+  };
+}
 
 export default async function TilesPage({ searchParams }: TilesPageProps) {
   const params = await searchParams;

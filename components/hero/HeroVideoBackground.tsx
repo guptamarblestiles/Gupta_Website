@@ -1,7 +1,8 @@
 "use client";
 
 import { useReducedMotion } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
+import Image from "next/image";
 
 /**
  * Full-bleed background playlist for the hero: plays all 10 clips back to
@@ -31,19 +32,40 @@ const PLAYLIST = [
 
 const POSTER = "/videos/hero-poster.jpg";
 
+/** Below this width, skip the video playlist entirely — mobile visitors
+ *  get the static poster instead, saving cellular data and main-thread
+ *  decode work (and keeping the poster image, not a video frame, as the
+ *  mobile LCP candidate). Matches Tailwind's `md` breakpoint. */
+const MOBILE_BREAKPOINT_QUERY = "(max-width: 767px)";
+
+function subscribeToMobileQuery(callback: () => void) {
+  const mql = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
+  mql.addEventListener("change", callback);
+  return () => mql.removeEventListener("change", callback);
+}
+
+/** Server snapshot is "mobile" so SSR/first paint always renders the
+ *  static poster — never a flash of video before hydration settles. */
+function getMobileSnapshot() {
+  return window.matchMedia(MOBILE_BREAKPOINT_QUERY).matches;
+}
+
 export function HeroVideoBackground() {
   const reduceMotion = useReducedMotion();
   const [index, setIndex] = useState(0);
+  const isMobile = useSyncExternalStore(subscribeToMobileQuery, getMobileSnapshot, () => true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  if (reduceMotion) {
+  if (reduceMotion || isMobile) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      <Image
         src={POSTER}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full object-cover"
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover"
       />
     );
   }
