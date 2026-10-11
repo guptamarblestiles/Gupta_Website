@@ -8,12 +8,19 @@
 import type { MetadataRoute } from "next";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { SITE_URL } from "@/lib/site";
+import { COLLECTIONS } from "@/lib/collections";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: SITE_URL, changeFrequency: "weekly", priority: 1 },
     { url: `${SITE_URL}/tiles`, changeFrequency: "daily", priority: 0.9 },
     { url: `${SITE_URL}/products`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${SITE_URL}/collections`, changeFrequency: "weekly", priority: 0.8 },
+    ...COLLECTIONS.map((c) => ({
+      url: `${SITE_URL}/collections/${c.slug}`,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
     { url: `${SITE_URL}/visualizer`, changeFrequency: "monthly", priority: 0.6 },
   ];
 

@@ -46,6 +46,7 @@ import { cn } from "@/lib/utils/cn";
 const NAV_LINKS = [
   { label: "Home", href: "/" },
   { label: "Tiles", href: "/tiles" },
+  { label: "Collections", href: "/collections" },
   { label: "About", href: "/#about" },
   { label: "Contact", href: "/#contact" },
 ];

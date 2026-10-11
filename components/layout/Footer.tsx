@@ -11,6 +11,7 @@ import { Container } from "@/components/ui/Container";
 import { InstagramIcon, LinkedinIcon } from "@/components/ui/SocialIcons";
 import { CONTACT_INFO } from "@/lib/contact";
 import { BUSINESS_INFO, socialLinks } from "@/lib/site";
+import { COLLECTIONS } from "@/lib/collections";
 
 const SOCIAL_ICONS: Record<string, typeof InstagramIcon> = {
   instagram: InstagramIcon,
@@ -58,6 +59,24 @@ export function Footer() {
                     className="font-body text-body text-hero-muted transition-colors duration-300 hover:text-secondary"
                   >
                     {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          <nav aria-label="Footer collections">
+            <p className="font-body text-label uppercase tracking-widest text-hero-foreground mb-5">
+              Collections
+            </p>
+            <ul className="flex flex-col gap-3">
+              {COLLECTIONS.map((c) => (
+                <li key={c.slug}>
+                  <Link
+                    href={`/collections/${c.slug}`}
+                    className="font-body text-body text-hero-muted transition-colors duration-300 hover:text-secondary"
+                  >
+                    {c.name}
                   </Link>
                 </li>
               ))}
