@@ -16,6 +16,11 @@ export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isPublic = PUBLIC_PATHS.some((p) => path === p || path.startsWith(`${p}/`));
 
+  // Local demo mode (never in production builds): no real sign-in.
+  if (process.env.NODE_ENV !== "production" && (process.env.ADMIN_DEMO === "1" || process.env.NEXT_PUBLIC_ADMIN_DEMO === "1")) {
+    return NextResponse.next();
+  }
+
   if (!url || !key) {
     return isPublic ? NextResponse.next() : NextResponse.redirect(new URL("/login", request.url));
   }

@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { requireRole } from "@/lib/auth";
 import { getValueSuggestions, listPdfOptions } from "@/lib/data/products";
 import { PageHeader } from "@/components/ui/Display";
-import { EMPTY_PRODUCT, ProductForm } from "@/components/products/ProductForm";
+import { ProductForm } from "@/components/products/ProductForm";
+import { EMPTY_PRODUCT } from "@/lib/catalogue/productForm";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Add product" };

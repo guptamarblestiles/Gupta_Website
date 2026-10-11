@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/shell/AppShell";
 import { requireRole, roleAtLeast, ROLE_LABELS } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { DEMO } from "@/lib/demo/mode";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await requireRole("viewer");
@@ -13,6 +14,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <AppShell
       newEnquiries={newEnquiries}
+      demo={DEMO}
       user={{
         name: session.displayName || session.email.split("@")[0],
         email: session.email,

@@ -24,6 +24,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Brand } from "@/components/shell/Brand";
+import { DemoBanner } from "@/components/shell/DemoBanner";
 import { signOut } from "@/actions/auth";
 import { cn } from "@/lib/cn";
 import type { AdminRole } from "@/lib/auth";
@@ -88,10 +89,12 @@ export function AppShell({
   children,
   user,
   newEnquiries,
+  demo,
 }: {
   children: ReactNode;
   user: { name: string; email: string; role: AdminRole; roleLabel: string };
   newEnquiries: number;
+  demo?: boolean;
 }) {
   const pathname = usePathname();
   const [drawer, setDrawer] = useState(false);
@@ -175,6 +178,7 @@ export function AppShell({
       )}
 
       <div className="flex min-w-0 flex-col">
+        {demo && <DemoBanner role={user.role} />}
         <TopBar onMenu={() => setDrawer(true)} canEdit={RANK[user.role] >= RANK.editor} />
         <main id="main" className="mx-auto w-full max-w-[1280px] flex-1 px-4 pt-6 pb-16 sm:px-6 lg:px-10 lg:pt-8">
           {children}

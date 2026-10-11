@@ -1,5 +1,6 @@
 import "server-only";
 import type { PublicSync } from "@/lib/actionResult";
+import { DEMO } from "@/lib/demo/mode";
 
 export const PUBLIC_SITE_URL = (process.env.PUBLIC_SITE_URL ?? "").replace(/\/$/, "");
 
@@ -21,6 +22,7 @@ export function publicProductUrl(slug: string): string | null {
  * runs, so a failure here is reported to the user separately.
  */
 export async function refreshPublicSite(): Promise<PublicSync> {
+  if (DEMO) return "not_needed"; // a demo never touches the real website
   const secret = process.env.PUBLIC_REVALIDATE_SECRET;
   if (!PUBLIC_SITE_URL || !secret) return "not_configured";
   try {

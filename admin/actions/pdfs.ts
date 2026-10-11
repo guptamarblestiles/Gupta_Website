@@ -7,6 +7,7 @@ import { fail, type ActionResult } from "@/lib/actionResult";
 import { MAX_PDF_MB, PDF_BUCKET, SOURCE_PDF_FOLDER, publicStorageUrl } from "@/lib/env";
 import { cleanText, slugify } from "@/lib/catalogue/normalize";
 import { refreshPublicSite } from "@/lib/publicSite";
+import { DEMO } from "@/lib/demo/mode";
 
 const prepareSchema = z.object({
   sha256: z.string().regex(/^[a-f0-9]{64}$/),
@@ -29,6 +30,7 @@ export type PreparedUpload =
  */
 export async function preparePdfUpload(input: z.input<typeof prepareSchema>): Promise<ActionResult<PreparedUpload>> {
   return runAction<PreparedUpload>("editor", async ({ db, session }) => {
+    if (DEMO) return fail("Demo mode: PDFs aren't uploaded. Try “Find products” on the sample catalogue in the library instead.");
     const parsed = prepareSchema.safeParse(input);
     if (!parsed.success) return fail("That file couldn't be read as a PDF.");
     const { sha256, size, pageCount } = parsed.data;

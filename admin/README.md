@@ -168,6 +168,8 @@ and create the DNS record Vercel shows you. Don't share the URL until the
 migration is applied and the first owner exists — until then nobody can sign
 in, but there's nothing useful behind it either.
 
+**Try it without a database:** `ADMIN_DEMO=1 NEXT_PUBLIC_ADMIN_DEMO=1 npm run dev` opens every screen with sample data (real public product images from the live site, made-up statuses and enquiries) held in memory. Edits work until the dev server restarts; nothing is uploaded or written anywhere, and a banner lets you switch between Owner, Editor and Read-only. Demo mode is ignored in production builds.
+
 **Dev tool:** `npx tsx scripts/try-extract.ts "<file.pdf>" --verbose` prints
 what the importer would find on each page of a local PDF, without uploading
 anything.

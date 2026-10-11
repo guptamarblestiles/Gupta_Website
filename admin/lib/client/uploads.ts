@@ -4,6 +4,8 @@ import { getBrowserClient } from "@/lib/supabase/browser";
 import { IMAGE_BUCKET, publicStorageUrl } from "@/lib/env";
 import { extensionFor, prepareImage } from "@/lib/client/files";
 
+const CLIENT_DEMO = process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_ADMIN_DEMO === "1";
+
 /**
  * Upload one product/library image straight from the browser to the public
  * "tiles" bucket. The object name is derived from the image's content hash,
@@ -12,6 +14,7 @@ import { extensionFor, prepareImage } from "@/lib/client/files";
  */
 export async function uploadImage(file: File, folder: string): Promise<{ url: string; path: string; reused: boolean }> {
   const { blob, hash } = await prepareImage(file);
+  if (CLIENT_DEMO) return { url: URL.createObjectURL(blob), path: `demo/${hash}`, reused: false };
   const path = `${folder.replace(/^\/+|\/+$/g, "")}/${hash.slice(0, 24)}.${extensionFor(blob)}`;
   const supabase = getBrowserClient();
   const { error } = await supabase.storage.from(IMAGE_BUCKET).upload(path, blob, {
@@ -29,6 +32,8 @@ export async function uploadImage(file: File, folder: string): Promise<{ url: st
 }
 
 export async function uploadBlob(blob: Blob, path: string): Promise<string> {
+  // Demo: keep the image in this browser tab only; nothing is uploaded.
+  if (CLIENT_DEMO) return URL.createObjectURL(blob);
   const supabase = getBrowserClient();
   const { error } = await supabase.storage.from(IMAGE_BUCKET).upload(path, blob, {
     contentType: blob.type,

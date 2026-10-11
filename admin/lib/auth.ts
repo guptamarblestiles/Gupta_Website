@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
+import { cookies } from "next/headers";
+import { DEMO, DEMO_ROLE_COOKIE } from "@/lib/demo/mode";
 
 export type AdminRole = "owner" | "editor" | "viewer";
 
@@ -36,6 +38,15 @@ export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
   // Never prerender an admin page at build time: who is looking decides
   // what is shown, so every request is rendered fresh.
   await connection();
+  if (DEMO) {
+    const role = (await cookies()).get(DEMO_ROLE_COOKIE)?.value;
+    return {
+      userId: "00000000-0000-4000-8000-000000000001",
+      email: "owner@demo.local",
+      displayName: "Demo Owner",
+      role: role === "editor" || role === "viewer" ? role : "owner",
+    };
+  }
   if (!isSupabaseConfigured) return null;
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
