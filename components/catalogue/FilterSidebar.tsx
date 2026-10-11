@@ -1,22 +1,12 @@
 /**
- * FILTER CONTRACT (Part 3) — read this before touching filter behavior.
+ * FILTER CONTRACT — see lib/products/queries.ts.
  *
- * Every option list rendered here (category/finish/size/color/wallOrFloor/
- * collection) comes from the `facets` prop — distinct values actually
- * present in the catalogue right now (lib/products/queries.ts's
- * getFilterFacets) — never a hardcoded list. The real taxonomy comes from
- * whatever folder names were fed through the Part 2 import and changes as
- * products are added, so a fixed enum here would silently stop matching
- * real data (this is exactly what broke when the old hardcoded
- * "Marble Slabs" / "Polished" etc. lists stopped matching the rebuilt
- * schema's free-text categories).
- *
- * Each facet is a checkbox multi-select; toggling a value adds/removes it
- * from that key's query param (?category=&finish=&size=&color=&
- * wallOrFloor=&collection=), which app/products/page.tsx (a Server
- * Component) reads and passes straight to getProducts — filtering always
- * happens server-side, never by slicing an already-fetched list. `search`
- * drives `?q=`, debounced 400ms.
+ * Every option (and its count) comes from the `facets` prop — live values
+ * from the catalogue, never a hardcoded list. Each group is a checkbox
+ * multi-select; toggling adds/removes the value on that group's URL param
+ * (?application=&rooms=&size=&...). app/tiles and app/products are Server
+ * Components that read those params and filter server-side. Search drives
+ * `?q=`, debounced 400ms. Mobile gets a bottom-sheet drawer.
  */
 "use client";
 
@@ -26,9 +16,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
-import type { ProductFilterFacets, ProductFilters } from "@/types/product";
-
-type FilterKey = "category" | "finish" | "size" | "color" | "wallOrFloor" | "collection";
+import {
+  FILTER_KEYS,
+  FILTER_LABELS,
+  type FacetOption,
+  type FilterKey,
+  type ProductFilterFacets,
+  type ProductFilters,
+} from "@/types/product";
 
 type FilterSidebarProps = {
   filters: ProductFilters;
@@ -102,13 +97,7 @@ export function FilterSidebar({ filters, resultCount, facets }: FilterSidebarPro
   }
 
   const activeCount =
-    (filters.category?.length ?? 0) +
-    (filters.finish?.length ?? 0) +
-    (filters.size?.length ?? 0) +
-    (filters.color?.length ?? 0) +
-    (filters.wallOrFloor?.length ?? 0) +
-    (filters.collection?.length ?? 0) +
-    (filters.search ? 1 : 0);
+    FILTER_KEYS.reduce((sum, key) => sum + (filters[key]?.length ?? 0), 0) + (filters.search ? 1 : 0);
 
   const controls = (
     <div className="flex flex-col gap-10">
@@ -129,42 +118,15 @@ export function FilterSidebar({ filters, resultCount, facets }: FilterSidebarPro
         />
       </div>
 
-      <FilterGroup
-        label="Category"
-        options={facets.categories}
-        active={filters.category ?? []}
-        onToggle={(value) => toggleValue("category", value)}
-      />
-      <FilterGroup
-        label="Finish"
-        options={facets.finishes}
-        active={filters.finish ?? []}
-        onToggle={(value) => toggleValue("finish", value)}
-      />
-      <FilterGroup
-        label="Size"
-        options={facets.sizes}
-        active={filters.size ?? []}
-        onToggle={(value) => toggleValue("size", value)}
-      />
-      <FilterGroup
-        label="Color"
-        options={facets.colors}
-        active={filters.color ?? []}
-        onToggle={(value) => toggleValue("color", value)}
-      />
-      <FilterGroup
-        label="Wall / Floor"
-        options={facets.wallOrFloors}
-        active={filters.wallOrFloor ?? []}
-        onToggle={(value) => toggleValue("wallOrFloor", value)}
-      />
-      <FilterGroup
-        label="Collection"
-        options={facets.collections}
-        active={filters.collection ?? []}
-        onToggle={(value) => toggleValue("collection", value)}
-      />
+      {FILTER_KEYS.map((key) => (
+        <FilterGroup
+          key={key}
+          label={FILTER_LABELS[key]}
+          options={facets[key]}
+          active={filters[key] ?? []}
+          onToggle={(value) => toggleValue(key, value)}
+        />
+      ))}
 
       {activeCount > 0 && (
         <button
@@ -249,28 +211,35 @@ export function FilterSidebar({ filters, resultCount, facets }: FilterSidebarPro
 
 type FilterGroupProps = {
   label: string;
-  options: string[];
+  options: FacetOption[];
   active: string[];
   onToggle: (value: string) => void;
 };
 
+const COLLAPSED_COUNT = 8;
+
 function FilterGroup({ label, options, active, onToggle }: FilterGroupProps) {
-  if (options.length === 0) return null;
+  const [expanded, setExpanded] = useState(false);
+  // Hide options that would return nothing, except ones already ticked.
+  const visible = options.filter((o) => o.count > 0 || active.includes(o.value));
+  if (visible.length === 0) return null;
+
+  const shown = expanded ? visible : visible.slice(0, COLLAPSED_COUNT);
 
   return (
-    <div>
-      <p className="mb-3 font-body text-label uppercase tracking-widest text-on-surface-variant">
+    <fieldset>
+      <legend className="mb-3 font-body text-label uppercase tracking-widest text-on-surface-variant">
         {label}
-      </p>
+      </legend>
       <div className="flex flex-col gap-3">
-        {options.map((option) => {
-          const checked = active.includes(option);
+        {shown.map(({ value, count }) => {
+          const checked = active.includes(value);
           return (
-            <label key={option} className="group flex cursor-pointer items-center gap-3">
+            <label key={value} className="group flex cursor-pointer items-center gap-3">
               <input
                 type="checkbox"
                 checked={checked}
-                onChange={() => onToggle(option)}
+                onChange={() => onToggle(value)}
                 className="peer sr-only"
               />
               <span
@@ -285,16 +254,26 @@ function FilterGroup({ label, options, active, onToggle }: FilterGroupProps) {
               </span>
               <span
                 className={cn(
-                  "font-body text-body transition-colors",
+                  "flex-1 font-body text-body transition-colors",
                   checked ? "text-on-surface" : "text-on-surface-variant group-hover:text-on-surface",
                 )}
               >
-                {option}
+                {value}
               </span>
+              <span className="font-body text-sm tabular-nums text-on-surface-variant">{count}</span>
             </label>
           );
         })}
       </div>
-    </div>
+      {visible.length > COLLAPSED_COUNT && (
+        <button
+          type="button"
+          onClick={() => setExpanded((e) => !e)}
+          className="mt-3 font-body text-label uppercase tracking-widest text-secondary-strong transition-colors hover:text-on-surface"
+        >
+          {expanded ? "Show less" : `Show all ${visible.length}`}
+        </button>
+      )}
+    </fieldset>
   );
 }

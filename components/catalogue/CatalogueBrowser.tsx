@@ -9,7 +9,7 @@ import { FilterSidebar } from "@/components/catalogue/FilterSidebar";
 import { ProductGrid } from "@/components/catalogue/ProductGrid";
 import { Pagination } from "@/components/catalogue/Pagination";
 import { getFilterFacets, getProducts } from "@/lib/products/queries";
-import type { ProductFilters } from "@/types/product";
+import { FILTER_KEYS, type ProductFilters } from "@/types/product";
 
 const PAGE_SIZE = 12;
 
@@ -24,25 +24,19 @@ type CatalogueBrowserProps = {
 };
 
 export async function CatalogueBrowser({ basePath, params }: CatalogueBrowserProps) {
-  // No hardcoded whitelist here on purpose (see FILTER CONTRACT in
-  // lib/products/queries.ts) — an unrecognized value just matches zero
-  // rows via .in(...), same as any other filter combo with no results.
+  // No hardcoded whitelist on purpose (see FILTER CONTRACT in
+  // lib/products/queries.ts) — an unrecognized value just matches zero rows.
   const filters: ProductFilters = {
-    category: toList(params.category),
-    finish: toList(params.finish),
-    size: toList(params.size),
-    color: toList(params.color),
-    wallOrFloor: toList(params.wallOrFloor),
-    collection: toList(params.collection),
     search: typeof params.q === "string" ? params.q : undefined,
   };
+  for (const key of FILTER_KEYS) filters[key] = toList(params[key]);
 
   const requestedPage = Number.parseInt(typeof params.page === "string" ? params.page : "1", 10);
   const page = Number.isFinite(requestedPage) ? Math.max(1, requestedPage) : 1;
 
   const [{ products, total }, facets] = await Promise.all([
     getProducts(filters, page, PAGE_SIZE),
-    getFilterFacets(),
+    getFilterFacets(filters),
   ]);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 

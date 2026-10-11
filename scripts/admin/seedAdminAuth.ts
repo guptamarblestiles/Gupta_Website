@@ -24,7 +24,11 @@ function loadEnvLocal() {
   }
   for (const line of text.split("\n")) {
     const match = line.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
-    if (match && !process.env[match[1]]) process.env[match[1]] = match[2];
+    if (!match || process.env[match[1]]) continue;
+    // `vercel env pull` wraps values in double quotes; strip them so the
+    // URL/key reach supabase-js exactly as issued, not with literal quotes.
+    const value = match[2].replace(/^"(.*)"$/, "$1");
+    process.env[match[1]] = value;
   }
 }
 
