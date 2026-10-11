@@ -3,6 +3,7 @@ import Link from "next/link";
 import { StoneSwatch } from "@/components/ui/StoneSwatch";
 import { PriceDisplay } from "@/components/product/PriceDisplay";
 import { getStoneForProduct } from "@/lib/products/stone";
+import { buildImageAlt } from "@/lib/products/alt";
 import type { Product } from "@/types/product";
 
 type TileCardProps = {
@@ -33,7 +34,7 @@ export function TileCard({ product, preload = false }: TileCardProps) {
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
-            alt={product.name}
+            alt={buildImageAlt(product)}
             fill
             preload={preload}
             sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"

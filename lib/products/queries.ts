@@ -19,6 +19,7 @@
  */
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { CATALOGUE_SIZES, MOCK_PRODUCTS } from "@/lib/products/mockProducts";
+import { buildImageAlt } from "@/lib/products/alt";
 import {
   FILTER_KEYS,
   type FilterKey,
@@ -68,11 +69,18 @@ type ProductRow = {
   product_images?: { image_url: string; sort_order: number }[];
 };
 
-/** product_images has no `alt` column — derive it from the product name so
- *  every image still gets reasonable alt text without a DB round-trip. */
+/** product_images has no `alt` column — derive it from the product's own
+ *  name/finish/size/category so every image gets descriptive, SEO-useful
+ *  alt text without a DB round-trip. */
 function rowToProduct(row: ProductRow): Product {
   const images = [...(row.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order);
   const pdf = row.source_pdfs;
+  const imageAlt = buildImageAlt({
+    name: row.name,
+    finish: row.finish ?? "",
+    size: row.size ?? "",
+    category: row.category,
+  });
 
   return {
     id: row.id,
@@ -111,7 +119,7 @@ function rowToProduct(row: ProductRow): Product {
       id: `${row.id}-${i}`,
       productId: row.id,
       imageUrl: img.image_url,
-      alt: row.name,
+      alt: imageAlt,
       sortOrder: img.sort_order,
     })),
     createdAt: row.created_at,
