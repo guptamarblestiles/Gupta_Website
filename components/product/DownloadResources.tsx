@@ -54,7 +54,10 @@ export function DownloadResources({ product }: { product: Product }) {
               <ExternalLink size={16} aria-hidden="true" />
               View PDF
             </a>
-            <a href={pdf.fileUrl} download={pdf.originalFilename} className={actionClass}>
+            <a
+              href={`${pdf.fileUrl}?download=${encodeURIComponent(pdf.originalFilename)}`}
+              className={actionClass}
+            >
               <Download size={16} aria-hidden="true" />
               Download
             </a>
