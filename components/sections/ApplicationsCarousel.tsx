@@ -1,9 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "framer-motion";
 import { Building2, ChevronLeft, ChevronRight, Home, UtensilsCrossed, type LucideIcon } from "lucide-react";
-import { Tile3D } from "./Tile3D";
+
+// Desktop-only (hidden lg:flex inside Tile3D itself) and purely
+// decorative (aria-hidden) — dynamically imported with ssr:false so its
+// JS is code-split out of the main bundle instead of shipping to every
+// visitor, mobile included, for a component mobile never renders.
+const Tile3D = dynamic(() => import("./Tile3D").then((m) => m.Tile3D), { ssr: false });
 
 type ApplicationItem = {
   title: string;
