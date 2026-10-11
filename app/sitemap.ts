@@ -20,8 +20,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const client = getSupabaseServerClient();
   if (!client) return staticRoutes;
 
-  const { data } = await client.from("products").select("slug, updated_at");
-  const productRoutes: MetadataRoute.Sitemap = (data ?? []).map((p) => ({
+  // Page through in chunks rather than one unbounded select — Supabase caps
+  // an unpaged select at 1000 rows, and the catalogue is already well past
+  // half that, so this keeps the sitemap complete as it grows.
+  const PAGE_SIZE = 1000;
+  const rows: { slug: string; updated_at: string | null }[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data } = await client
+      .from("products")
+      .select("slug, updated_at")
+      .eq("is_visible", true)
+      .range(from, from + PAGE_SIZE - 1);
+    if (!data || data.length === 0) break;
+    rows.push(...data);
+    if (data.length < PAGE_SIZE) break;
+  }
+
+  const productRoutes: MetadataRoute.Sitemap = rows.map((p) => ({
     url: `${SITE_URL}/products/${p.slug}`,
     lastModified: p.updated_at ? new Date(p.updated_at) : undefined,
     changeFrequency: "weekly",
