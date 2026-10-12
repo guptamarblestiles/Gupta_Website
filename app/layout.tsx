@@ -13,7 +13,6 @@ import "@fontsource/playfair-display/400-italic.css";
 import "@fontsource/playfair-display/500-italic.css";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site";
-import { GridLines } from "@/components/ui/GridLines";
 import { NoiseOverlay } from "@/components/ui/NoiseOverlay";
 
 export const metadata: Metadata = {
@@ -56,7 +55,6 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <GridLines />
         <NoiseOverlay />
         {children}
       </body>
