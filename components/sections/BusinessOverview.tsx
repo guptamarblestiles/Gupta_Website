@@ -19,13 +19,12 @@ export function BusinessOverview() {
                 <p className="font-body text-label uppercase text-secondary-strong">Who We Are</p>
               </div>
               <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface mb-6">
-                Architectural Surfaces for <em className="italic text-secondary">Visionary</em> Spaces
+                Quality tiles and natural stone, chosen with care
               </h2>
               <p className="font-body text-body-lg text-on-surface-variant leading-relaxed mb-10 max-w-xl">
-                At Gupta Interior, we source and curate the world&apos;s most exceptional
-                marble and stone. With 25+ years of expertise, we&apos;ve transformed thousands of
-                projects across residential, commercial, and hospitality sectors. Visit our showroom
-                in Mangolpur Kalan, Rohini, serving homeowners and architects across Delhi NCR.
+                Gupta Interior sources and curates tiles, marble, and natural stone from trusted
+                suppliers, with 25+ years in the business. Visit our showroom in Mangolpur Kalan,
+                Rohini, serving homeowners and architects across Delhi NCR.
               </p>
               <Button href="/tiles" variant="secondary" size="lg">
                 Explore Our Range

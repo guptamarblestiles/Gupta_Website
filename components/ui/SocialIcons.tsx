@@ -27,6 +27,26 @@ export function InstagramIcon({ size = 18, className }: IconProps) {
   );
 }
 
+export function WhatsAppIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M4 20l1.3-3.9A8 8 0 1 1 9 18.6Z" />
+      <path d="M8.5 9.5c0 3 2.5 5.5 5.5 5.5.6 0 1-.4.9-1l-.3-1.1a.9.9 0 0 0-1-.6l-1 .2a4 4 0 0 1-2.6-2.6l.2-1a.9.9 0 0 0-.6-1L8.5 7.6c-.6-.1-1 .3-1 .9Z" />
+    </svg>
+  );
+}
+
 export function LinkedinIcon({ size = 18, className }: IconProps) {
   return (
     <svg

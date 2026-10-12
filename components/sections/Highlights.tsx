@@ -14,7 +14,7 @@ const HIGHLIGHTS = [
     description: "Sourced from trusted quarries and suppliers, selected slab by slab.",
   },
   {
-    title: "Certified Quality",
+    title: "Consistent Quality",
     description: "Durability-tested surfaces that hold up to daily commercial and residential use.",
   },
   {

@@ -4,42 +4,36 @@ import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { NewsletterForm } from "./NewsletterForm";
 
 /**
- * "Begin Your Vision" CTA band — approved Stitch copy. Deliberately
- * returns to the dark hero palette so the homepage bookends itself (dark
- * hero to open, dark CTA + footer to close), reinforcing the cinematic
- * dark identity rather than ending on a flat white note.
+ * Closing CTA band — solid charcoal panel, matching the hero, so the
+ * homepage bookends itself. Copy sticks to what the business actually
+ * does (sell tiles/marble, visit the showroom, get a quote) — no "design
+ * consultants" claim, since no design/consultation service is verified.
  */
 export function CtaBand() {
   return (
     <RevealOnScroll>
       <section className="bg-hero-bg py-section-gap">
         <Container className="flex flex-col items-center text-center">
-          <div className="mb-4 flex items-center gap-3">
-            <span className="h-px w-8 md:w-12 bg-hero-foreground" aria-hidden="true" />
-            <p className="font-body text-label uppercase text-secondary">Get Started</p>
-            <span className="h-px w-8 md:w-12 bg-hero-foreground" aria-hidden="true" />
-          </div>
+          <p className="font-body text-label text-secondary-fixed mb-4 uppercase">Get Started</p>
           <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-hero-foreground mb-6 max-w-2xl">
-            Begin Your <em className="italic text-secondary">Vision</em>
+            Find the right material for your project
           </h2>
           <p className="font-body text-body-lg text-hero-muted max-w-xl mb-10 leading-relaxed">
-            Speak with our design consultants, request samples, or browse the full catalogue —
-            whichever suits where your project stands today.
+            Browse the full catalogue online, or visit our Delhi showroom to see finishes and
+            sizes in person before you order.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 mb-12">
             <Button href="/products" variant="hero-primary" size="lg">
               Browse the Catalogue
             </Button>
-            <Button href="/#contact" variant="hero-secondary" size="lg">
-              Talk to Us
+            <Button href="/contact" variant="hero-secondary" size="lg">
+              Enquire Now
             </Button>
           </div>
 
           <div className="w-full flex flex-col items-center gap-3 pt-10 border-t border-hero-border">
-            <p className="font-body text-label uppercase text-hero-muted">
-              Stay in the know
-            </p>
+            <p className="font-body text-label text-hero-muted uppercase">Stay in the know</p>
             <NewsletterForm />
           </div>
         </Container>

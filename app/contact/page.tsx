@@ -4,9 +4,12 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { WhatsAppIcon } from "@/components/ui/SocialIcons";
 import { EnquiryForm } from "@/components/enquiry/EnquiryForm";
 import { CONTACT_INFO } from "@/lib/contact";
 import { BUSINESS_INFO, SITE_URL } from "@/lib/site";
+
+const WHATSAPP_HREF = `https://wa.me/${CONTACT_INFO.phoneHref.replace(/^\+/, "")}`;
 
 const canonical = `${SITE_URL}/contact`;
 const title = "Contact Us – Showroom in Mangolpur Kalan, Delhi";
@@ -76,6 +79,17 @@ export default function ContactPage() {
                   <span className="font-body text-body text-on-surface-variant leading-relaxed">
                     {BUSINESS_INFO.openingHours.display}
                   </span>
+                </li>
+                <li className="flex items-center gap-4">
+                  <WhatsAppIcon size={20} className="text-secondary shrink-0" />
+                  <a
+                    href={WHATSAPP_HREF}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="font-body text-body text-on-surface-variant transition-colors hover:text-secondary"
+                  >
+                    Chat on WhatsApp
+                  </a>
                 </li>
                 <li>
                   <Button href={mapsUrl} variant="secondary" target="_blank" rel="noreferrer noopener">

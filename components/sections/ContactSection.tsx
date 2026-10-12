@@ -9,9 +9,12 @@
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
+import { WhatsAppIcon } from "@/components/ui/SocialIcons";
 import { EnquiryForm } from "@/components/enquiry/EnquiryForm";
 import { CONTACT_INFO } from "@/lib/contact";
 import { BUSINESS_INFO } from "@/lib/site";
+
+const WHATSAPP_HREF = `https://wa.me/${CONTACT_INFO.phoneHref.replace(/^\+/, "")}`;
 
 export function ContactSection() {
   return (
@@ -42,6 +45,17 @@ export function ContactSection() {
                   className="font-body text-body text-on-surface-variant transition-colors hover:text-secondary"
                 >
                   {CONTACT_INFO.phoneDisplay}
+                </a>
+              </li>
+              <li className="flex items-center gap-4">
+                <WhatsAppIcon size={20} className="text-secondary shrink-0" />
+                <a
+                  href={WHATSAPP_HREF}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="font-body text-body text-on-surface-variant transition-colors hover:text-secondary"
+                >
+                  Chat on WhatsApp
                 </a>
               </li>
               <li className="flex items-center gap-4">

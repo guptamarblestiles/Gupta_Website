@@ -4,59 +4,63 @@ import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { HeroVideoBackground } from "./HeroVideoBackground";
-import { ScrollIndicator } from "./ScrollIndicator";
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 16 },
   show: (delay: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] as const },
+    transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] as const },
   }),
 };
 
+/**
+ * Split editorial hero: a solid charcoal text panel beside a real video/
+ * image panel, rather than text floating over a dark wash on top of a
+ * photo. This is a deliberate fix for the "opaque grey overlay with
+ * floating text" problem — copy never needs to fight the image for
+ * contrast because it never sits on top of it.
+ *
+ * The media panel currently plays the real marble/stone/interior video
+ * clips already in the project (components/hero/HeroVideoBackground).
+ * Swap in real finished-space photography here once available — no other
+ * changes needed, this panel is a plain full-bleed media slot.
+ */
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen bg-hero-bg overflow-hidden flex items-center pt-32 pb-20 lg:pt-40 lg:pb-28">
-      <HeroVideoBackground />
-      {/* Scrim so headline/copy stay legible over the video; matches hero-bg
-          so it also reads correctly during the poster/reduced-motion fallback. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-hero-bg/70"
-      />
-
-      {/* Cinematic spotlight glow — kept subtle per brief section 10 */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[900px] max-h-[900px] opacity-40 blur-[120px]"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(230,161,102,0.35) 0%, rgba(184,115,51,0.12) 45%, transparent 70%)",
-        }}
-      />
-
-      <Container className="relative z-10">
-        <div className="max-w-2xl flex flex-col">
-          <motion.h1
+    <section className="relative bg-hero-bg pt-16 md:pt-20 lg:pt-0 lg:grid lg:grid-cols-12 lg:min-h-[85vh]">
+      <div className="relative z-10 flex flex-col justify-center pt-10 pb-16 md:pt-12 md:pb-20 lg:py-28 lg:col-span-5 px-margin lg:px-0">
+        <Container as="div" className="lg:ml-auto lg:mr-0 lg:max-w-xl lg:px-12 xl:px-16">
+          <motion.p
             initial="hidden"
             animate="show"
             custom={0}
             variants={fadeUp}
-            className="font-display text-display-mobile md:text-display-tablet lg:text-display text-hero-foreground mb-8"
+            className="font-body text-label text-secondary-fixed mb-5 uppercase"
           >
-            Redefining <span className="italic text-secondary">Elegance</span>
+            Tiles &middot; Marble &middot; Natural Stone
+          </motion.p>
+
+          <motion.h1
+            initial="hidden"
+            animate="show"
+            custom={0.1}
+            variants={fadeUp}
+            className="font-display text-display-mobile md:text-display-tablet lg:text-display text-hero-foreground mb-6"
+          >
+            Beautiful spaces begin with the right materials.
           </motion.h1>
 
           <motion.p
             initial="hidden"
             animate="show"
-            custom={0.15}
+            custom={0.2}
             variants={fadeUp}
-            className="font-body text-body-lg text-hero-muted max-w-lg mb-12 leading-relaxed"
+            className="font-body text-body-lg text-hero-muted max-w-md mb-10 leading-relaxed"
           >
-            Architectural surfaces designed to transform spaces. We source and curate the
-            world&apos;s most exceptional marble and stone for visionary projects.
+            Discover a thoughtfully curated range of tiles, marble, and natural stone at our
+            Delhi showroom — the right surface for every room, chosen with you, not just sold
+            to you.
           </motion.p>
 
           <motion.div
@@ -66,25 +70,28 @@ export function HeroSection() {
             variants={fadeUp}
             className="flex flex-col sm:flex-row gap-4"
           >
-            <Button href="/products" variant="hero-primary" size="lg">
-              Explore the Catalogue
+            <Button href="/collections" variant="hero-primary" size="lg">
+              Explore Our Collections
             </Button>
-            <Button href="/#contact" variant="hero-secondary" size="lg">
-              Get in Touch
+            <Button href="/contact" variant="hero-secondary" size="lg">
+              Enquire Now
             </Button>
           </motion.div>
-        </div>
-      </Container>
+        </Container>
+      </div>
 
-      <ScrollIndicator />
-
-      {/* Soft fade into the light section that follows, smoothing the
-          dark-to-light handoff (fuller scroll-driven transition lands in
-          the next build step once that section has real content). */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-hero-bg"
-      />
+      <div className="relative h-[55vh] lg:h-auto lg:min-h-[85vh] lg:col-span-7 overflow-hidden">
+        <HeroVideoBackground />
+        {/* Light bottom gradient only, for the showroom caption below —
+            never an opaque wash over the whole image. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-hero-bg/60 to-transparent"
+        />
+        <p className="absolute bottom-6 right-6 font-body text-micro text-hero-foreground/80 uppercase">
+          Showroom &middot; Mangolpur Kalan, Delhi
+        </p>
+      </div>
     </section>
   );
 }

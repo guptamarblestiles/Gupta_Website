@@ -34,13 +34,14 @@ import Link from "next/link";
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { Button } from "@/components/ui/Button";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Tiles", href: "/tiles" },
+  { label: "Materials", href: "/tiles" },
   { label: "Collections", href: "/collections" },
   { label: "About", href: "/#about" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const BRAND_NAME = "Gupta Interior";
@@ -101,22 +102,33 @@ export function Navbar({ variant = "light" }: NavbarProps) {
             {BRAND_NAME}
           </Link>
 
-          <nav className="hidden md:flex items-center gap-10">
+          <nav className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "font-body text-label uppercase transition-colors duration-500 ease-luxury",
+                  "font-body text-label transition-colors duration-200 ease-luxury",
                   darkText
-                    ? "text-on-surface-variant hover:text-secondary"
-                    : "text-hero-muted hover:text-secondary",
+                    ? "text-on-surface-variant hover:text-on-surface"
+                    : "text-hero-muted hover:text-hero-foreground",
                 )}
               >
                 {link.label}
               </Link>
             ))}
           </nav>
+
+          <div className="hidden md:block">
+            <Button
+              href="/contact"
+              variant={darkText ? "primary" : "hero-primary"}
+              size="default"
+              className="h-10 px-6"
+            >
+              Enquire Now
+            </Button>
+          </div>
 
           <button
             type="button"
@@ -148,11 +160,14 @@ export function Navbar({ variant = "light" }: NavbarProps) {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="font-body text-label uppercase text-on-surface-variant hover:text-secondary transition-colors duration-500 ease-luxury"
+                className="font-body text-label text-on-surface-variant hover:text-on-surface transition-colors duration-200 ease-luxury"
               >
                 {link.label}
               </Link>
             ))}
+            <Button href="/contact" variant="primary" onClick={() => setMobileOpen(false)}>
+              Enquire Now
+            </Button>
           </motion.nav>
         )}
       </AnimatePresence>

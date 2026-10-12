@@ -13,7 +13,6 @@ import "@fontsource/playfair-display/400-italic.css";
 import "@fontsource/playfair-display/500-italic.css";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site";
-import { NoiseOverlay } from "@/components/ui/NoiseOverlay";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -55,7 +54,6 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <NoiseOverlay />
         {children}
       </body>
     </html>

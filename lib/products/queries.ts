@@ -323,6 +323,19 @@ export async function getFilterFacets(filters: ProductFilters = {}): Promise<Pro
 /** Single product lookup for the product detail page, including its
  *  gallery images and source PDF. Falls back to a join-less query if the
  *  source_pdfs migration isn't applied yet. */
+/** Live count of real catalogue rows — used by the homepage trust section
+ *  so that figure can never drift out of sync with the actual database,
+ *  unlike a hand-typed marketing number. Falls back to the mock dataset's
+ *  length when Supabase isn't configured. */
+export async function getProductCount(): Promise<number> {
+  const client = getSupabaseServerClient();
+  if (!client) return MOCK_PRODUCTS.length;
+
+  const { count, error } = await client.from("products").select("id", { count: "exact", head: true });
+  if (error || count === null) return MOCK_PRODUCTS.length;
+  return count;
+}
+
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
   const client = getSupabaseServerClient();
   if (!client) return MOCK_PRODUCTS.find((product) => product.slug === slug);

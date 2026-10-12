@@ -26,7 +26,7 @@ function iconForLink(url: string) {
 
 const QUICK_LINKS = [
   { label: "Home", href: "/" },
-  { label: "Tiles", href: "/tiles" },
+  { label: "Materials", href: "/tiles" },
   { label: "About", href: "/#about" },
   { label: "Contact", href: "/contact" },
 ];
@@ -42,8 +42,7 @@ export function Footer() {
             </Link>
             <p className="mt-2 font-body text-sm text-secondary-fixed">By Mayank Gupta</p>
             <p className="mt-4 font-body text-body text-hero-muted leading-relaxed max-w-xs">
-              Architectural surfaces designed to transform spaces — curated marble, granite and
-              tile for visionary projects.
+              Tiles, marble, and natural stone, curated for homes and projects across Delhi NCR.
             </p>
           </div>
 

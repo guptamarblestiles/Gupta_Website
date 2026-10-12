@@ -3,58 +3,58 @@
 /*
  * Gupta Interior — Design Tokens
  *
- * Luxury/editorial system (sophisticated monochrome + metallic gold accent,
- * Playfair Display + Inter, 0px radius everywhere). Token *names* are kept
- * stable from the previous (Stitch-reconciled) palette on purpose — every
- * component already references these names, and lib/utils/cn.ts's
- * tailwind-merge config knows them — only the *values* moved to the new
- * system. Do not introduce parallel "editorial-*" tokens; extend these.
+ * Premium architectural-editorial system: warm ivory/stone/charcoal with a
+ * muted olive accent used sparingly, Playfair Display + Inter, restrained
+ * motion, no gold, no glassmorphism, no glow. Token *names* are kept stable
+ * from the previous palette on purpose — every component already
+ * references these names, and lib/utils/cn.ts's tailwind-merge config
+ * knows them — only the *values* moved. Do not introduce parallel
+ * "editorial-*" tokens; extend these.
  *
  * Two palettes:
  *  - Light palette (bg-background, text-on-surface, ...): used everywhere —
  *    catalogue, product pages, and the majority of the homepage. Warm
- *    alabaster background, rich charcoal text — never pure white/black.
- *  - Hero palette (bg-hero, text-hero-foreground, ...): the dark cinematic
- *    hero section. Luxury "dark section" inversion of the light palette —
- *    charcoal background, alabaster text, alabaster-at-opacity for muted
- *    text/borders — rather than a separate near-black palette.
+ *    ivory background, warm white for elevated cards, charcoal text.
+ *  - Hero palette (bg-hero, text-hero-foreground, ...): the solid charcoal
+ *    panel half of the split hero layout — not a dark wash over imagery,
+ *    an actual solid-color panel, so hero copy never needs an opaque
+ *    scrim over a photo to stay legible.
  */
 
 @theme {
   /* ---- Light palette (default site-wide theme) ---- */
-  --color-background: #f9f8f6; /* Warm Alabaster — never pure white */
-  --color-surface: #f9f8f6;
-  --color-surface-variant: #ebe5de; /* Pale Taupe — subtle surface elevation */
-  --color-surface-container: #ebe5de;
-  --color-on-surface: #1a1a1a; /* Rich Charcoal — never pure black */
-  --color-on-surface-variant: #6c6863; /* Warm Grey — secondary text/captions */
-  --color-outline: rgba(26, 26, 26, 0.2);
-  --color-outline-variant: rgba(26, 26, 26, 0.1);
+  --color-background: #f5f2ec; /* Warm Ivory */
+  --color-surface: #ffffff; /* Warm White — elevated cards read slightly lighter than the page */
+  --color-surface-variant: #ddd8d0; /* Soft Stone — subtle surface elevation, dividers */
+  --color-surface-container: #ddd8d0;
+  --color-on-surface: #252522; /* Charcoal */
+  --color-on-surface-variant: #5c5850; /* warm grey, secondary text/captions — 5.4:1 on ivory */
+  --color-outline: rgba(37, 37, 34, 0.18);
+  --color-outline-variant: rgba(37, 37, 34, 0.1);
 
-  /* Metallic gold accent. Sparingly: hover states, underlines, focus
-     indicators, small decorative elements — never large fills. */
-  --color-secondary: #d4af37;
-  --color-secondary-fixed: #e4c565;
-  --color-secondary-fixed-dim: #c9a227;
+  /* Muted olive accent. Sparingly: hover states, links, small highlights —
+     never large fills, never a gradient. */
+  --color-secondary: #6e7154;
+  --color-secondary-fixed: #8a8d6c;
+  --color-secondary-fixed-dim: #565843;
   --color-on-secondary: #ffffff;
-  /* #d4af37 on #f9f8f6 is ~1.8:1 — nowhere near WCAG AA for the small
-     uppercase text-label kicker/button copy used sitewide. This deep
-     bronze-gold variant (same hue family, same role the previous copper
-     palette already solved this with) clears 4.5:1 on alabaster. Base
-     --color-secondary is unchanged everywhere else. */
-  --color-secondary-strong: #8c6e1c;
+  /* #6e7154 on #f5f2ec is ~3.3:1 — fine for large text/icons/borders but
+     short of WCAG AA (4.5:1) for small uppercase label copy. This darker
+     olive variant (same hue, 6.3:1 on ivory) is for that specific case;
+     base --color-secondary is unchanged everywhere else. */
+  --color-secondary-strong: #4a4c3a;
 
   --color-error: #ba1a1a;
 
-  /* ---- Hero palette (dark cinematic environment, hero section only) ---- */
-  --color-hero-bg: #1a1a1a;
-  --color-hero-surface: #262625;
-  --color-hero-foreground: #f9f8f6;
-  --color-hero-muted: rgba(249, 248, 246, 0.7);
-  --color-hero-border: rgba(249, 248, 246, 0.15);
+  /* ---- Hero palette: the solid charcoal panel in the split hero. ---- */
+  --color-hero-bg: #252522;
+  --color-hero-surface: #2f2f2b;
+  --color-hero-foreground: #f5f2ec;
+  --color-hero-muted: rgba(245, 242, 236, 0.72);
+  --color-hero-border: rgba(245, 242, 236, 0.16);
 
-  /* Luxury's signature slow, deliberate easing — never ease-in/ease-in-out. */
-  --ease-luxury: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Restrained, quick, professional easing — not luxury's deliberate slow-motion. */
+  --ease-luxury: cubic-bezier(0.4, 0, 0.2, 1);
 
   /* ---- Typography ----
    * Three-tier scale approved for the redesign: mobile (<768px) is the
@@ -65,20 +65,18 @@
   --font-display: "Playfair Display", ui-serif, Georgia, serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
 
-  /* H1 (luxury "Hero Headline") — 48px mobile / 64px tablet / 96px desktop.
-     Already sits inside the luxury text-6xl..9xl hero range at every tier —
-     only the leading tightens, toward the spec's signature leading-[0.9]. */
-  --text-display-mobile: 3rem; /* 48px */
-  --text-display-mobile--line-height: 0.95;
+  /* H1 (hero headline) — 44px mobile / 56px tablet / 76px desktop. Natural,
+     readable leading — editorial, not ultra-compressed luxury leading. */
+  --text-display-mobile: 2.75rem; /* 44px */
+  --text-display-mobile--line-height: 1.1;
   --text-display-mobile--font-weight: 400;
 
-  --text-display-tablet: 4rem; /* 64px */
-  --text-display-tablet--line-height: 0.92;
+  --text-display-tablet: 3.5rem; /* 56px */
+  --text-display-tablet--line-height: 1.08;
   --text-display-tablet--font-weight: 400;
 
-  --text-display: 6rem; /* 96px */
-  --text-display--line-height: 0.9;
-  --text-display--letter-spacing: -0.01em;
+  --text-display: 4.75rem; /* 76px */
+  --text-display--line-height: 1.05;
   --text-display--font-weight: 400;
 
   /* H2 — 32px mobile / 40px tablet / 56px desktop */
@@ -120,18 +118,19 @@
   --text-caption: 0.875rem; /* 14px */
   --text-caption--line-height: 1.4;
 
-  /* Overline/label — uppercase kickers AND buttons. Luxury wide tracking
-     (0.25–0.3em) is the single most load-bearing "feels expensive" detail
-     in this system; Inter Medium (500), not 600, per the weight spec. */
-  --text-label: 0.75rem;
-  --text-label--line-height: 1;
-  --text-label--letter-spacing: 0.28em;
+  /* Overline/label — nav links, kickers, buttons. Readable size, modest
+     tracking only — the brief is explicit that tiny, heavily-tracked nav
+     text reads as a template, not a premium brand. */
+  --text-label: 0.9375rem; /* 15px */
+  --text-label--line-height: 1.2;
+  --text-label--letter-spacing: 0.02em;
   --text-label--font-weight: 500;
 
-  /* Micro-text — metadata, copyright, tiny labels. */
-  --text-micro: 0.625rem; /* 10px */
+  /* Micro-text — metadata, copyright, tiny labels. Still readable, not
+     a tiny all-caps mark. */
+  --text-micro: 0.8125rem; /* 13px */
   --text-micro--line-height: 1.4;
-  --text-micro--letter-spacing: 0.2em;
+  --text-micro--letter-spacing: 0.01em;
   --text-micro--font-weight: 500;
 }
 
@@ -172,7 +171,7 @@
   }
 }
 
-@utility gold-accent {
+@utility olive-accent {
   color: var(--color-secondary);
 }
 
@@ -220,27 +219,15 @@
     inset 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
-/* ---- Image grayscale → color reveal. The single most recognizable
-   "bold factor" of this system: every catalogue/feature/hero image starts
-   desaturated and earns its color back, slowly, only on hover. Apply to
-   the <img>/<Image> itself; pair with `group` + `group-hover:scale-105`
-   on an ancestor for the matching lift. ---- */
-@utility grayscale-reveal {
-  filter: grayscale(1);
-  transition:
-    filter 1500ms var(--ease-luxury),
-    transform 1500ms var(--ease-luxury);
+/* ---- Image hover reveal. Real material colour is the whole point of
+   this catalogue — images never desaturate by default. A restrained
+   scale-up on hover is the only image micro-interaction; pair with
+   `group` on an ancestor. ---- */
+@utility image-hover-zoom {
+  transition: transform 400ms var(--ease-luxury);
 }
-.group:hover .grayscale-reveal {
-  filter: grayscale(0);
-}
-
-/* ---- Paper grain. Fixed, full-viewport, 2% opacity, pointer-events
-   disabled — mounted once in app/layout.tsx via <NoiseOverlay>. Not meant
-   to be consciously visible; it's the difference between a screen and
-   stock. ---- */
-@utility bg-noise {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+.group:hover .image-hover-zoom {
+  transform: scale(1.03);
 }
 
 /* ---- Drop cap. Apply directly to a paragraph's own class list — no
@@ -262,12 +249,11 @@
 }
 
 /*
- * Border radius: 0px, everywhere, on the public site — an architectural
- * choice, not a default. No global reset is applied here on purpose: the
- * admin panel (app/admin/**) is explicitly out of scope for this redesign
- * (see docs note in components/admin) and keeps its own rounded-* styling.
- * Every public-facing component's rounded-* is removed directly at the
- * call site as part of its redesign pass instead.
+ * Border radius: a small, consistent amount on cards/buttons/inputs
+ * (rounded-sm/md in component classes) for a tactile, contemporary feel —
+ * not the previous system's strict 0px, and never a full pill/rounded-full
+ * shape. No global override is applied here; each component sets its own
+ * radius utility directly.
  */
 
 body {
