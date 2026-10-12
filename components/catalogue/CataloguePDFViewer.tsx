@@ -71,7 +71,7 @@ export function CataloguePDFViewer({ title, pdfUrl, onClose }: CataloguePDFViewe
               <a
                 href={pdfUrl}
                 download
-                className="flex items-center gap-2 rounded border border-hero-border px-3 py-2 font-body text-label uppercase tracking-widest text-hero-foreground transition-colors duration-300 hover:border-secondary hover:text-secondary"
+                className="flex items-center gap-2 border border-hero-border px-3 py-2 font-body text-label uppercase text-hero-foreground transition-colors duration-500 ease-luxury hover:border-secondary hover:text-secondary"
               >
                 <Download size={16} aria-hidden="true" />
                 <span className="hidden sm:inline">Download</span>
@@ -80,7 +80,7 @@ export function CataloguePDFViewer({ title, pdfUrl, onClose }: CataloguePDFViewe
                 type="button"
                 onClick={onClose}
                 aria-label="Close catalogue viewer"
-                className="flex items-center justify-center rounded border border-hero-border p-2 text-hero-foreground transition-colors duration-300 hover:border-secondary hover:text-secondary"
+                className="flex items-center justify-center border border-hero-border p-2 text-hero-foreground transition-colors duration-500 ease-luxury hover:border-secondary hover:text-secondary"
               >
                 <X size={18} aria-hidden="true" />
               </button>

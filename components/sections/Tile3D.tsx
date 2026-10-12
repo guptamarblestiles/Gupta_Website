@@ -55,7 +55,7 @@ export function Tile3D({ imageUrl }: Tile3DProps) {
       >
         {/* Face */}
         <div
-          className="absolute inset-0 rounded-md bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${imageUrl})`, transform: "translateZ(10px)" }}
         />
         {/* Edge (gives the panel visible thickness) */}

@@ -29,7 +29,7 @@ export function HeroSection() {
       {/* Cinematic spotlight glow — kept subtle per brief section 10 */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[900px] max-h-[900px] rounded-full opacity-40 blur-[120px]"
+        className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[900px] max-h-[900px] opacity-40 blur-[120px]"
         style={{
           background:
             "radial-gradient(circle, rgba(230,161,102,0.35) 0%, rgba(184,115,51,0.12) 45%, transparent 70%)",

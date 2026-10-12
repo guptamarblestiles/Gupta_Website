@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
+import { Field, inputClasses, textareaClasses } from "@/components/ui/Field";
 import { enquirySchema } from "@/lib/enquiry/schema";
 import { submitEnquiry } from "@/lib/enquiry/actions";
 import { sendEnquiryEmailJs } from "@/lib/enquiry/emailjs";
@@ -168,7 +169,7 @@ export function EnquiryForm({ product }: EnquiryFormProps) {
           value={values.message}
           onChange={(e) => setField("message", e.target.value)}
           aria-invalid={Boolean(fieldErrors.message)}
-          className={cn(inputClasses(Boolean(fieldErrors.message)), "resize-none")}
+          className={textareaClasses(Boolean(fieldErrors.message))}
         />
       </Field>
 
@@ -179,35 +180,3 @@ export function EnquiryForm({ product }: EnquiryFormProps) {
   );
 }
 
-function inputClasses(hasError: boolean) {
-  return cn(
-    "w-full border bg-surface px-4 py-3 font-body text-body text-on-surface placeholder:text-on-surface-variant transition-colors focus:outline-none",
-    hasError ? "border-error" : "border-outline-variant focus:border-secondary",
-  );
-}
-
-type FieldProps = {
-  label: string;
-  htmlFor: string;
-  error?: string;
-  children: React.ReactNode;
-};
-
-function Field({ label, htmlFor, error, children }: FieldProps) {
-  return (
-    <div>
-      <label
-        htmlFor={htmlFor}
-        className="mb-2 block font-body text-label uppercase tracking-widest text-on-surface-variant"
-      >
-        {label}
-      </label>
-      {children}
-      {error && (
-        <p className="mt-2 font-body text-sm text-error" role="alert">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}

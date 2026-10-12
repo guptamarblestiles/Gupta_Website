@@ -28,7 +28,7 @@ export default async function VisualizerPage() {
         <section className="py-section-gap">
           <Container>
             <div className="mb-10 md:mb-12 max-w-2xl">
-              <p className="mb-4 font-body text-label uppercase tracking-widest text-secondary-strong">
+              <p className="mb-4 font-body text-label uppercase text-secondary-strong">
                 Visualizer
               </p>
               <h1 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface">

@@ -14,11 +14,13 @@ export function CtaBand() {
     <RevealOnScroll>
       <section className="bg-hero-bg py-section-gap">
         <Container className="flex flex-col items-center text-center">
-          <p className="font-body text-label uppercase tracking-widest text-secondary mb-4">
-            Get Started
-          </p>
+          <div className="mb-4 flex items-center gap-3">
+            <span className="h-px w-8 md:w-12 bg-hero-foreground" aria-hidden="true" />
+            <p className="font-body text-label uppercase text-secondary">Get Started</p>
+            <span className="h-px w-8 md:w-12 bg-hero-foreground" aria-hidden="true" />
+          </div>
           <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-hero-foreground mb-6 max-w-2xl">
-            Begin Your Vision
+            Begin Your <em className="italic text-secondary">Vision</em>
           </h2>
           <p className="font-body text-body-lg text-hero-muted max-w-xl mb-10 leading-relaxed">
             Speak with our design consultants, request samples, or browse the full catalogue —
@@ -35,7 +37,7 @@ export function CtaBand() {
           </div>
 
           <div className="w-full flex flex-col items-center gap-3 pt-10 border-t border-hero-border">
-            <p className="font-body text-label uppercase tracking-widest text-hero-muted">
+            <p className="font-body text-label uppercase text-hero-muted">
               Stay in the know
             </p>
             <NewsletterForm />

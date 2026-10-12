@@ -28,15 +28,15 @@ export function CatalogueCard({ catalogue }: { catalogue: Catalogue }) {
             here" depth cue, purely decorative (aria-hidden). */}
         <span
           aria-hidden="true"
-          className="absolute inset-0 translate-x-2 translate-y-2 rounded-sm bg-surface-variant/60 transition-transform duration-500 ease-out group-hover:translate-x-3 group-hover:translate-y-3"
+          className="absolute inset-0 translate-x-2 translate-y-2 bg-surface-variant/60 transition-transform duration-500 ease-out group-hover:translate-x-3 group-hover:translate-y-3"
         />
         <span
           aria-hidden="true"
-          className="absolute inset-0 translate-x-1 translate-y-1 rounded-sm bg-surface-variant/80 transition-transform duration-500 ease-out group-hover:translate-x-1.5 group-hover:translate-y-1.5"
+          className="absolute inset-0 translate-x-1 translate-y-1 bg-surface-variant/80 transition-transform duration-500 ease-out group-hover:translate-x-1.5 group-hover:translate-y-1.5"
         />
 
         <motion.div
-          className="relative flex flex-col overflow-hidden rounded-sm bg-surface shadow-md"
+          className="relative flex flex-col overflow-hidden bg-surface shadow-card transition-shadow duration-700 ease-luxury group-hover:shadow-card-hover"
           whileHover={reduceMotion ? undefined : { y: -4 }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         >
@@ -46,7 +46,7 @@ export function CatalogueCard({ catalogue }: { catalogue: Catalogue }) {
               <img
                 src={catalogue.thumbnailUrl}
                 alt=""
-                className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                className="grayscale-reveal h-full w-full object-cover group-hover:scale-105"
               />
             ) : (
               <FileText
@@ -67,7 +67,7 @@ export function CatalogueCard({ catalogue }: { catalogue: Catalogue }) {
                 {catalogue.description}
               </p>
             )}
-            <span className="inline-flex items-center gap-2 font-body text-label uppercase tracking-widest text-secondary-strong">
+            <span className="inline-flex items-center gap-2 font-body text-label uppercase text-secondary-strong">
               View Catalogue
               <ArrowRight
                 size={16}

@@ -34,7 +34,7 @@ export function ImageGallery({ stone, productName, images }: ImageGalleryProps) 
 
     return (
       <div className="flex flex-col gap-4">
-        <div className="relative aspect-square overflow-hidden bg-surface-variant">
+        <div className="relative aspect-square overflow-hidden bg-surface-variant shadow-feature-framed">
           <Image
             src={current.url}
             alt={current.alt || productName}
@@ -80,7 +80,7 @@ export function ImageGallery({ stone, productName, images }: ImageGalleryProps) 
           className="absolute inset-0 h-full w-full transition-transform duration-500 ease-out"
           style={{ transform: `scale(${view.scale})`, transformOrigin: view.position }}
         />
-        <p className="absolute bottom-4 left-4 font-body text-label uppercase tracking-widest text-white/90 drop-shadow">
+        <p className="absolute bottom-4 left-4 font-body text-label uppercase text-white/90 drop-shadow">
           {view.label}
         </p>
       </div>

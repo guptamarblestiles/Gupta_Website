@@ -108,7 +108,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
             </nav>
 
             <div className="max-w-3xl mb-12">
-              <p className="mb-4 font-body text-label uppercase tracking-widest text-secondary-strong">
+              <p className="mb-4 font-body text-label uppercase text-secondary-strong">
                 Collection
               </p>
               <h1 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface mb-6">

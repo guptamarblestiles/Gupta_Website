@@ -22,7 +22,7 @@ export function TrustStats() {
                 <span className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-secondary mb-2">
                   {stat.value}
                 </span>
-                <span className="font-body text-label uppercase tracking-widest text-on-surface-variant">
+                <span className="font-body text-label uppercase text-on-surface-variant">
                   {stat.label}
                 </span>
               </div>

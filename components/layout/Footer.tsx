@@ -48,7 +48,7 @@ export function Footer() {
           </div>
 
           <nav aria-label="Footer navigation">
-            <p className="font-body text-label uppercase tracking-widest text-hero-foreground mb-5">
+            <p className="font-body text-label uppercase text-hero-foreground mb-5">
               Quick Links
             </p>
             <ul className="flex flex-col gap-3">
@@ -56,7 +56,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="font-body text-body text-hero-muted transition-colors duration-300 hover:text-secondary"
+                    className="font-body text-body text-hero-muted transition-colors duration-500 ease-luxury hover:text-secondary"
                   >
                     {link.label}
                   </Link>
@@ -66,7 +66,7 @@ export function Footer() {
           </nav>
 
           <nav aria-label="Footer collections">
-            <p className="font-body text-label uppercase tracking-widest text-hero-foreground mb-5">
+            <p className="font-body text-label uppercase text-hero-foreground mb-5">
               Collections
             </p>
             <ul className="flex flex-col gap-3">
@@ -74,7 +74,7 @@ export function Footer() {
                 <li key={c.slug}>
                   <Link
                     href={`/collections/${c.slug}`}
-                    className="font-body text-body text-hero-muted transition-colors duration-300 hover:text-secondary"
+                    className="font-body text-body text-hero-muted transition-colors duration-500 ease-luxury hover:text-secondary"
                   >
                     {c.name}
                   </Link>
@@ -84,7 +84,7 @@ export function Footer() {
           </nav>
 
           <div>
-            <p className="font-body text-label uppercase tracking-widest text-hero-foreground mb-5">
+            <p className="font-body text-label uppercase text-hero-foreground mb-5">
               Contact
             </p>
             <ul className="flex flex-col gap-4">
@@ -96,7 +96,7 @@ export function Footer() {
                 <Phone size={18} className="text-secondary shrink-0" aria-hidden="true" />
                 <a
                   href={`tel:${CONTACT_INFO.phoneHref}`}
-                  className="font-body text-body text-hero-muted transition-colors duration-300 hover:text-secondary"
+                  className="font-body text-body text-hero-muted transition-colors duration-500 ease-luxury hover:text-secondary"
                 >
                   {CONTACT_INFO.phoneDisplay}
                 </a>
@@ -105,7 +105,7 @@ export function Footer() {
                 <Mail size={18} className="text-secondary shrink-0" aria-hidden="true" />
                 <a
                   href={`mailto:${CONTACT_INFO.email}`}
-                  className="font-body text-body text-hero-muted transition-colors duration-300 hover:text-secondary"
+                  className="font-body text-body text-hero-muted transition-colors duration-500 ease-luxury hover:text-secondary"
                 >
                   {CONTACT_INFO.email}
                 </a>
@@ -121,7 +121,7 @@ export function Footer() {
 
           {socialLinks.length > 0 && (
             <div>
-              <p className="font-body text-label uppercase tracking-widest text-hero-foreground mb-5">
+              <p className="font-body text-label uppercase text-hero-foreground mb-5">
                 Follow
               </p>
               <div className="flex items-center gap-4">
@@ -134,7 +134,7 @@ export function Footer() {
                       target="_blank"
                       rel="noreferrer noopener"
                       aria-label={`Gupta Interior on ${new URL(url).hostname}`}
-                      className="text-hero-muted transition-colors duration-300 hover:text-secondary"
+                      className="text-hero-muted transition-colors duration-500 ease-luxury hover:text-secondary"
                     >
                       {Icon ? <Icon size={18} /> : <span className="text-body">{new URL(url).hostname}</span>}
                     </a>
@@ -153,7 +153,7 @@ export function Footer() {
             <p className="font-body text-sm text-hero-muted">Premium Marble &amp; Tile Curation</p>
             <Link
               href="/admin/login"
-              className="font-body text-sm text-hero-muted/60 transition-colors duration-300 hover:text-secondary"
+              className="font-body text-sm text-hero-muted/60 transition-colors duration-500 ease-luxury hover:text-secondary"
             >
               Admin
             </Link>

@@ -16,6 +16,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
+import { inputClasses } from "@/components/ui/Field";
 import {
   FILTER_KEYS,
   FILTER_LABELS,
@@ -104,7 +105,7 @@ export function FilterSidebar({ filters, resultCount, facets }: FilterSidebarPro
       <div>
         <label
           htmlFor="catalogue-search"
-          className="mb-3 block font-body text-label uppercase tracking-widest text-on-surface-variant"
+          className="mb-3 block font-body text-label uppercase text-on-surface-variant"
         >
           Search
         </label>
@@ -114,7 +115,7 @@ export function FilterSidebar({ filters, resultCount, facets }: FilterSidebarPro
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name or code..."
-          className="w-full border border-outline-variant bg-surface px-4 py-3 font-body text-body text-on-surface placeholder:text-on-surface-variant transition-colors focus:border-secondary focus:outline-none"
+          className={inputClasses(false)}
         />
       </div>
 
@@ -132,7 +133,7 @@ export function FilterSidebar({ filters, resultCount, facets }: FilterSidebarPro
         <button
           type="button"
           onClick={clearAll}
-          className="self-start font-body text-label uppercase tracking-widest text-secondary-strong transition-colors hover:text-on-surface"
+          className="self-start font-body text-label uppercase text-secondary-strong transition-colors hover:text-on-surface"
         >
           Clear All Filters
         </button>
@@ -148,7 +149,7 @@ export function FilterSidebar({ filters, resultCount, facets }: FilterSidebarPro
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
-          className="inline-flex items-center gap-2 border border-outline-variant px-6 py-3 font-body text-label uppercase tracking-widest text-on-surface transition-colors hover:border-secondary"
+          className="inline-flex items-center gap-2 border border-outline-variant px-6 py-3 font-body text-label uppercase text-on-surface transition-colors hover:border-secondary"
         >
           <SlidersHorizontal size={16} aria-hidden="true" />
           Filters
@@ -165,7 +166,7 @@ export function FilterSidebar({ filters, resultCount, facets }: FilterSidebarPro
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-[60] bg-black/50 lg:hidden"
+              className="fixed inset-0 z-[60] bg-on-surface/50 lg:hidden"
               onClick={() => setMobileOpen(false)}
             />
             <motion.div
@@ -174,7 +175,7 @@ export function FilterSidebar({ filters, resultCount, facets }: FilterSidebarPro
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-x-0 bottom-0 z-[70] max-h-[85vh] overflow-y-auto rounded-t-2xl bg-surface px-margin pt-6 pb-8 lg:hidden"
+              className="fixed inset-x-0 bottom-0 z-[70] max-h-[85vh] overflow-y-auto bg-surface px-margin pt-6 pb-8 lg:hidden"
             >
               <div className="mb-8 flex items-center justify-between">
                 <h2 className="font-display text-headline-sm text-on-surface">Filters</h2>
@@ -228,7 +229,7 @@ function FilterGroup({ label, options, active, onToggle }: FilterGroupProps) {
 
   return (
     <fieldset>
-      <legend className="mb-3 font-body text-label uppercase tracking-widest text-on-surface-variant">
+      <legend className="mb-3 font-body text-label uppercase text-on-surface-variant">
         {label}
       </legend>
       <div className="flex flex-col gap-3">
@@ -269,7 +270,7 @@ function FilterGroup({ label, options, active, onToggle }: FilterGroupProps) {
         <button
           type="button"
           onClick={() => setExpanded((e) => !e)}
-          className="mt-3 font-body text-label uppercase tracking-widest text-secondary-strong transition-colors hover:text-on-surface"
+          className="mt-3 font-body text-label uppercase text-secondary-strong transition-colors hover:text-on-surface"
         >
           {expanded ? "Show less" : `Show all ${visible.length}`}
         </button>

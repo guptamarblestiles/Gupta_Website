@@ -19,7 +19,7 @@ export function ContactSection() {
       <section id="contact" className="bg-background py-section-gap scroll-mt-20">
         <Container>
           <div className="mb-12 md:mb-16 max-w-2xl mx-auto text-center">
-            <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">
+            <p className="font-body text-label uppercase text-secondary-strong mb-4">
               Contact
             </p>
             <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface">

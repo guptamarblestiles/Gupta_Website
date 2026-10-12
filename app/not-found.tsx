@@ -10,7 +10,7 @@ export default function NotFound() {
       <main id="main-content" className="pt-16 md:pt-20 pb-20">
         <section className="py-section-gap">
           <Container className="max-w-xl text-center mx-auto">
-            <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">
+            <p className="font-body text-label uppercase text-secondary-strong mb-4">
               404
             </p>
             <h1 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface mb-6">

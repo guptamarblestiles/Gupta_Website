@@ -42,7 +42,7 @@ export function HighlightsGrid({ items }: { items: HighlightItem[] }) {
           viewport={{ once: true, margin: "-60px" }}
           transition={{ delay: i * 0.12, duration: 0.6, ease: "easeOut" }}
           whileHover={{ y: -8 }}
-          className="group flex flex-col overflow-hidden rounded-lg border-l-4 border-secondary bg-surface shadow-sm transition-shadow hover:shadow-xl"
+          className="group flex flex-col overflow-hidden border-t-4 border-t-secondary bg-surface shadow-card transition-shadow duration-700 ease-luxury hover:shadow-card-hover"
         >
           {imageUrl && (
             <div className="relative h-40 overflow-hidden">
@@ -54,13 +54,13 @@ export function HighlightsGrid({ items }: { items: HighlightItem[] }) {
                 whileInView={reduceMotion ? undefined : { scale: 1, opacity: 1 }}
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ delay: i * 0.12 + 0.1, duration: 0.9, ease: "easeOut" }}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="grayscale-reveal h-full w-full object-cover group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-on-surface/30 to-transparent" />
             </div>
           )}
           <div className="flex flex-1 flex-col items-start p-6">
-            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-secondary/10 text-secondary">
+            <div className="mb-4 flex h-11 w-11 items-center justify-center bg-secondary/10 text-secondary">
               <Icon size={20} aria-hidden="true" />
             </div>
             <h3 className="font-display text-headline-sm-mobile md:text-headline-sm text-on-surface mb-2">

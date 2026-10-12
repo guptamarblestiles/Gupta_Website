@@ -24,7 +24,7 @@ export function Pagination({ page, totalPages, prevHref, nextHref }: PaginationP
       className="mt-16 md:mt-20 flex items-center justify-center gap-6"
     >
       <PageLink href={prevHref} label="Previous" icon="prev" />
-      <p className="font-body text-label uppercase tracking-widest text-on-surface-variant">
+      <p className="font-body text-label uppercase text-on-surface-variant">
         Page {page} of {totalPages}
       </p>
       <PageLink href={nextHref} label="Next" icon="next" />
@@ -40,7 +40,7 @@ type PageLinkProps = {
 
 function PageLink({ href, label, icon }: PageLinkProps) {
   const classes = cn(
-    "inline-flex items-center gap-2 border px-6 py-3 font-body text-label uppercase tracking-widest transition-colors",
+    "inline-flex items-center gap-2 border px-6 py-3 font-body text-label uppercase transition-colors",
     href
       ? "border-outline-variant text-on-surface hover:border-secondary hover:text-secondary"
       : "border-outline-variant/50 text-on-surface-variant/40",

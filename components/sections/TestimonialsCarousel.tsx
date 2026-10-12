@@ -50,7 +50,7 @@ export function TestimonialsCarousel({ items }: { items: Testimonial[] }) {
       >
         <Container>
           <div className="mb-12 md:mb-16 max-w-2xl mx-auto text-center">
-            <p className="font-body text-label uppercase tracking-widest text-secondary mb-4">
+            <p className="font-body text-label uppercase text-secondary mb-4">
               What Clients Say
             </p>
             <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-hero-foreground">
@@ -73,7 +73,7 @@ export function TestimonialsCarousel({ items }: { items: Testimonial[] }) {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.6, ease: "easeInOut" }}
-                className="relative h-[440px] md:h-[420px] overflow-hidden rounded-lg cursor-grab active:cursor-grabbing"
+                className="relative h-[440px] md:h-[420px] overflow-hidden cursor-grab active:cursor-grabbing"
               >
                 {active.imageUrl ? (
                   <motion.img
@@ -114,10 +114,10 @@ export function TestimonialsCarousel({ items }: { items: Testimonial[] }) {
                     transition={{ delay: 0.5, duration: 0.5 }}
                     className="flex items-center gap-3"
                   >
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-secondary-fixed to-secondary-strong font-body text-sm font-semibold text-white">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center bg-secondary-strong font-body text-sm font-semibold text-white">
                       {initialsFor(active.attribution)}
                     </div>
-                    <p className="font-body text-label uppercase tracking-widest text-white/80">
+                    <p className="font-body text-label uppercase text-white/80">
                       {active.attribution}
                     </p>
                   </motion.div>
@@ -141,7 +141,7 @@ export function TestimonialsCarousel({ items }: { items: Testimonial[] }) {
                     type="button"
                     aria-label={`Go to testimonial ${i + 1}`}
                     onClick={() => setIndex(i)}
-                    className={`h-1.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${
+                    className={`h-1.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${
                       i === index ? "w-6 bg-secondary" : "w-1.5 bg-hero-border"
                     }`}
                   />

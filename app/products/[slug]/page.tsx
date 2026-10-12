@@ -12,6 +12,7 @@ import { EnquiryForm } from "@/components/enquiry/EnquiryForm";
 import { StickyEnquireBar } from "@/components/product/StickyEnquireBar";
 import { PriceDisplay } from "@/components/product/PriceDisplay";
 import { DownloadResources } from "@/components/product/DownloadResources";
+import { VerticalLabel } from "@/components/ui/VerticalLabel";
 import { getProductBySlug, getRelatedProducts } from "@/lib/products/queries";
 import { getStoneForProduct } from "@/lib/products/stone";
 import type { Product } from "@/types/product";
@@ -156,20 +157,25 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </nav>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter lg:gap-16">
-              <ImageGallery
-                stone={stone}
-                productName={product.name}
-                images={product.images?.map((image) => ({ url: image.imageUrl, alt: image.alt }))}
-              />
+              <div className="relative">
+                <VerticalLabel className="absolute -left-8 top-0 bottom-0">
+                  {product.category} / {product.productCode}
+                </VerticalLabel>
+                <ImageGallery
+                  stone={stone}
+                  productName={product.name}
+                  images={product.images?.map((image) => ({ url: image.imageUrl, alt: image.alt }))}
+                />
+              </div>
 
               <div className="flex flex-col">
-                <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">
+                <p className="font-body text-label uppercase text-secondary-strong mb-4">
                   {product.category}
                 </p>
                 <h1 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface mb-4">
                   {product.name}
                 </h1>
-                <p className="font-body text-body-lg text-on-surface-variant mb-8">
+                <p className="drop-cap font-body text-body-lg text-on-surface-variant mb-8">
                   {product.description}
                 </p>
 
@@ -179,7 +185,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     if (!resolved) return null;
                     return (
                       <div key={label} className="flex items-center justify-between py-4 gap-4">
-                        <dt className="font-body text-label uppercase tracking-widest text-on-surface-variant">
+                        <dt className="font-body text-label uppercase text-on-surface-variant">
                           {label}
                         </dt>
                         <dd className="font-body text-body text-on-surface text-right">{resolved}</dd>
@@ -209,7 +215,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <Container>
             <div className="mx-auto max-w-xl">
               <div className="mb-10 md:mb-12 text-center">
-                <p className="mb-4 font-body text-label uppercase tracking-widest text-secondary-strong">
+                <p className="mb-4 font-body text-label uppercase text-secondary-strong">
                   Enquire
                 </p>
                 <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface">
@@ -231,7 +237,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <section className="bg-surface-variant py-section-gap">
               <Container>
                 <div className="mb-12 md:mb-16 max-w-2xl">
-                  <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">
+                  <p className="font-body text-label uppercase text-secondary-strong mb-4">
                     Related Selections
                   </p>
                   <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface">

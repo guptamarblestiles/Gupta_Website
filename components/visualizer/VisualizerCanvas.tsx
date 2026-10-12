@@ -43,7 +43,7 @@ export function VisualizerCanvas({ preset, tileByZone }: VisualizerCanvasProps) 
   return (
     <div
       ref={wrapperRef}
-      className="relative w-full overflow-hidden rounded-lg bg-neutral-900"
+      className="relative w-full overflow-hidden bg-neutral-900"
       style={{ aspectRatio: `${preset.imageWidth} / ${preset.imageHeight}` }}
     >
       <div

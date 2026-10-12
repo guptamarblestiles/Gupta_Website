@@ -2,34 +2,34 @@ import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
 
 type Variant =
-  | "primary" // filled dark, for light backgrounds (e.g. EXPLORE THE CATALOGUE, ENQUIRE NOW)
-  | "secondary" // outline, for light backgrounds (e.g. GET IN TOUCH, Our Story)
+  | "primary" // filled charcoal, gold slides in on hover — light backgrounds
+  | "secondary" // outline, fills charcoal on hover — light backgrounds
   | "ghost" // no border, for nav / low-emphasis actions
-  | "hero-primary" // filled light, for the dark hero section
-  | "hero-secondary"; // outline light, for the dark hero section
+  | "hero-primary" // filled alabaster, for the dark hero section
+  | "hero-secondary"; // outline alabaster, for the dark hero section
 
 type Size = "default" | "lg";
 
-const variantClasses: Record<Variant, string> = {
-  primary:
-    "bg-on-surface text-white border border-on-surface hover:bg-transparent hover:text-on-surface",
-  secondary:
-    "bg-transparent text-on-surface border border-outline-variant hover:border-secondary hover:text-secondary",
-  ghost:
-    "bg-transparent text-on-surface-variant border border-transparent hover:text-on-surface",
-  "hero-primary":
-    "bg-hero-foreground text-hero-bg border border-hero-foreground hover:bg-transparent hover:text-hero-foreground",
-  "hero-secondary":
-    "bg-transparent text-hero-foreground border border-hero-border hover:border-secondary hover:text-secondary",
-};
-
 const sizeClasses: Record<Size, string> = {
-  default: "px-8 py-4 text-label",
-  lg: "px-10 py-5 text-label",
+  default: "h-12 px-8 text-label",
+  lg: "h-14 px-10 text-label",
 };
 
 const baseClasses =
-  "inline-flex items-center justify-center gap-2 font-body uppercase tracking-widest transition-colors duration-300 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+  "relative inline-flex items-center justify-center gap-2 overflow-hidden font-body uppercase whitespace-nowrap transition-colors duration-500 ease-luxury focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-secondary disabled:opacity-50 disabled:cursor-not-allowed";
+
+/** The sliding gold fill behind a primary button's content — off-screen
+ *  left at rest, covers the button on hover/focus. Luxury's signature
+ *  "Gold Sliding Animation" bold-factor; requires the layered span
+ *  structure below so label text can sit above it via z-index. */
+function GoldSlide() {
+  return (
+    <span
+      aria-hidden
+      className="absolute inset-0 -translate-x-full bg-secondary transition-transform duration-500 ease-luxury group-hover:translate-x-0 group-focus-visible:translate-x-0"
+    />
+  );
+}
 
 type CommonProps = {
   variant?: Variant;
@@ -48,8 +48,9 @@ type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 /**
  * Shared CTA button. Renders a Next.js <Link> when `href` is provided,
- * otherwise a native <button>. Variants map 1:1 to the button treatments
- * approved across the Stitch homepage / catalogue / product prototypes.
+ * otherwise a native <button>. `primary`/`hero-primary` carry the gold
+ * slide-in fill + deepening shadow; `secondary`/`hero-secondary` are
+ * outline-only, filling solid on hover; `ghost` stays text-only.
  */
 export function Button({
   variant = "primary",
@@ -58,20 +59,54 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
-  const classes = cn(baseClasses, variantClasses[variant], sizeClasses[size], className);
+  const sizeClass = cn(baseClasses, sizeClasses[size]);
+  const isPrimary = variant === "primary" || variant === "hero-primary";
+
+  let variantClasses: string;
+  switch (variant) {
+    case "primary":
+      variantClasses =
+        "group bg-on-surface text-white shadow-button hover:shadow-button-hover";
+      break;
+    case "secondary":
+      variantClasses =
+        "border border-on-surface text-on-surface hover:bg-on-surface hover:text-white";
+      break;
+    case "ghost":
+      variantClasses = "text-on-surface-variant hover:text-secondary";
+      break;
+    case "hero-primary":
+      variantClasses =
+        "group bg-hero-foreground text-hero-bg shadow-button hover:shadow-button-hover";
+      break;
+    case "hero-secondary":
+      variantClasses =
+        "border border-hero-border text-hero-foreground hover:border-secondary hover:text-secondary";
+      break;
+  }
+
+  const classes = cn(sizeClass, variantClasses, className);
+  const content = isPrimary ? (
+    <>
+      <GoldSlide />
+      <span className="relative z-10 flex items-center gap-2">{children}</span>
+    </>
+  ) : (
+    children
+  );
 
   if ("href" in props && props.href) {
     const { href, ...anchorProps } = props;
     return (
       <Link href={href} className={classes} {...anchorProps}>
-        {children}
+        {content}
       </Link>
     );
   }
 
   return (
     <button className={classes} {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}>
-      {children}
+      {content}
     </button>
   );
 }

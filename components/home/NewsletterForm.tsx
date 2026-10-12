@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowRight, Check } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { Button } from "@/components/ui/Button";
 
 /**
  * Email-capture control for the CTA band. UI-complete and validated, but
@@ -51,7 +52,7 @@ export function NewsletterForm() {
           }}
           placeholder="Enter your email"
           className={cn(
-            "w-full bg-transparent border px-5 py-4 font-body text-body text-hero-foreground placeholder:text-hero-muted transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary",
+            "h-12 w-full border-0 border-b bg-transparent px-0 font-body text-body text-hero-foreground placeholder:font-display placeholder:italic placeholder:text-hero-muted transition-colors duration-500 ease-luxury focus-visible:outline-none",
             status === "error" ? "border-error" : "border-hero-border focus:border-secondary",
           )}
           aria-invalid={status === "error"}
@@ -63,13 +64,10 @@ export function NewsletterForm() {
           </p>
         )}
       </div>
-      <button
-        type="submit"
-        className="inline-flex items-center justify-center gap-2 bg-secondary px-6 py-4 font-body text-label uppercase tracking-widest text-white transition-colors duration-300 hover:bg-secondary-fixed-dim focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hero-foreground"
-      >
+      <Button type="submit" variant="hero-primary">
         Subscribe
         <ArrowRight size={16} aria-hidden="true" />
-      </button>
+      </Button>
     </form>
   );
 }

@@ -28,7 +28,7 @@ export function TileCard({ product, preload = false }: TileCardProps) {
   return (
     <Link
       href={`/products/${product.slug}`}
-      className="group flex flex-col bg-surface transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+      className="group flex flex-col bg-surface shadow-card transition-shadow duration-700 ease-luxury hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-secondary"
     >
       <div className="relative aspect-square overflow-hidden">
         {product.imageUrl ? (
@@ -38,20 +38,20 @@ export function TileCard({ product, preload = false }: TileCardProps) {
             fill
             preload={preload}
             sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+            className="grayscale-reveal object-cover group-hover:scale-105"
           />
         ) : (
           <StoneSwatch
             stone={stone}
-            className="absolute inset-0 h-full w-full transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+            className="absolute inset-0 h-full w-full transition-transform duration-700 ease-luxury group-hover:scale-105"
           />
         )}
-        <div className="absolute inset-0 flex items-end justify-start p-5 bg-gradient-to-t from-black/45 via-black/0 to-black/0 opacity-0 transition-opacity duration-400 group-hover:opacity-100">
-          <span className="font-body text-label uppercase tracking-widest text-white">View Details</span>
+        <div className="absolute inset-0 flex items-end justify-start p-5 bg-gradient-to-t from-on-surface/50 via-on-surface/0 to-on-surface/0 opacity-0 transition-opacity duration-500 ease-luxury group-hover:opacity-100">
+          <span className="font-body text-label uppercase text-white">View Details</span>
         </div>
       </div>
       <div className="p-card">
-        <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-2">
+        <p className="font-body text-label uppercase text-secondary-strong mb-2">
           {product.category}
         </p>
         <h3 className="font-display text-headline-sm-mobile md:text-headline-sm-tablet lg:text-headline-sm text-on-surface mb-1">{product.name}</h3>

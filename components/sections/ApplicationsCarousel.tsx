@@ -48,7 +48,7 @@ export function ApplicationsCarousel({ items }: ApplicationsCarouselProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-gutter items-center">
       <div>
-        <div className="relative h-[420px] md:h-[520px] overflow-hidden rounded-lg">
+        <div className="relative h-[420px] md:h-[520px] overflow-hidden">
           <AnimatePresence initial={false} mode="popLayout">
             <motion.div
               key={active.title}
@@ -70,7 +70,7 @@ export function ApplicationsCarousel({ items }: ApplicationsCarouselProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
               <div className="absolute inset-x-0 bottom-0 p-8 md:p-10">
-                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm">
+                <div className="mb-3 flex h-11 w-11 items-center justify-center bg-white/15 text-white backdrop-blur-sm">
                   <Icon size={20} aria-hidden="true" />
                 </div>
                 <h3 className="font-display text-headline-sm-mobile md:text-headline-sm text-white mb-2">
@@ -100,7 +100,7 @@ export function ApplicationsCarousel({ items }: ApplicationsCarouselProps) {
                 type="button"
                 aria-label={`Go to ${item.title}`}
                 onClick={() => go(i)}
-                className={`h-1.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${
+                className={`h-1.5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 ${
                   i === index ? "w-6 bg-secondary" : "w-1.5 bg-outline-variant"
                 }`}
               />

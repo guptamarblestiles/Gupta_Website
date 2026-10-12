@@ -65,7 +65,7 @@ export function VisualizerApp({ products }: VisualizerAppProps) {
     <div className="space-y-10">
       {/* Step 1 — space type */}
       <div>
-        <p className="mb-3 font-body text-label uppercase tracking-widest text-on-surface-variant">
+        <p className="mb-3 font-body text-label uppercase text-on-surface-variant">
           1. Space Type
         </p>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
@@ -97,7 +97,7 @@ export function VisualizerApp({ products }: VisualizerAppProps) {
       {/* Step 2 — room preset within that space type */}
       {presetsForSpace.length > 0 && (
         <div>
-          <p className="mb-3 font-body text-label uppercase tracking-widest text-on-surface-variant">
+          <p className="mb-3 font-body text-label uppercase text-on-surface-variant">
             2. Room
           </p>
           <div className="flex flex-wrap gap-2">
@@ -124,7 +124,7 @@ export function VisualizerApp({ products }: VisualizerAppProps) {
         {/* Step 3 — independent tile picker per zone */}
         <div className="space-y-8 order-2 lg:order-1">
           <div>
-            <p className="mb-3 font-body text-label uppercase tracking-widest text-on-surface-variant">
+            <p className="mb-3 font-body text-label uppercase text-on-surface-variant">
               3. Tiles
             </p>
             <input
@@ -168,7 +168,7 @@ export function VisualizerApp({ products }: VisualizerAppProps) {
 
         {/* Step 4 — combined live preview */}
         <div className="order-1 lg:order-2">
-          <p className="mb-3 font-body text-label uppercase tracking-widest text-on-surface-variant">
+          <p className="mb-3 font-body text-label uppercase text-on-surface-variant">
             4. Preview
           </p>
           <VisualizerCanvas preset={preset} tileByZone={tileByZoneUrl} />

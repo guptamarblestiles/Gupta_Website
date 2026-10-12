@@ -13,6 +13,8 @@ import "@fontsource/playfair-display/400-italic.css";
 import "@fontsource/playfair-display/500-italic.css";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site";
+import { GridLines } from "@/components/ui/GridLines";
+import { NoiseOverlay } from "@/components/ui/NoiseOverlay";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -50,10 +52,12 @@ export default function RootLayout({
             straight to page content. */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded focus:bg-secondary focus:px-4 focus:py-2 focus:text-white"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-on-surface focus:px-4 focus:py-2 focus:text-white"
         >
           Skip to content
         </a>
+        <GridLines />
+        <NoiseOverlay />
         {children}
       </body>
     </html>

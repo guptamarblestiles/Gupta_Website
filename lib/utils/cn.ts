@@ -41,6 +41,24 @@ const FONT_SIZE_TOKENS = [
   "body-lg",
   "body",
   "label",
+  "micro",
+];
+
+// Our custom named box-shadow utilities (app/globals.css) also need to be
+// registered as one conflict group, same reasoning as COLOR_TOKENS above —
+// otherwise e.g. `shadow-card group-hover:shadow-card-hover` would have the
+// second one silently dropped as an unrecognized, unrelated class.
+const SHADOW_TOKENS = [
+  "card",
+  "card-hover",
+  "feature",
+  "blog",
+  "blog-hover",
+  "hero-image",
+  "button",
+  "button-hover",
+  "inner-frame",
+  "feature-framed",
 ];
 
 const twMerge = extendTailwindMerge({
@@ -50,6 +68,7 @@ const twMerge = extendTailwindMerge({
       "bg-color": [{ bg: COLOR_TOKENS }],
       "border-color": [{ border: COLOR_TOKENS }],
       "font-size": [{ text: FONT_SIZE_TOKENS }],
+      "shadow": [{ shadow: SHADOW_TOKENS }],
     },
   },
 });

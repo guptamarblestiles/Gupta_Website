@@ -39,7 +39,7 @@ export async function ApplicationsTiles() {
       <section className="bg-surface-variant py-section-gap overflow-hidden">
         <Container>
           <div className="mb-12 md:mb-16 max-w-2xl mx-auto text-center">
-            <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">
+            <p className="font-body text-label uppercase text-secondary-strong mb-4">
               Where It Goes
             </p>
             <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface">
@@ -62,7 +62,7 @@ export async function ApplicationsTiles() {
                   key={title}
                   className="flex flex-col items-center text-center bg-surface p-card transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                 >
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-secondary/10 text-secondary">
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center bg-secondary/10 text-secondary">
                     <Icon size={22} aria-hidden="true" />
                   </div>
                   <h3 className="font-display text-headline-sm-mobile md:text-headline-sm text-on-surface mb-2">

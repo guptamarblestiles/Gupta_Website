@@ -26,13 +26,13 @@ export function DownloadResources({ product }: { product: Product }) {
       : pdf.fileUrl
     : undefined;
   const actionClass =
-    "inline-flex items-center gap-2 border border-outline-variant px-5 py-3 font-body text-label uppercase tracking-widest text-on-surface transition-colors hover:border-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary";
+    "inline-flex items-center gap-2 border border-outline-variant px-5 py-3 font-body text-label uppercase text-on-surface transition-colors hover:border-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary";
 
   return (
     <section aria-labelledby="download-resources" className="mb-10">
       <h2
         id="download-resources"
-        className="mb-4 font-body text-label uppercase tracking-widest text-on-surface-variant"
+        className="mb-4 font-body text-label uppercase text-on-surface-variant"
       >
         Download Resources
       </h2>

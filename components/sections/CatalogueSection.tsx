@@ -16,7 +16,7 @@ export async function CatalogueSection() {
       <section className="bg-surface-variant py-section-gap">
         <Container>
           <div className="mb-12 md:mb-16 max-w-2xl mx-auto text-center">
-            <p className="font-body text-label uppercase tracking-widest text-secondary-strong mb-4">
+            <p className="font-body text-label uppercase text-secondary-strong mb-4">
               The Full Range
             </p>
             <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface mb-4">
