@@ -1,17 +1,21 @@
 /**
  * One-off data fix: a chunk of imported products have a thin PDF-caption
- * crop (e.g. a "HEAVY DUTY" banner strip) stored as their sort_order 0
- * image instead of the real tile photo, because the extraction pipeline
- * picked up every crop on the page as an "image" with no size/content
- * filtering. The public site always shows sort_order 0 first, so these
+ * crop (e.g. a "HEAVY DUTY" banner strip, ~1172x90px) stored as their
+ * sort_order 0 image instead of the real tile photo, because the
+ * extraction pipeline picked up every crop on the page as an "image" with
+ * no filtering. The public site always shows sort_order 0 first, so these
  * products show a stretched, blank-looking banner instead of the tile.
  *
- * Detection heuristic: for products with >=2 images, HEAD each image URL.
- * If the current sort_order:0 image is both under 10KB AND less than a
- * third the size of the largest image in the set, it's almost certainly a
- * caption/banner crop, not a photo — swap sort_order with the largest
- * image so the real photo becomes primary. Nothing is deleted; the banner
- * image just moves to the back of the gallery instead of the front.
+ * Detection: for products with >=2 images, read each image's actual
+ * pixel dimensions (via sharp). A banner crop is extremely wide and
+ * short (aspect ratio > BANNER_ASPECT); a real tile photo is ~square.
+ * File size was tried first but is unreliable — a low-detail photo
+ * (plain white marble, flat black/white checkerboard) can compress
+ * smaller than the banner text crop, so size alone misses real cases.
+ * Dimensions don't have that problem. If the current sort_order:0 image
+ * is banner-shaped and another image in the set is square-ish, swap
+ * their sort_order so the real photo becomes primary. Nothing is
+ * deleted; the banner image just moves to the back of the gallery.
  *
  * SAFE BY DEFAULT: dry run, writes nothing. Pass --apply to write.
  * Needs .env.local: NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SECRET_KEY.
@@ -22,6 +26,7 @@
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import sharp from "sharp";
 import { getSupabaseAdminClient } from "../../lib/supabase/admin";
 
 function loadEnvLocal() {
@@ -37,17 +42,21 @@ function loadEnvLocal() {
 loadEnvLocal();
 
 const APPLY = process.argv.includes("--apply");
-const MIN_BANNER_BYTES = 10_000;
-const MIN_RATIO = 3; // real photo must be at least 3x the suspect image's size
+const BANNER_ASPECT = 4; // width/height above this is a banner strip, not a tile photo
+const SQUARE_ASPECT_MAX = 1.5; // width/height below this counts as "square enough" to be a real photo
 
 type ImageRow = { id: string; image_url: string; sort_order: number };
 
-async function sizeOf(url: string): Promise<number> {
+async function aspectOf(url: string): Promise<number | null> {
   try {
-    const res = await fetch(url, { method: "HEAD" });
-    return parseInt(res.headers.get("content-length") ?? "0", 10);
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const buf = Buffer.from(await res.arrayBuffer());
+    const meta = await sharp(buf).metadata();
+    if (!meta.width || !meta.height) return null;
+    return meta.width / meta.height;
   } catch {
-    return 0;
+    return null;
   }
 }
 
@@ -68,14 +77,14 @@ async function main() {
   const swaps: {
     slug: string;
     bannerId: string;
-    bannerBytes: number;
+    bannerAspect: number;
     bannerOldOrder: number;
     photoId: string;
-    photoBytes: number;
+    photoAspect: number;
     photoOldOrder: number;
   }[] = [];
 
-  const CONCURRENCY = 20;
+  const CONCURRENCY = 10;
   let idx = 0;
   async function worker() {
     while (idx < products.length) {
@@ -83,30 +92,30 @@ async function main() {
       const imgs = (p.product_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order);
       if (imgs.length < 2) continue;
 
-      const sizes = await Promise.all(imgs.map((img) => sizeOf(img.image_url)));
       const primary = imgs[0];
-      const primarySize = sizes[0];
-      if (primarySize === 0 || primarySize >= MIN_BANNER_BYTES) continue;
+      const primaryAspect = await aspectOf(primary.image_url);
+      if (primaryAspect === null || primaryAspect < BANNER_ASPECT) continue;
 
-      let bestIdx = -1;
-      let bestSize = 0;
+      let candidate: ImageRow | null = null;
+      let candidateAspect = 0;
       for (let i = 1; i < imgs.length; i++) {
-        if (sizes[i] > bestSize) {
-          bestSize = sizes[i];
-          bestIdx = i;
+        const aspect = await aspectOf(imgs[i].image_url);
+        if (aspect !== null && aspect <= SQUARE_ASPECT_MAX) {
+          candidate = imgs[i];
+          candidateAspect = aspect;
+          break;
         }
       }
-      if (bestIdx === -1 || bestSize < primarySize * MIN_RATIO) continue;
+      if (!candidate) continue;
 
-      const photo = imgs[bestIdx];
       swaps.push({
         slug: p.slug,
         bannerId: primary.id,
-        bannerBytes: primarySize,
+        bannerAspect: primaryAspect,
         bannerOldOrder: primary.sort_order,
-        photoId: photo.id,
-        photoBytes: bestSize,
-        photoOldOrder: photo.sort_order,
+        photoId: candidate.id,
+        photoAspect: candidateAspect,
+        photoOldOrder: candidate.sort_order,
       });
     }
   }
@@ -115,7 +124,7 @@ async function main() {
   console.log(`Checked ${products.length} products. Found ${swaps.length} to fix.\n`);
   for (const s of swaps) {
     console.log(
-      `${s.slug}: sort_order ${s.bannerOldOrder} (${s.bannerBytes}B banner) <-> ${s.photoOldOrder} (${s.photoBytes}B photo)`,
+      `${s.slug}: sort_order ${s.bannerOldOrder} (${s.bannerAspect.toFixed(1)}:1 banner) <-> ${s.photoOldOrder} (${s.photoAspect.toFixed(2)}:1 photo)`,
     );
   }
 
