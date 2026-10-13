@@ -2,6 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/hero/HeroSection";
 import { ScrollTransition } from "@/components/home/ScrollTransition";
+import { SpacesSection } from "@/components/sections/SpacesSection";
 import { BusinessOverview } from "@/components/sections/BusinessOverview";
 import { ApplicationsTiles } from "@/components/sections/ApplicationsTiles";
 import { Highlights } from "@/components/sections/Highlights";
@@ -58,6 +59,7 @@ export default function HomePage() {
       <main id="main-content">
         <HeroSection />
         <ScrollTransition />
+        <SpacesSection />
         <BusinessOverview />
         <ApplicationsTiles />
         <Highlights />
