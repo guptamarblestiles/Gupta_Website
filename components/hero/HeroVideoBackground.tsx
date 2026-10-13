@@ -17,6 +17,9 @@ import Image from "next/image";
  *
  * Reduced-motion users get the static poster frame only, no video/JS timer.
  */
+// "09-house-interior" (a generic real-estate walkthrough clip) and
+// "10-cleaning" (a Roomba vacuum commercial) were in the original asset
+// drop but have nothing to do with marble/tile/stone — excluded.
 const PLAYLIST = [
   "01-marble-veining",
   "02-marble-polished",
@@ -26,8 +29,6 @@ const PLAYLIST = [
   "06-marble-close-up",
   "07-tile-pattern",
   "08-stone-surface",
-  "09-house-interior",
-  "10-cleaning",
 ].map((name) => `/videos/hero/${name}.mp4`);
 
 const POSTER = "/videos/hero-poster.jpg";
