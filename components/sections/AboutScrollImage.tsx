@@ -29,36 +29,55 @@ function getMobileSnapshot() {
   return window.matchMedia(MOBILE_QUERY).matches;
 }
 
-/** Server snapshot is "desktop" (false) — the larger desktop start width is
- *  the safer default if a mobile client briefly renders it before
- *  hydration settles, since it just means a moment of fixed-px sizing
- *  rather than fighting mobile's percentage-based layout. */
+/** Server snapshot is "desktop" (false) — mobile gets the static final-state
+ *  render regardless (see the early-return branch below), so this only
+ *  matters for a one-frame flash before hydration settles. */
 function getServerSnapshot() {
   return false;
 }
 
-// Text colors interpolate from the section's normal light-cream palette
-// to a warm off-white once the image has taken over the whole background,
-// so the heading/paragraph/button stay readable (>= 4.5:1) against the
-// dark overlay in both states. Literal colors (not CSS vars) because
-// framer-motion's useTransform can only interpolate concrete color values.
-const KICKER_COLORS = ["#8c6e1c", "#e4c565"];
-const HEADING_COLORS = ["#1a1a1a", "#f9f8f6"];
-const PARAGRAPH_COLORS = ["#6c6863", "#e5ded2"];
-const BUTTON_COLORS = ["#1a1a1a", "#f9f8f6"];
+function lerpChannel(a: number, b: number, t: number) {
+  return Math.round(a + (b - a) * t);
+}
+
+function lerpHex(hexA: string, hexB: string, t: number) {
+  const a = [1, 3, 5].map((i) => parseInt(hexA.slice(i, i + 2), 16));
+  const b = [1, 3, 5].map((i) => parseInt(hexB.slice(i, i + 2), 16));
+  const mixed = a.map((channel, i) => lerpChannel(channel, b[i], t));
+  return `#${mixed.map((c) => c.toString(16).padStart(2, "0")).join("")}`;
+}
+
+// Text recolors in lockstep with the dark scrim, both driven by the same
+// scrollYProgress and the same [0, 0.5, 1] keyframe positions — front-loaded
+// (85% of the way to the end color by the halfway point of the scroll) so
+// that at mid-scroll the text is already nearly white against an already
+// substantially dark scrim, rather than both being stuck at a washed-out
+// 50/50 blend. MID_T is that front-load factor.
+const MID_T = 0.85;
+function colorStops(startHex: string, endHex: string): [string, string, string] {
+  return [startHex, lerpHex(startHex, endHex, MID_T), endHex];
+}
+
+const KICKER_STOPS = colorStops("#8c6e1c", "#e4c565");
+const HEADING_STOPS = colorStops("#1a1a1a", "#f9f8f6");
+const PARAGRAPH_STOPS = colorStops("#6c6863", "#e5ded2");
+const BUTTON_STOPS = colorStops("#1a1a1a", "#f9f8f6");
+const PROGRESS_STOPS = [0, 0.5, 1];
 
 /**
  * Pins the section (tall wrapper + sticky inner panel) while the image
  * grows from a small centred rounded shape to a full-bleed background
  * covering the entire pinned viewport — border-radius easing to 0, width
- * and height both reaching 100%. The heading/kicker/paragraph/button sit
- * on top the whole time (never fade out) and smoothly recolor from dark
- * (readable over the start state's light cream background) to a warm
- * off-white (readable over the image's dark overlay once expanded).
+ * and height both reaching 100%. There is no card/panel of any kind behind
+ * the text: it sits directly on the plain page background at the start,
+ * then directly on the image once a dark scrim (rgba(20,16,12), fading
+ * 0 -> ~0.55) has grown in behind it. The image itself stays at full
+ * opacity throughout — only the scrim dims it. Text recolors dark -> white
+ * off the same scrollYProgress and the same keyframe positions as the
+ * scrim, so the two are always in step (see colorStops/PROGRESS_STOPS).
  *
- * Only `transform`/`opacity`/dimensions tied to `scale`+`border-radius`
- * are animated — `will-change` is scoped to just the image frame, the one
- * element whose box actually resizes every frame.
+ * Mobile and prefers-reduced-motion both render the static final state
+ * (full-bleed image, full scrim, white text) with no pinning/animation.
  */
 export function AboutScrollImage({
   kicker,
@@ -84,44 +103,22 @@ export function AboutScrollImage({
   // motion's useTransform can't interpolate between mismatched units
   // (e.g. "420px" -> "100%"), it silently pairs the start number with the
   // end unit instead, which renders as the end state from scroll 0.
-  const frameWidth = useTransform(scrollYProgress, [0, 1], [isMobile ? "45%" : "22%", "100%"]);
-  const frameHeight = useTransform(scrollYProgress, [0, 1], [isMobile ? "22vh" : "26vh", "100%"]);
+  const frameWidth = useTransform(scrollYProgress, [0, 1], ["22%", "100%"]);
+  const frameHeight = useTransform(scrollYProgress, [0, 1], ["26vh", "100%"]);
   const frameRadius = useTransform(scrollYProgress, [0, 1], ["500px", "0px"]);
   const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.06]);
-  // Both ramp up fast (most of the way there by the midpoint) so the dark
-  // overlay is already strong well before the text finishes turning white
-  // — otherwise light text briefly sits on a still-bright image.
-  const imageOpacity = useTransform(scrollYProgress, [0, 0.4, 1], [1, 0.4, 0.25]);
-  const overlayOpacity = useTransform(scrollYProgress, [0, 0.4, 1], [0, 0.75, 0.9]);
+  const scrimOpacity = useTransform(scrollYProgress, PROGRESS_STOPS, [0, 0.4, 0.55]);
 
-  const kickerColor = useTransform(scrollYProgress, [0.5, 0.85], KICKER_COLORS);
-  const headingColor = useTransform(scrollYProgress, [0.5, 0.85], HEADING_COLORS);
-  const paragraphColor = useTransform(scrollYProgress, [0.5, 0.85], PARAGRAPH_COLORS);
-  const buttonColor = useTransform(scrollYProgress, [0.5, 0.85], BUTTON_COLORS);
+  const kickerColor = useTransform(scrollYProgress, PROGRESS_STOPS, KICKER_STOPS);
+  const headingColor = useTransform(scrollYProgress, PROGRESS_STOPS, HEADING_STOPS);
+  const paragraphColor = useTransform(scrollYProgress, PROGRESS_STOPS, PARAGRAPH_STOPS);
+  const buttonColor = useTransform(scrollYProgress, PROGRESS_STOPS, BUTTON_STOPS);
 
-  // A soft cream backdrop sits behind the text while the image is still
-  // small (so the early overlap between the two centred, stacked layers
-  // never drops below AA contrast), then fades out just as the dark
-  // gradient overlay above has grown strong enough to carry contrast on
-  // its own — and well before the text itself starts turning light (0.5+).
-  const textPanelOpacity = useTransform(scrollYProgress, [0.15, 0.4], [0.94, 0]);
-
-  if (reduceMotion) {
+  if (reduceMotion || isMobile) {
     return (
-      <div className="relative flex min-h-[80vh] w-full flex-col items-center justify-center overflow-hidden px-margin py-24 text-center">
-        <Image
-          src={imageSrc}
-          alt={imageAlt}
-          fill
-          sizes="100vw"
-          className="object-cover"
-          style={{ opacity: 0.4 }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(to bottom, rgba(20,16,12,0.6), rgba(20,16,12,0.7))" }}
-        />
+      <div className="relative flex min-h-[70vh] w-full flex-col items-center justify-center overflow-hidden px-margin py-20 text-center">
+        <Image src={imageSrc} alt={imageAlt} fill sizes="100vw" className="object-cover" />
+        <div aria-hidden="true" className="absolute inset-0" style={{ backgroundColor: "rgba(20,16,12,0.55)" }} />
         <div className="relative z-10 max-w-2xl">
           <TextBlock
             kicker={kicker}
@@ -153,26 +150,18 @@ export function AboutScrollImage({
           }}
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
         >
-          <motion.div style={{ scale: imageScale, opacity: imageOpacity }} className="absolute inset-0">
+          <motion.div style={{ scale: imageScale }} className="absolute inset-0">
             <Image src={imageSrc} alt={imageAlt} fill sizes="100vw" className="object-cover" />
           </motion.div>
           <motion.div
             aria-hidden="true"
-            style={{
-              opacity: overlayOpacity,
-              background: "linear-gradient(to bottom, rgba(20,16,12,0.55), rgba(20,16,12,0.75))",
-            }}
+            style={{ opacity: scrimOpacity, backgroundColor: "rgba(20,16,12,1)" }}
             className="absolute inset-0"
           />
         </motion.div>
 
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-margin text-center">
-          <div className="relative max-w-2xl">
-            <motion.div
-              aria-hidden="true"
-              style={{ opacity: textPanelOpacity }}
-              className="absolute -inset-x-6 -inset-y-8 -z-10 rounded-[2rem] bg-background md:-inset-x-10 md:-inset-y-10"
-            />
+          <div className="max-w-2xl">
             <TextBlock
               kicker={kicker}
               headingLead={headingLead}
