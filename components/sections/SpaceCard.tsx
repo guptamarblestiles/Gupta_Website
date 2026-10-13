@@ -18,6 +18,7 @@ export type SpaceClip = {
 
 type SpaceCardProps = {
   title: string;
+  caption: string;
   href: string;
   clips: SpaceClip[];
 };
@@ -33,7 +34,8 @@ const CROSSFADE_MS = 700;
  * Two stacked <video> elements swap opacity for the crossfade so there's
  * never a flash/black-frame between clips; a plain <img> poster sits
  * underneath both and is all that ever renders for prefers-reduced-motion
- * users or before the user has interacted with the card.
+ * users or before the user has interacted with the card. The caption
+ * renders in its own soft box below the card frame, not on the image.
  *
  * Deliberately keeps video0Ref/video1Ref as two separate named refs (no
  * `[ref0, ref1]` array) — the array is a fresh value every render, which
@@ -41,7 +43,7 @@ const CROSSFADE_MS = 700;
  * ref, so it flags the imperative `.currentTime =` / `.play()` calls as
  * illegal post-render mutation. Direct named refs read clean.
  */
-export function SpaceCard({ title, href, clips }: SpaceCardProps) {
+export function SpaceCard({ title, caption, href, clips }: SpaceCardProps) {
   const reduceMotion = useReducedMotion();
   const [playing, setPlaying] = useState(false);
   const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
@@ -126,87 +128,94 @@ export function SpaceCard({ title, href, clips }: SpaceCardProps) {
   }, [reduceMotion, start, stop]);
 
   return (
-    <Link
-      ref={cardRef}
-      href={href}
-      aria-label={`Explore ${title}`}
-      onMouseEnter={start}
-      onMouseLeave={stop}
-      onFocus={start}
-      onBlur={stop}
-      className="group relative flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-3xl bg-surface-variant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
-    >
-      {/* Poster — the permanent fallback for reduced motion, and what
-          shows whenever the card isn't actively playing. */}
-      <Image
-        src={clips[0].poster}
-        alt=""
-        aria-hidden="true"
-        fill
-        sizes="(min-width: 1024px) 33vw, 100vw"
-        className={cn(
-          "object-cover transition-opacity duration-700",
-          playing && !reduceMotion ? "opacity-0" : "opacity-100",
+    <div className="flex flex-col gap-3">
+      <Link
+        ref={cardRef}
+        href={href}
+        aria-label={`Explore ${title}`}
+        onMouseEnter={start}
+        onMouseLeave={stop}
+        onFocus={start}
+        onBlur={stop}
+        className="group relative block aspect-[4/5] overflow-hidden rounded-3xl bg-surface-variant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2"
+      >
+        {/* Poster — the permanent fallback for reduced motion, and what
+            shows whenever the card isn't actively playing. */}
+        <Image
+          src={clips[0].poster}
+          alt=""
+          aria-hidden="true"
+          fill
+          sizes="(min-width: 1024px) 33vw, 100vw"
+          className={cn(
+            "object-cover transition-opacity duration-700",
+            playing && !reduceMotion ? "opacity-0" : "opacity-100",
+          )}
+          style={{ objectPosition: clips[0].objectPosition }}
+        />
+
+        {!reduceMotion && (
+          <video
+            ref={video0Ref}
+            src={(hasMultipleClips ? clips[layerClipIndex[0]] : clips[0]).src}
+            poster={(hasMultipleClips ? clips[layerClipIndex[0]] : clips[0]).poster}
+            muted
+            playsInline
+            preload="metadata"
+            loop={!hasMultipleClips}
+            onEnded={() => handleClipEnded(0)}
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover transition-opacity ease-out",
+              activeLayer === 0 && playing ? "opacity-100" : "opacity-0",
+            )}
+            style={{
+              transitionDuration: `${CROSSFADE_MS}ms`,
+              objectPosition: (hasMultipleClips ? clips[layerClipIndex[0]] : clips[0]).objectPosition,
+            }}
+            aria-hidden="true"
+          />
         )}
-        style={{ objectPosition: clips[0].objectPosition }}
-      />
 
-      {!reduceMotion && (
-        <video
-          ref={video0Ref}
-          src={(hasMultipleClips ? clips[layerClipIndex[0]] : clips[0]).src}
-          poster={(hasMultipleClips ? clips[layerClipIndex[0]] : clips[0]).poster}
-          muted
-          playsInline
-          preload="metadata"
-          loop={!hasMultipleClips}
-          onEnded={() => handleClipEnded(0)}
-          className={cn(
-            "absolute inset-0 h-full w-full object-cover transition-opacity ease-out",
-            activeLayer === 0 && playing ? "opacity-100" : "opacity-0",
-          )}
-          style={{
-            transitionDuration: `${CROSSFADE_MS}ms`,
-            objectPosition: (hasMultipleClips ? clips[layerClipIndex[0]] : clips[0]).objectPosition,
-          }}
+        {!reduceMotion && hasMultipleClips && (
+          <video
+            ref={video1Ref}
+            src={clips[layerClipIndex[1]].src}
+            poster={clips[layerClipIndex[1]].poster}
+            muted
+            playsInline
+            preload="metadata"
+            onEnded={() => handleClipEnded(1)}
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover transition-opacity ease-out",
+              activeLayer === 1 && playing ? "opacity-100" : "opacity-0",
+            )}
+            style={{
+              transitionDuration: `${CROSSFADE_MS}ms`,
+              objectPosition: clips[layerClipIndex[1]].objectPosition,
+            }}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Subtle top scrim so the label pill stays readable over any frame. */}
+        <div
           aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/40 to-transparent"
         />
-      )}
 
-      {!reduceMotion && hasMultipleClips && (
-        <video
-          ref={video1Ref}
-          src={clips[layerClipIndex[1]].src}
-          poster={clips[layerClipIndex[1]].poster}
-          muted
-          playsInline
-          preload="metadata"
-          onEnded={() => handleClipEnded(1)}
-          className={cn(
-            "absolute inset-0 h-full w-full object-cover transition-opacity ease-out",
-            activeLayer === 1 && playing ? "opacity-100" : "opacity-0",
-          )}
-          style={{
-            transitionDuration: `${CROSSFADE_MS}ms`,
-            objectPosition: clips[layerClipIndex[1]].objectPosition,
-          }}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Scrim so the label/link stay readable over any frame of footage. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 via-black/10 to-transparent"
-      />
-
-      <div className="relative z-10 flex items-center justify-between gap-3 p-6 md:p-7">
-        <span className="font-display text-xl text-white md:text-2xl">{title}</span>
-        <span className="inline-flex items-center gap-1 font-body text-sm font-medium uppercase tracking-wide text-white/90 transition-colors group-hover:text-secondary-fixed">
-          Explore
-          <ArrowUpRight size={16} aria-hidden="true" />
+        <span className="absolute left-4 top-4 z-10 rounded-full bg-background/90 px-4 py-1.5 font-body text-xs font-medium uppercase tracking-wide text-on-surface backdrop-blur-sm">
+          {title}
         </span>
-      </div>
-    </Link>
+
+        <span className="absolute bottom-4 right-4 z-10 inline-flex items-center gap-1 rounded-full bg-background/90 px-4 py-1.5 font-body text-xs font-medium uppercase tracking-wide text-on-surface backdrop-blur-sm transition-colors group-hover:bg-secondary group-hover:text-on-secondary">
+          Explore
+          <ArrowUpRight size={14} aria-hidden="true" />
+        </span>
+      </Link>
+
+      <p className="rounded-2xl bg-surface px-5 py-4 font-body text-sm text-on-surface-variant shadow-card">
+        {caption}
+      </p>
+    </div>
   );
 }
