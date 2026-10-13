@@ -1,71 +1,78 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils/cn";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const MOBILE_QUERY = "(max-width: 767px)";
 
-function subscribeToMobileQuery(callback: () => void) {
-  const mql = window.matchMedia(MOBILE_QUERY);
-  mql.addEventListener("change", callback);
-  return () => mql.removeEventListener("change", callback);
-}
-
-function getMobileSnapshot() {
-  return window.matchMedia(MOBILE_QUERY).matches;
-}
-
-function getServerSnapshot() {
-  return false;
-}
+type Offset = { x?: number; y?: number };
 
 type Tile = {
   src: string;
   alt: string;
-  /** Desktop entry offset in px; halved-ish for mobile (32px cap) inside the component. */
-  from: { x?: number; y?: number };
+  /** Desktop entry offset in px — mobile uses a flat 32px in the same direction. */
+  from: Offset;
   delay: number;
-  className: string;
+  objectPosition?: string;
+  /** Percent position/size within the 2400x1500 collage reference frame. */
+  desktop: { left: number; top: number; width: number; height: number };
+  /** Mobile: plain grid-flow box with an explicit aspect ratio instead of
+   *  absolute positioning — the desktop layout's proportions can't survive
+   *  a 2-column width without squashing every photo. */
+  mobileClassName: string;
 };
 
+// Reference frame 2400x1500, 12px gutters — positions given directly in
+// the brief (x/y/w/h), converted to percentages of that frame so the
+// layout scales with the container's own width. The math below is just
+// x/2400, y/1500, w/2400, h/1500; the resulting 0.8%/0.5% gaps are exactly
+// 12px at the 2400x1500 reference size.
 const TILES: Tile[] = [
   {
     src: "/images/applications/home-bedroom-travertine-wall.webp",
     alt: "Travertine feature wall in a bedroom",
     from: { x: -80 },
     delay: 0,
-    className: "md:row-start-1",
-  },
-  {
-    src: "/images/applications/hospitality-cafe-stone-brick.webp",
-    alt: "Stone and brick wall in a café",
-    from: { x: -60, y: 60 },
-    delay: 0.08,
-    className: "col-span-2 md:col-span-1 md:row-start-2",
+    desktop: { left: 0, top: 0, width: (764 / 2400) * 100, height: (900 / 1500) * 100 },
+    mobileClassName: "aspect-[4/5]",
   },
   {
     src: "/images/applications/home-kitchen-marble-island.webp",
     alt: "Marble kitchen island",
     from: { y: -80 },
+    delay: 0.08,
+    desktop: { left: (776 / 2400) * 100, top: 0, width: (876 / 2400) * 100, height: (720 / 1500) * 100 },
+    mobileClassName: "aspect-[4/5]",
+  },
+  {
+    src: "/images/applications/hospitality-cafe-stone-brick.webp",
+    alt: "Stone and brick wall in a café",
+    from: { x: -60, y: 60 },
     delay: 0.16,
-    className: "md:row-start-1",
+    objectPosition: "center bottom",
+    desktop: { left: 0, top: (912 / 1500) * 100, width: (764 / 2400) * 100, height: (588 / 1500) * 100 },
+    // On mobile, placed third in the 2-col grid (not second) so it doesn't
+    // immediately follow the bedroom tile and push "kitchen" onto its own
+    // row below both of them — array order only matters for mobile's plain
+    // document-order grid flow, not desktop's absolute positioning.
+    mobileClassName: "col-span-2 aspect-[16/10]",
   },
   {
     src: "/images/applications/building-lobby-atrium.webp",
     alt: "Stone-clad atrium in a building lobby",
     from: { y: 80 },
     delay: 0.24,
-    className: "md:row-start-2",
+    desktop: { left: (776 / 2400) * 100, top: (732 / 1500) * 100, width: (876 / 2400) * 100, height: (768 / 1500) * 100 },
+    mobileClassName: "aspect-[4/5]",
   },
   {
     src: "/images/applications/home-shower-herringbone-tile.webp",
     alt: "Herringbone tile in a walk-in shower",
     from: { x: 80 },
     delay: 0.32,
-    className: "col-span-2 md:col-span-1 md:row-span-2",
+    desktop: { left: (1664 / 2400) * 100, top: 0, width: (736 / 2400) * 100, height: 100 },
+    mobileClassName: "aspect-[4/5]",
   },
 ];
 
@@ -73,18 +80,18 @@ const TILES: Tile[] = [
  * Collage reveal, closing the Applications section: the 5 curated photos
  * (not the applications-collage.webp composite, which stays unused by
  * this component — kept only as a static reference/preview) arrive from
- * five different directions and settle into a grid. Desktop reproduces
- * the asymmetric 3-column/2-row collage proportions (764/876/764 wide,
- * 900+576 / 720+768 tall) via two nested sub-grids (left/middle columns)
- * plus one full-height tile (right); mobile collapses to a simple
- * 2-column staggered grid — `contents` on the column wrappers lets each
- * tile become a direct child of the outer 2-col grid at that breakpoint
- * instead of trying to preserve the desktop asymmetry at a width it can't
- * fit cleanly.
+ * five different directions and settle into a tight editorial grid.
+ *
+ * Desktop: one relative, aspect-[2400/1500] container; each tile is
+ * absolutely positioned by percentage (derived from the 2400x1500
+ * reference layout with 12px gutters — see TILES above), so the whole
+ * collage scales with its width while every edge still lines up exactly.
+ * Mobile: a plain 2-column grid with explicit per-tile aspect ratios
+ * instead — the desktop proportions can't be preserved at that width
+ * without squashing photos, so mobile is a deliberately simpler stack.
  */
 export function ApplicationsCollage() {
   const reduceMotion = useReducedMotion();
-  const isMobile = useSyncExternalStore(subscribeToMobileQuery, getMobileSnapshot, getServerSnapshot);
 
   return (
     <div>
@@ -92,26 +99,36 @@ export function ApplicationsCollage() {
         Our surfaces, in real spaces
       </p>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-[764fr_876fr_764fr] md:grid-rows-2">
-        {/* Left column: bedroom (900fr) over café (576fr) */}
-        <div className="contents md:grid md:grid-rows-[900fr_576fr] md:gap-3 md:col-start-1 md:row-span-2">
-          <CollageTile tile={TILES[0]} reduceMotion={reduceMotion} isMobile={isMobile} />
-          <CollageTile tile={TILES[1]} reduceMotion={reduceMotion} isMobile={isMobile} />
-        </div>
+      {/* Desktop (md+): absolute percentage layout */}
+      <div className="relative hidden w-full md:block" style={{ aspectRatio: "2400 / 1500" }}>
+        {TILES.map((tile) => (
+          <CollageTile
+            key={tile.src}
+            tile={tile}
+            reduceMotion={reduceMotion}
+            offsetScale={1}
+            style={{
+              left: `${tile.desktop.left}%`,
+              top: `${tile.desktop.top}%`,
+              width: `${tile.desktop.width}%`,
+              height: `${tile.desktop.height}%`,
+            }}
+            className="absolute"
+          />
+        ))}
+      </div>
 
-        {/* Middle column: kitchen (720fr) over lobby (768fr) */}
-        <div className="contents md:grid md:grid-rows-[720fr_768fr] md:gap-3 md:col-start-2 md:row-span-2">
-          <CollageTile tile={TILES[2]} reduceMotion={reduceMotion} isMobile={isMobile} />
-          <CollageTile tile={TILES[3]} reduceMotion={reduceMotion} isMobile={isMobile} />
-        </div>
-
-        {/* Right column: shower, full height */}
-        <CollageTile
-          tile={TILES[4]}
-          reduceMotion={reduceMotion}
-          isMobile={isMobile}
-          className="md:col-start-3 md:row-span-2"
-        />
+      {/* Mobile (below md): simple 2-column staggered grid */}
+      <div className="grid grid-cols-2 gap-3 md:hidden">
+        {TILES.map((tile) => (
+          <CollageTile
+            key={tile.src}
+            tile={tile}
+            reduceMotion={reduceMotion}
+            offsetScale={32}
+            className={cn("relative w-full", tile.mobileClassName)}
+          />
+        ))}
       </div>
     </div>
   );
@@ -120,21 +137,24 @@ export function ApplicationsCollage() {
 function CollageTile({
   tile,
   reduceMotion,
-  isMobile,
+  offsetScale,
   className,
+  style,
 }: {
   tile: Tile;
   reduceMotion: boolean | null;
-  isMobile: boolean;
+  /** 1 = use tile.from as-is (desktop); 32 = flatten to a 32px offset in the same direction (mobile). */
+  offsetScale: number;
   className?: string;
+  style?: React.CSSProperties;
 }) {
-  // Mobile offsets capped at 32px per the brief; desktop uses the full
-  // directional offset defined per tile above.
-  const mobileFrom = {
-    x: tile.from.x ? Math.sign(tile.from.x) * 32 : undefined,
-    y: tile.from.y ? Math.sign(tile.from.y) * 32 : undefined,
-  };
-  const from = isMobile ? mobileFrom : tile.from;
+  const from: Offset =
+    offsetScale === 1
+      ? tile.from
+      : {
+          x: tile.from.x ? Math.sign(tile.from.x) * offsetScale : undefined,
+          y: tile.from.y ? Math.sign(tile.from.y) * offsetScale : undefined,
+        };
 
   return (
     <motion.div
@@ -142,9 +162,17 @@ function CollageTile({
       whileInView={{ opacity: 1, x: 0, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.8, delay: tile.delay, ease: EASE }}
-      className={cn("relative aspect-square overflow-hidden rounded-[8px] bg-surface-variant", tile.className, className)}
+      style={style}
+      className={cn("overflow-hidden rounded-[8px] bg-surface-variant", className)}
     >
-      <Image src={tile.src} alt={tile.alt} fill sizes="(min-width: 768px) 30vw, 50vw" className="object-cover" />
+      <Image
+        src={tile.src}
+        alt={tile.alt}
+        fill
+        sizes="(min-width: 768px) 35vw, 50vw"
+        className="object-cover"
+        style={{ objectPosition: tile.objectPosition }}
+      />
     </motion.div>
   );
 }
