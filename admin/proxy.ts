@@ -22,7 +22,7 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!url || !key) {
-    return isPublic ? NextResponse.next() : NextResponse.redirect(new URL("/login", request.url));
+    return isPublic ? NextResponse.next() : NextResponse.redirect(new URL(request.nextUrl.basePath + "/login", request.url));
   }
 
   let response = NextResponse.next({ request });
@@ -43,17 +43,22 @@ export async function proxy(request: NextRequest) {
   const signedIn = Boolean(data?.claims?.sub);
 
   if (!signedIn && !isPublic) {
-    const login = new URL("/login", request.url);
+    const login = new URL(request.nextUrl.basePath + "/login", request.url);
     if (path !== "/") login.searchParams.set("next", path + request.nextUrl.search);
     return NextResponse.redirect(login);
   }
   if (signedIn && path === "/login") {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL(request.nextUrl.basePath + "/", request.url));
   }
   response.headers.set("Cache-Control", "private, no-store");
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|pdf.worker.min.mjs|.*\\.(?:png|jpg|svg|webp|mjs)$).*)"],
+  // "/" is listed explicitly, not just covered by the catch-all below —
+  // under a configured basePath the bare zone root has been observed to
+  // not match the negative-lookahead pattern on its own (see
+  // docs/admin-integration-next-steps.md's routing section), so this
+  // request shape must never rely on that pattern alone.
+  matcher: ["/", "/((?!_next/static|_next/image|favicon.ico|icon.svg|pdf.worker.min.mjs|.*\\.(?:png|jpg|svg|webp|mjs)$).*)"],
 };

@@ -99,6 +99,42 @@ describe("roles", () => {
     assert.ok(e.rows.length > 0);
   });
 
+  test("editor can update an enquiry's status and notes (matches updateEnquiry's exact payload shape); it stamps handled_by and never touches the customer's own fields", async () => {
+    const { rows } = await db.as(ids.owner, () => db.query<{ id: string }>("insert into public.enquiries (name, email, message) values ('Real Customer', 'real@example.com', 'Quote please') returning id"));
+    const enquiryId = rows[0].id;
+
+    const viewerAttempt = await db.as(ids.viewer, () =>
+      db.query("update public.enquiries set status = 'contacted' where id = $1", [enquiryId]),
+    );
+    assert.equal(viewerAttempt.affectedRows, 0); // RLS silently filters it out, matching "editor" minimum role
+
+    await db.as(ids.editor, () =>
+      db.query("update public.enquiries set status = 'contacted', staff_notes = 'Called, will send a quote', handled_by = $2 where id = $1", [enquiryId, ids.editor]),
+    );
+
+    const after = await db.as(ids.owner, () => db.query<{ status: string; staff_notes: string; handled_by: string; name: string; email: string; message: string }>(
+      "select status, staff_notes, handled_by, name, email, message from public.enquiries where id = $1",
+      [enquiryId],
+    ));
+    const row = after.rows[0];
+    assert.equal(row.status, "contacted");
+    assert.equal(row.staff_notes, "Called, will send a quote");
+    assert.equal(row.handled_by, ids.editor);
+    // The customer's own submitted fields are never touched by a status update.
+    assert.equal(row.name, "Real Customer");
+    assert.equal(row.email, "real@example.com");
+    assert.equal(row.message, "Quote please");
+  });
+
+  test("only owners can delete an enquiry", async () => {
+    const { rows } = await db.as(ids.owner, () => db.query<{ id: string }>("insert into public.enquiries (name, email, message) values ('To Delete', 'd@example.com', 'x') returning id"));
+    const id = rows[0].id;
+    const editorAttempt = await db.as(ids.editor, () => db.query("delete from public.enquiries where id = $1", [id]));
+    assert.equal(editorAttempt.affectedRows, 0);
+    const ownerAttempt = await db.as(ids.owner, () => db.query("delete from public.enquiries where id = $1", [id]));
+    assert.equal(ownerAttempt.affectedRows, 1);
+  });
+
   test("editor can create and edit, but not delete products", async () => {
     const id = await db.as(ids.editor, async () => {
       const { rows } = await db.query<{ id: string }>(
