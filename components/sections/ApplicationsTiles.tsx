@@ -1,82 +1,78 @@
 /**
- * Applications showcase — fetches real room photos (lib/media/tileImages)
- * server-side, keeping the existing Residential/Commercial/Hospitality
- * copy unchanged, and hands off to ApplicationsCarousel (client) for the
- * interactive dominant/prev/next carousel + the small 3D tile element.
- * Falls back to the original plain icon-card grid if no images are found
- * (e.g. Supabase not configured), rather than rendering a broken carousel.
+ * Applications showcase — editorial scroll-reveal built from the curated
+ * photos in public/images/applications/ (static, not database-driven; see
+ * CREDITS.md in that folder). Replaces the old carousel + 3D tile element.
+ *
+ * "View Tiles for This" links all go to the unfiltered catalogue for now —
+ * see the TODO on each row below for why (no real per-space filter data
+ * exists yet; faking one would misrepresent the catalogue).
  */
-import { Building2, Home, UtensilsCrossed } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
-import { getApplicationImages } from "@/lib/media/tileImages";
-import { ApplicationsCarousel } from "./ApplicationsCarousel";
+import { ApplicationRow } from "./ApplicationRow";
+import { ApplicationsCollage } from "./ApplicationsCollage";
 
-const APPLICATIONS = [
+const ROWS = [
   {
-    icon: Home,
-    title: "Residential",
-    description: "Kitchen countertops, bathroom walls, and living room floors finished in stone.",
+    number: "01",
+    title: "Homes",
+    description: "Kitchens, bedrooms, bathrooms and living areas.",
+    // TODO: filter by room/space once products are tagged that way — no
+    // such tagging exists in the catalogue yet (checked live: `rooms` is
+    // only ever populated with "Kitchen", for 5 of 548 products).
+    href: "/tiles",
+    imageSrc: "/images/applications/home-bedroom-travertine-wall.webp",
+    imageAlt: "Travertine feature wall in a bedroom",
+    secondaryImage: {
+      src: "/images/applications/home-kitchen-marble-island.webp",
+      alt: "Marble kitchen island",
+    },
+    imageOnRight: false,
   },
   {
-    icon: Building2,
-    title: "Commercial",
-    description: "Lobbies, office floors, and facades built for daily wear without losing polish.",
+    number: "02",
+    title: "Buildings",
+    description: "Lobbies, offices and commercial floors.",
+    // TODO: filter by space once products are tagged — no commercial/
+    // office/lobby tagging exists in the catalogue at all today.
+    href: "/tiles",
+    imageSrc: "/images/applications/building-lobby-atrium.webp",
+    imageAlt: "Stone-clad atrium in a building lobby",
+    imageOnRight: true,
   },
   {
-    icon: UtensilsCrossed,
+    number: "03",
     title: "Hospitality",
-    description: "Hotel lobbies, restaurant interiors, and spa spaces finished to a five-star standard.",
+    description: "Restaurants, cafes, hotels and spas.",
+    // TODO: filter by space once products are tagged — no restaurant/
+    // hotel/spa tagging exists in the catalogue at all today.
+    href: "/tiles",
+    imageSrc: "/images/applications/hospitality-cafe-stone-brick.webp",
+    imageAlt: "Stone and brick wall in a café",
+    imageOnRight: false,
   },
-];
+] as const;
 
-export async function ApplicationsTiles() {
-  const images = await getApplicationImages();
-  const hasImages = images.length === APPLICATIONS.length;
-
+export function ApplicationsTiles() {
   return (
-    <RevealOnScroll>
-      <section className="bg-surface-variant py-section-gap overflow-hidden">
-        <Container>
-          <div className="mb-12 md:mb-16 max-w-2xl mx-auto text-center">
-            <p className="font-body text-label uppercase text-secondary-strong mb-4">
-              Where It Goes
-            </p>
-            <h2 className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-on-surface">
-              Applications
-            </h2>
-          </div>
+    <section className="bg-surface-variant py-section-gap overflow-x-clip">
+      <Container>
+        <div className="mb-16 md:mb-24 max-w-3xl">
+          <p className="font-body text-label uppercase text-secondary-strong mb-4">Where It Goes</p>
+          <h2 className="font-display text-display-mobile md:text-display-tablet lg:text-display text-on-surface">
+            Made for Every Space.
+          </h2>
+        </div>
 
-          {hasImages ? (
-            <ApplicationsCarousel
-              items={APPLICATIONS.map(({ title, description }, i) => ({
-                title,
-                description,
-                imageUrl: images[i].imageUrl,
-              }))}
-            />
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-gutter">
-              {APPLICATIONS.map(({ icon: Icon, title, description }) => (
-                <div
-                  key={title}
-                  className="flex flex-col items-center text-center bg-surface p-card transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-                >
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center bg-secondary/10 text-secondary">
-                    <Icon size={22} aria-hidden="true" />
-                  </div>
-                  <h3 className="font-display text-headline-sm-mobile md:text-headline-sm text-on-surface mb-2">
-                    {title}
-                  </h3>
-                  <p className="font-body text-body text-on-surface-variant leading-relaxed">
-                    {description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </Container>
-      </section>
-    </RevealOnScroll>
+        <div className="flex flex-col gap-24 md:gap-32">
+          {ROWS.map((row) => (
+            <ApplicationRow key={row.number} {...row} />
+          ))}
+        </div>
+
+        <div className="mt-24 md:mt-32">
+          <ApplicationsCollage />
+        </div>
+      </Container>
+    </section>
   );
 }

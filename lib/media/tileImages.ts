@@ -1,6 +1,7 @@
 /**
  * Database-driven image selection for the homepage's editorial sections
- * (cinematic quote zoom, Applications, Highlights, Testimonials) — pulls
+ * (Highlights, Testimonials — Applications moved to static curated photos
+ * in public/images/applications/ and no longer uses this file) — pulls
  * real photos from the live `products`/`product_images` tables rather than
  * hardcoding image URLs directly, so if a product is ever edited/removed
  * in the admin panel, these sections update automatically.
@@ -70,17 +71,6 @@ async function fetchCurated(slug: string, imageIndex: number): Promise<CuratedIm
  *  for the cinematic scroll-zoom quote section. */
 export async function getSlabTextureImage(): Promise<CuratedImage | null> {
   return fetchCurated(CURATED_SLUGS.slab, 0);
-}
-
-/** Residential/Commercial/Hospitality room photos (sort_order 2 — the
- *  lifestyle shot) for the Applications showcase, in that display order. */
-export async function getApplicationImages(): Promise<CuratedImage[]> {
-  const results = await Promise.all([
-    fetchCurated(CURATED_SLUGS.residential, 2),
-    fetchCurated(CURATED_SLUGS.commercial, 2),
-    fetchCurated(CURATED_SLUGS.hospitality, 2),
-  ]);
-  return results.filter((r): r is CuratedImage => r !== null);
 }
 
 /** Four room photos for the Highlights showcase (reuses the same vetted
