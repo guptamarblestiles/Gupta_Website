@@ -65,6 +65,13 @@
   --font-display: "Playfair Display", ui-serif, Georgia, serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
 
+  /* Brand-wordmark-only fonts — see components/ui/BrandWordmark.tsx. Kept
+     off --font-display so the logotype can read differently from section
+     headings without affecting them. */
+  --font-brand-marcellus: "Marcellus", ui-serif, Georgia, serif;
+  --font-brand-cormorant: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-brand-cinzel: "Cinzel", ui-serif, Georgia, serif;
+
   /* H1 (luxury "Hero Headline") — 48px mobile / 64px tablet / 96px desktop.
      Already sits inside the luxury text-6xl..9xl hero range at every tier —
      only the leading tightens, toward the spec's signature leading-[0.9]. */
