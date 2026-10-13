@@ -12,6 +12,7 @@ import { InstagramIcon, LinkedinIcon } from "@/components/ui/SocialIcons";
 import { CONTACT_INFO } from "@/lib/contact";
 import { BUSINESS_INFO, socialLinks } from "@/lib/site";
 import { COLLECTIONS } from "@/lib/collections";
+import { BrandWordmark } from "@/components/ui/BrandWordmark";
 
 const SOCIAL_ICONS: Record<string, typeof InstagramIcon> = {
   instagram: InstagramIcon,
@@ -37,8 +38,8 @@ export function Footer() {
       <Container className="py-16 md:py-20">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-16">
           <div className="md:col-span-1">
-            <Link href="/" className="font-display text-xl text-hero-foreground tracking-tight">
-              Gupta Interior
+            <Link href="/" className="text-xl text-hero-foreground">
+              <BrandWordmark />
             </Link>
             <p className="mt-2 font-body text-sm text-secondary-fixed">By Mayank Gupta</p>
             <p className="mt-4 font-body text-body text-hero-muted leading-relaxed max-w-xs">

@@ -11,6 +11,12 @@ import "@fontsource/playfair-display/500.css";
 import "@fontsource/playfair-display/600.css";
 import "@fontsource/playfair-display/400-italic.css";
 import "@fontsource/playfair-display/500-italic.css";
+// Brand-wordmark-only fonts (see components/ui/BrandWordmark.tsx) — kept
+// separate from the heading font so the logotype can read differently
+// from body headings without affecting them.
+import "@fontsource/marcellus/400.css";
+import "@fontsource/cormorant-garamond/600.css";
+import "@fontsource/cinzel/500.css";
 import "./globals.css";
 import { SITE_URL } from "@/lib/site";
 import { NoiseOverlay } from "@/components/ui/NoiseOverlay";

@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { HeroVideoBackground } from "./HeroVideoBackground";
-import { ScrollIndicator } from "./ScrollIndicator";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -75,8 +74,6 @@ export function HeroSection() {
           </motion.div>
         </div>
       </Container>
-
-      <ScrollIndicator />
 
       {/* Soft fade into the light section that follows, smoothing the
           dark-to-light handoff (fuller scroll-driven transition lands in

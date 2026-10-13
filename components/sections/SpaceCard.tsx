@@ -18,6 +18,7 @@ export type SpaceClip = {
 
 type SpaceCardProps = {
   title: string;
+  caption: string;
   href: string;
   clips: SpaceClip[];
 };
@@ -41,7 +42,7 @@ const CROSSFADE_MS = 700;
  * ref, so it flags the imperative `.currentTime =` / `.play()` calls as
  * illegal post-render mutation. Direct named refs read clean.
  */
-export function SpaceCard({ title, href, clips }: SpaceCardProps) {
+export function SpaceCard({ title, caption, href, clips }: SpaceCardProps) {
   const reduceMotion = useReducedMotion();
   const [playing, setPlaying] = useState(false);
   const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
@@ -197,15 +198,18 @@ export function SpaceCard({ title, href, clips }: SpaceCardProps) {
       {/* Scrim so the label/link stay readable over any frame of footage. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 via-black/10 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
       />
 
-      <div className="relative z-10 flex items-center justify-between gap-3 p-6 md:p-7">
-        <span className="font-display text-xl text-white md:text-2xl">{title}</span>
-        <span className="inline-flex items-center gap-1 font-body text-sm font-medium uppercase tracking-wide text-white/90 transition-colors group-hover:text-secondary-fixed">
-          Explore
-          <ArrowUpRight size={16} aria-hidden="true" />
-        </span>
+      <div className="relative z-10 flex flex-col gap-2 p-6 md:p-7">
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-display text-xl text-white md:text-2xl">{title}</span>
+          <span className="inline-flex items-center gap-1 font-body text-sm font-medium uppercase tracking-wide text-white/90 transition-colors group-hover:text-secondary-fixed">
+            Explore
+            <ArrowUpRight size={16} aria-hidden="true" />
+          </span>
+        </div>
+        <p className="font-body text-sm text-white/80 max-w-[85%] leading-relaxed">{caption}</p>
       </div>
     </Link>
   );

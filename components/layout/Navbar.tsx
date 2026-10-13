@@ -19,8 +19,18 @@
  * background solidifies almost immediately on scroll, while the text color
  * must wait until the dark hero has actually scrolled past.
  *
+ * Hide-on-scroll-down / show-on-scroll-up (both variants): the bar is
+ * always visible until the hero is scrolled past (HERO_RATIO of the
+ * viewport height — approximates the hero's `min-h-screen` without a
+ * layout-coupled ref). Past that point, any downward scroll hides it;
+ * scrolling up by UP_REVEAL_PX or more brings it back. Tracked via a ref
+ * (not state) for the upward-travel accumulator so the 60fps scroll
+ * handler doesn't re-render every tick — only the two booleans that
+ * actually change class/transform (`hidden`, the existing `scrolled` /
+ * `overLight`) trigger renders.
+ *
  * "light" variant (every other page) is the same flat bar, always solid,
- * no scroll animation.
+ * no scroll animation, and never hides.
  *
  * DEVIATION: the redesign spec's nav list includes "Catalogue" (a PDF
  * showcase page) — that page was explicitly deferred (no PDF files exist
@@ -29,11 +39,12 @@
  */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import { BrandWordmark } from "@/components/ui/BrandWordmark";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -43,9 +54,11 @@ const NAV_LINKS = [
   { label: "Contact", href: "/#contact" },
 ];
 
-const BRAND_NAME = "Gupta Interior";
 const SCROLL_THRESHOLD = 60; // px scrolled before the bar gains its solid background
+const HERO_RATIO = 0.9; // fraction of viewport height treated as "still in the hero"
+const UP_REVEAL_PX = 8; // cumulative upward travel before the bar re-shows
 const COLOR_TRANSITION = { duration: 0.5, ease: "easeInOut" as const };
+const SLIDE_TRANSITION = { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const };
 
 type NavbarProps = {
   /**
@@ -60,12 +73,40 @@ export function Navbar({ variant = "light" }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [overLight, setOverLight] = useState(false);
+  const [navHidden, setNavHidden] = useState(false);
+  const reduceMotion = useReducedMotion();
+
+  const lastYRef = useRef(0);
+  const upTravelRef = useRef(0);
 
   const { scrollY } = useScroll();
   useMotionValueEvent(scrollY, "change", (latest) => {
     if (variant !== "auto") return;
     setScrolled(latest > SCROLL_THRESHOLD);
     setOverLight(latest > window.innerHeight * 0.8);
+
+    const heroBoundary = window.innerHeight * HERO_RATIO;
+    const lastY = lastYRef.current;
+    const delta = latest - lastY;
+    lastYRef.current = latest;
+
+    if (latest <= heroBoundary) {
+      upTravelRef.current = 0;
+      setNavHidden(false);
+      return;
+    }
+
+    if (delta > 0) {
+      // Scrolling down past the hero — hide, and reset the upward-travel
+      // accumulator so a brief up-flick mid-downward-scroll doesn't count.
+      upTravelRef.current = 0;
+      setNavHidden(true);
+    } else if (delta < 0) {
+      upTravelRef.current += -delta;
+      if (upTravelRef.current >= UP_REVEAL_PX) {
+        setNavHidden(false);
+      }
+    }
   });
 
   // Lock body scroll while the mobile menu is open.
@@ -79,6 +120,9 @@ export function Navbar({ variant = "light" }: NavbarProps) {
   const isAuto = variant === "auto";
   const solid = !isAuto || scrolled;
   const darkText = !isAuto || overLight;
+  // Never hide while the mobile menu is open, or for the "light" variant's
+  // sub-pages — only the homepage hero/scroll choreography hides the bar.
+  const hidden = isAuto && navHidden && !mobileOpen;
 
   return (
     <header className="fixed top-0 inset-x-0 z-50">
@@ -86,19 +130,21 @@ export function Navbar({ variant = "light" }: NavbarProps) {
         animate={{
           backgroundColor: solid ? "var(--color-background)" : "rgba(0,0,0,0)",
           borderColor: solid ? "var(--color-outline-variant)" : "rgba(0,0,0,0)",
+          y: hidden ? "-100%" : "0%",
         }}
-        transition={COLOR_TRANSITION}
+        transition={reduceMotion ? { duration: 0 } : { ...COLOR_TRANSITION, y: SLIDE_TRANSITION }}
+        onFocusCapture={() => setNavHidden(false)}
         className="border-b px-margin"
       >
         <div className="flex items-center justify-between h-16 md:h-20 gap-8">
           <Link
             href="/"
             className={cn(
-              "font-display text-xl tracking-tight transition-colors duration-500 ease-luxury whitespace-nowrap",
+              "text-xl transition-colors duration-500 ease-luxury",
               darkText ? "text-on-surface" : "text-hero-foreground",
             )}
           >
-            {BRAND_NAME}
+            <BrandWordmark />
           </Link>
 
           <nav className="hidden md:flex items-center gap-10">
