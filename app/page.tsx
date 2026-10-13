@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/hero/HeroSection";
 import { SpacesSection } from "@/components/sections/SpacesSection";
 import { BusinessOverview } from "@/components/sections/BusinessOverview";
+import { WhatWeDealIn } from "@/components/sections/WhatWeDealIn";
 import { ApplicationsTiles } from "@/components/sections/ApplicationsTiles";
 import { Highlights } from "@/components/sections/Highlights";
 import { CatalogueSection } from "@/components/sections/CatalogueSection";
@@ -59,6 +60,7 @@ export default function HomePage() {
         <HeroSection />
         <SpacesSection />
         <BusinessOverview />
+        <WhatWeDealIn />
         <ApplicationsTiles />
         <Highlights />
         <CatalogueSection />

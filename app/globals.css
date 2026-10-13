@@ -268,6 +268,24 @@
   }
 }
 
+/* ---- "What we deal in" marquee track (components/sections/WhatWeDealIn.tsx).
+   The track renders the word list twice back-to-back; translating exactly
+   -50% shifts by one full copy's width, so the loop is seamless. Reduced
+   motion is handled by the component itself (motion-reduce:hidden on the
+   animated track, a static wrapped row shown instead) rather than relying
+   on this animation simply freezing mid-loop. ---- */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@utility animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
 /*
  * Border radius: 0px, everywhere, on the public site — an architectural
  * choice, not a default. No global reset is applied here on purpose: the
