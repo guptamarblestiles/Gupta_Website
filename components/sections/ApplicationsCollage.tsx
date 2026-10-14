@@ -59,8 +59,8 @@ const TILES: Tile[] = [
     mobileClassName: "col-span-2 aspect-[16/10]",
   },
   {
-    src: "/images/applications/building-lobby-atrium.webp",
-    alt: "Stone-clad atrium in a building lobby",
+    src: "/images/applications/building-lobby-glass-wood-panels.webp",
+    alt: "Office lobby with wood-panelled walls and a glossy floor",
     from: { y: 80 },
     delay: 0.24,
     desktop: { left: (776 / 2400) * 100, top: (732 / 1500) * 100, width: (876 / 2400) * 100, height: (768 / 1500) * 100 },
