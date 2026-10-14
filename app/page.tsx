@@ -7,7 +7,6 @@ import { WhatWeDealIn } from "@/components/sections/WhatWeDealIn";
 import { ApplicationsTiles } from "@/components/sections/ApplicationsTiles";
 import { Highlights } from "@/components/sections/Highlights";
 import { CatalogueSection } from "@/components/sections/CatalogueSection";
-import { Testimonials } from "@/components/sections/Testimonials";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { TrustStats } from "@/components/home/TrustStats";
 import { CtaBand } from "@/components/home/CtaBand";
@@ -64,7 +63,6 @@ export default function HomePage() {
         <ApplicationsTiles />
         <Highlights />
         <CatalogueSection />
-        <Testimonials />
         <ContactSection />
         <TrustStats />
         <CtaBand />

@@ -18,6 +18,7 @@ type ApplicationRowProps = {
   href: string;
   imageSrc: string;
   imageAlt: string;
+  imageObjectPosition?: string;
   secondaryImage?: SecondaryImage;
   imageOnRight: boolean;
 };
@@ -43,6 +44,7 @@ export function ApplicationRow({
   href,
   imageSrc,
   imageAlt,
+  imageObjectPosition,
   secondaryImage,
   imageOnRight,
 }: ApplicationRowProps) {
@@ -91,6 +93,7 @@ export function ApplicationRow({
             fill
             sizes="(min-width: 1024px) 45vw, 100vw"
             className="object-cover"
+            style={{ objectPosition: imageObjectPosition }}
           />
         </div>
 

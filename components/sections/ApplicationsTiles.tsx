@@ -35,8 +35,12 @@ const ROWS = [
     // TODO: filter by space once products are tagged — no commercial/
     // office/lobby tagging exists in the catalogue at all today.
     href: "/tiles",
-    imageSrc: "/images/applications/building-lobby-atrium.webp",
-    imageAlt: "Stone-clad atrium in a building lobby",
+    imageSrc: "/images/applications/building-lobby-stone-floor.webp",
+    imageAlt: "Lobby with a large-format stone-look floor and floor-to-ceiling glass",
+    secondaryImage: {
+      src: "/images/applications/building-lobby-glass-wood-panels.webp",
+      alt: "Office lobby with a glossy floor and wood-panelled walls",
+    },
     imageOnRight: true,
   },
   {
@@ -46,8 +50,13 @@ const ROWS = [
     // TODO: filter by space once products are tagged — no restaurant/
     // hotel/spa tagging exists in the catalogue at all today.
     href: "/tiles",
-    imageSrc: "/images/applications/hospitality-cafe-stone-brick.webp",
-    imageAlt: "Stone and brick wall in a café",
+    imageSrc: "/images/applications/hospitality-lobby-inlaid-marble.webp",
+    imageAlt: "Hotel lobby with an inlaid marble floor",
+    imageObjectPosition: "center 70%",
+    secondaryImage: {
+      src: "/images/applications/hospitality-cafe-stone-brick.webp",
+      alt: "Stone and brick walls in a café",
+    },
     imageOnRight: false,
   },
 ] as const;
