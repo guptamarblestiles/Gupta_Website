@@ -44,3 +44,9 @@ supabase/.temp/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# copied from pdfjs-dist on install (admin-src/scripts/copy-pdf-worker.mjs)
+/public/pdf.worker.min.mjs
+
+# OCR language data cached by tesseract.js when run under Node
+*.traineddata

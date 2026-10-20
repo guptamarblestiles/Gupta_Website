@@ -13,8 +13,8 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "admin panel/**",
-    // Separate Next.js app with its own lint config (admin/eslint.config.mjs).
-    "admin/**",
+    // Copied from pdfjs-dist on install (admin-src/scripts/copy-pdf-worker.mjs).
+    "public/pdf.worker.min.mjs",
   ]),
 ]);
 
