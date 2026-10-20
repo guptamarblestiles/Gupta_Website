@@ -13,11 +13,11 @@ export function TrustStats() {
     <RevealOnScroll>
       <section id="about" className="bg-background py-section-gap scroll-mt-20">
         <Container>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-gutter divide-y divide-outline-variant md:divide-y-0 md:divide-x">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-gutter divide-y divide-outline-variant sm:divide-y-0 sm:divide-x">
             {TRUST_STATS.map((stat, i) => (
               <div
                 key={stat.label}
-                className={`flex flex-col items-center text-center px-4 ${i < 2 ? "pb-8 md:pb-0" : "pt-8 md:pt-0"}`}
+                className={`flex flex-col items-center text-center px-4 ${i > 0 ? "pt-8 sm:pt-0" : ""}`}
               >
                 <span className="font-display text-headline-mobile md:text-headline-tablet lg:text-headline text-secondary mb-2">
                   {stat.value}

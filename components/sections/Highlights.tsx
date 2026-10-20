@@ -30,10 +30,10 @@ const HIGHLIGHTS = [
   },
   {
     title: "Expert Support",
-    description: "25+ years of industry experience guiding every selection.",
+    description: "15+ years of industry experience guiding every selection.",
     imageSrc: "/images/applications/highlight-expert-support.webp",
     imageAlt: "Minimalist living room with a plastered feature wall and floor lamp",
-    stat: "25+",
+    stat: "15+",
   },
 ] as const;
 

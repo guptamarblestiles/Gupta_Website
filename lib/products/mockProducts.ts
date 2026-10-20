@@ -100,9 +100,8 @@ export const FEATURED_STONES: FeaturedStone[] = [
 ];
 
 export const TRUST_STATS = [
-  { value: "25+", label: "Years of Excellence" },
+  { value: "15+", label: "Years of Excellence" },
   { value: "5,000+", label: "Projects Delivered" },
-  { value: "04", label: "Premium Showrooms" },
   { value: "ISO", label: "Certified Quality" },
 ] as const;
 

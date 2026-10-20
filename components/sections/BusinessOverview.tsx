@@ -1,7 +1,7 @@
 /**
  * "Who We Are" — company overview. Content/copy is unchanged from the
  * previous version (see the integration report for which specific claims
- * — "25+ years", "thousands of projects", the showroom location — remain
+ * — "15+ years", "thousands of projects", the showroom location — remain
  * unverified, carried over as-is, not newly added here). The section is
  * edge-to-edge (no Container) so AboutScrollImage's image can expand to a
  * true full-bleed background; the text itself still gets the site's
@@ -24,7 +24,7 @@ export function BusinessOverview() {
           headingLead="Architectural Surfaces for"
           headingAccent="Visionary"
           headingTail="Spaces"
-          paragraph="At Gupta Interior, we source and curate the world's most exceptional marble and stone. With 25+ years of expertise, we've transformed thousands of projects across residential, commercial, and hospitality sectors. Visit our showroom in Mangolpur Kalan, Rohini, serving homeowners and architects across Delhi NCR."
+          paragraph="At Gupta Interior, we source and curate the world's most exceptional marble and stone. With 15+ years of expertise, we've transformed thousands of projects across residential, commercial, and hospitality sectors. Visit our showroom in Mangolpur Kalan, Rohini, serving homeowners and architects across Delhi NCR."
           buttonHref="/tiles"
           buttonLabel="Explore Our Range"
         />
