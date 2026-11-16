@@ -1,5 +1,5 @@
 import "server-only";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import type { PublicSync } from "@admin/lib/actionResult";
 import { DEMO } from "@admin/lib/demo/mode";
 
@@ -29,6 +29,11 @@ export async function refreshPublicSite(): Promise<PublicSync> {
   if (DEMO) return "not_needed"; // a demo never touches the real website
   try {
     revalidatePath("/", "layout");
+    // Public reads are cached 1h under these tags (unstable_cache). Expire
+    // them immediately ({ expire: 0 }, not the stale-while-revalidate
+    // "max" profile) so an admin edit shows on the very next visit.
+    revalidateTag("products", { expire: 0 });
+    revalidateTag("catalogues", { expire: 0 });
     return "refreshed";
   } catch {
     return "failed";

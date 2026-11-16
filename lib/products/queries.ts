@@ -13,11 +13,19 @@
  *
  * Legacy rows predate the normalized columns, so two groups fall back:
  * application = application ?? wall_or_floor, series = series ?? collection.
- * New columns are read via select("*") and never named in a select list, so
- * this code is safe to deploy before OR after the migration is applied.
+ * Columns are selected explicitly (never "*") to keep egress small; this
+ * requires the 20261011160000 curation migration to be applied.
  * Row visibility (is_visible) is enforced by RLS, not by this code.
+ *
+ * Caching/errors: every public read is wrapped in unstable_cache (1h, tag
+ * "products") on a cookie-less client. Supabase failures THROW — they are
+ * never replaced by mock/empty data — so nothing broken is ever cached and
+ * Next keeps serving the last good ISR page.
  */
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { getPublicSupabaseClient } from "@/lib/supabase/server";
 import { CATALOGUE_SIZES, MOCK_PRODUCTS } from "@/lib/products/mockProducts";
 import { buildImageAlt } from "@/lib/products/alt";
 import {
@@ -30,7 +38,15 @@ import {
 } from "@/types/product";
 
 const DEFAULT_PAGE_SIZE = 24;
-const FACET_ROW_LIMIT = 5000;
+const FACET_PAGE_SIZE = 1000; // PostgREST silently caps a response at 1000 rows
+const FACET_ROW_LIMIT = 10_000;
+const MAX_SEARCH_LENGTH = 80;
+const CACHE_SECONDS = 3600;
+const PRODUCTS_TAG = "products";
+
+function queryFailed(what: string, error: { code?: string; message: string }): Error {
+  return new Error(`Supabase ${what} query failed: ${error.code ?? "unknown"} ${error.message}`);
+}
 
 type SourcePdfRow = {
   id: string;
@@ -131,7 +147,9 @@ function rowToProduct(row: ProductRow): Product {
  *  strip them from user-typed search input so a stray character can't
  *  reshape the filter instead of just failing to match anything. */
 function sanitizeSearchTerm(term: string): string {
-  return term.replace(/[,()"]/g, " ").trim();
+  const cleaned = term.replace(/[,()"]/g, " ").trim().slice(0, MAX_SEARCH_LENGTH);
+  // Escape LIKE wildcards so user input matches literally.
+  return cleaned.replace(/[\\%_]/g, (c) => `\\${c}`);
 }
 
 /** Quote a value for use inside a PostgREST `in.(...)` list. */
@@ -139,25 +157,36 @@ function quoted(values: string[]): string {
   return values.map((v) => `"${v.replace(/["\\]/g, "")}"`).join(",");
 }
 
-// Query joins. The source_pdfs embed needs the migration; the plain select
-// is the fallback if it hasn't been applied yet.
-const LIST_SELECT = "*, product_images(image_url, sort_order)";
-const DETAIL_SELECT = "*, product_images(image_url, sort_order), source_pdfs(id, title, original_filename, file_url, file_size_bytes)";
+// Exactly the columns rowToProduct reads — no internal/audit columns
+// (created_by, updated_by, status, review fields).
+const PRODUCT_COLUMNS =
+  "id, name, slug, product_code, category, finish, size, color, wall_or_floor, collection, application, rooms, pattern, thickness, material, series, finish_detail, source_page, price, price_unit, price_note, description, created_at, updated_at";
+const LIST_SELECT = `${PRODUCT_COLUMNS}, product_images(image_url, sort_order)`;
+const DETAIL_SELECT = `${LIST_SELECT}, source_pdfs(id, title, original_filename, file_url, file_size_bytes)`;
+// Only what getFilterFacets / matches() need.
+const FACET_COLUMNS =
+  "name, product_code, category, finish, size, color, application, wall_or_floor, rooms, pattern, thickness, series, collection";
 
-/**
- * Filters + paginates the catalogue. Reads from Supabase when
- * NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY are set;
- * falls back to the typed MOCK_PRODUCTS dataset otherwise.
- */
-export async function getProducts(
-  filters: ProductFilters = {},
-  page = 1,
-  pageSize = DEFAULT_PAGE_SIZE,
+/** Stable cache-key fragment: sorted keys and sorted value lists, so
+ *  equivalent filters share one cache entry. */
+function filtersKey(filters: ProductFilters): string {
+  const out: Record<string, unknown> = {};
+  for (const key of Object.keys(filters).sort() as (keyof ProductFilters)[]) {
+    const v = filters[key];
+    if (v === undefined || v === null) continue;
+    out[key] = Array.isArray(v) ? [...v].sort() : v;
+  }
+  return JSON.stringify(out);
+}
+
+async function fetchProducts(
+  filters: ProductFilters,
+  safePage: number,
+  pageSize: number,
 ): Promise<PaginatedProducts> {
-  const safePage = Math.max(1, Math.trunc(page) || 1);
   const start = (safePage - 1) * pageSize;
 
-  const client = getSupabaseServerClient();
+  const client = getPublicSupabaseClient();
   if (!client) {
     return getProductsFromMock(filters, safePage, pageSize, start);
   }
@@ -189,14 +218,33 @@ export async function getProducts(
 
   const { data, error, count } = await query
     .order("created_at", { ascending: false })
+    .order("id") // tiebreaker: equal created_at must not duplicate/skip rows across pages
     .range(start, start + pageSize - 1);
 
-  if (error) throw error;
+  if (error) throw queryFailed("products", error);
 
-  const products = (data ?? []).map(rowToProduct);
+  const products = (data ?? []).map((r) => rowToProduct(r as unknown as ProductRow));
   const total = count ?? products.length;
 
   return { products, total, page: safePage, pageSize, hasMore: start + pageSize < total };
+}
+
+/**
+ * Filters + paginates the catalogue (cached 1h, tag "products"). Reads from
+ * Supabase; the typed MOCK_PRODUCTS dataset is used only in local dev/test
+ * when Supabase isn't configured. Throws on Supabase failure.
+ */
+export async function getProducts(
+  filters: ProductFilters = {},
+  page = 1,
+  pageSize = DEFAULT_PAGE_SIZE,
+): Promise<PaginatedProducts> {
+  const safePage = Math.max(1, Math.trunc(page) || 1);
+  return unstable_cache(
+    () => fetchProducts(filters, safePage, pageSize),
+    ["products:list", filtersKey(filters), String(safePage), String(pageSize)],
+    { revalidate: CACHE_SECONDS, tags: [PRODUCTS_TAG] },
+  )();
 }
 
 /** Minimal per-product record the facet counter works on. */
@@ -243,7 +291,7 @@ function matches(row: FacetRow, filters: ProductFilters, skip?: FilterKey): bool
 }
 
 async function loadFacetRows(): Promise<FacetRow[]> {
-  const client = getSupabaseServerClient();
+  const client = getPublicSupabaseClient();
   if (!client) {
     return MOCK_PRODUCTS.map((p) =>
       toFacetRow({
@@ -255,12 +303,22 @@ async function loadFacetRows(): Promise<FacetRow[]> {
       }),
     );
   }
-  const { data, error } = await client
-    .from("products")
-    .select("*")
-    .range(0, FACET_ROW_LIMIT - 1);
-  if (error) throw error;
-  return (data ?? []).map(toFacetRow);
+  // Page in chunks of 1000 so PostgREST's response cap can't silently
+  // truncate the facet source rows.
+  const rows: FacetRow[] = [];
+  for (let from = 0; from < FACET_ROW_LIMIT; from += FACET_PAGE_SIZE) {
+    const { data, error } = await client
+      .from("products")
+      .select(FACET_COLUMNS)
+      .order("id")
+      .range(from, from + FACET_PAGE_SIZE - 1);
+    if (error) throw queryFailed("facets", error);
+    const batch = (data ?? []) as unknown as Parameters<typeof toFacetRow>[0][];
+    rows.push(...batch.map(toFacetRow));
+    if (batch.length < FACET_PAGE_SIZE) return rows;
+  }
+  console.warn(`getFilterFacets: hit the ${FACET_ROW_LIMIT}-row cap; facet counts may be incomplete`);
+  return rows;
 }
 
 function getProductsFromMock(
@@ -291,13 +349,7 @@ function getProductsFromMock(
   };
 }
 
-/**
- * Option lists with live counts for every filter group. Selected values stay
- * listed even at count 0 so they can always be un-ticked. Sizes fall back to
- * the curated CATALOGUE_SIZES only when Supabase isn't configured and the
- * mock data yields none.
- */
-export async function getFilterFacets(filters: ProductFilters = {}): Promise<ProductFilterFacets> {
+async function computeFilterFacets(filters: ProductFilters): Promise<ProductFilterFacets> {
   const rows = await loadFacetRows();
   const facets = {} as ProductFilterFacets;
 
@@ -314,28 +366,44 @@ export async function getFilterFacets(filters: ProductFilters = {}): Promise<Pro
       .sort((a, b) => a.value.localeCompare(b.value, undefined, { numeric: true }));
   }
 
-  if (!facets.size.length && !getSupabaseServerClient()) {
+  if (!facets.size.length && !getPublicSupabaseClient()) {
     facets.size = CATALOGUE_SIZES.map((value) => ({ value, count: 0 }));
   }
   return facets;
 }
 
-/** Single product lookup for the product detail page, including its
- *  gallery images and source PDF. Falls back to a join-less query if the
- *  source_pdfs migration isn't applied yet. */
-export async function getProductBySlug(slug: string): Promise<Product | undefined> {
-  const client = getSupabaseServerClient();
-  if (!client) return MOCK_PRODUCTS.find((product) => product.slug === slug);
-
-  let result = await client.from("products").select(DETAIL_SELECT).eq("slug", slug).maybeSingle();
-  if (result.error) {
-    result = await client.from("products").select(LIST_SELECT).eq("slug", slug).maybeSingle();
-  }
-  if (result.error) throw result.error;
-  if (!result.data) return undefined;
-
-  return rowToProduct(result.data as unknown as ProductRow);
+/**
+ * Option lists with live counts for every filter group (cached 1h, tag
+ * "products"). Selected values stay listed even at count 0 so they can always
+ * be un-ticked. Sizes fall back to the curated CATALOGUE_SIZES only in local
+ * dev when Supabase isn't configured and the mock data yields none.
+ */
+export async function getFilterFacets(filters: ProductFilters = {}): Promise<ProductFilterFacets> {
+  return unstable_cache(() => computeFilterFacets(filters), ["products:facets", filtersKey(filters)], {
+    revalidate: CACHE_SECONDS,
+    tags: [PRODUCTS_TAG],
+  })();
 }
+
+async function fetchProductBySlug(slug: string): Promise<Product | null> {
+  const client = getPublicSupabaseClient();
+  if (!client) return MOCK_PRODUCTS.find((product) => product.slug === slug) ?? null;
+
+  const { data, error } = await client.from("products").select(DETAIL_SELECT).eq("slug", slug).maybeSingle();
+  if (error) throw queryFailed("product", error);
+  return data ? rowToProduct(data as unknown as ProductRow) : null;
+}
+
+/** Single product lookup for the product detail page, including its gallery
+ *  images and source PDF. Cached 1h (tag "products") and wrapped in React
+ *  cache() so generateMetadata and the page share one call per request. */
+export const getProductBySlug = cache(async (slug: string): Promise<Product | undefined> => {
+  const product = await unstable_cache(() => fetchProductBySlug(slug), ["products:slug", slug], {
+    revalidate: CACHE_SECONDS,
+    tags: [PRODUCTS_TAG],
+  })();
+  return product ?? undefined;
+});
 
 /**
  * "Related Selections" — other products in the same category, excluding
@@ -344,29 +412,74 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
  * than it needs to.
  */
 export async function getRelatedProducts(product: Product, limit = 4): Promise<Product[]> {
-  const client = getSupabaseServerClient();
-  if (!client) return getRelatedFromMock(product, limit);
+  return unstable_cache(
+    () => fetchRelatedProducts(product.id, product.category, limit),
+    ["products:related", product.id, product.category, String(limit)],
+    { revalidate: CACHE_SECONDS, tags: [PRODUCTS_TAG] },
+  )();
+}
+
+async function fetchRelatedProducts(productId: string, category: string, limit: number): Promise<Product[]> {
+  const client = getPublicSupabaseClient();
+  if (!client) {
+    const current = MOCK_PRODUCTS.find((p) => p.id === productId);
+    return getRelatedFromMock({ id: productId, category, ...(current ?? {}) } as Product, limit);
+  }
 
   const { data: sameCategoryRows, error: sameCategoryError } = await client
     .from("products")
-    .select("*, product_images(image_url, sort_order)")
-    .eq("category", product.category)
-    .neq("id", product.id)
+    .select(LIST_SELECT)
+    .eq("category", category)
+    .neq("id", productId)
+    .order("created_at", { ascending: false })
+    .order("id")
     .limit(limit);
-  if (sameCategoryError) throw sameCategoryError;
+  if (sameCategoryError) throw queryFailed("related products", sameCategoryError);
 
-  const related = (sameCategoryRows ?? []).map(rowToProduct);
+  const related = (sameCategoryRows ?? []).map((r) => rowToProduct(r as unknown as ProductRow));
   if (related.length >= limit) return related;
 
   const { data: otherRows, error: otherError } = await client
     .from("products")
-    .select("*, product_images(image_url, sort_order)")
-    .neq("category", product.category)
-    .neq("id", product.id)
+    .select(LIST_SELECT)
+    .neq("category", category)
+    .neq("id", productId)
+    .order("created_at", { ascending: false })
+    .order("id")
     .limit(limit - related.length);
-  if (otherError) throw otherError;
+  if (otherError) throw queryFailed("related products", otherError);
 
-  return [...related, ...(otherRows ?? []).map(rowToProduct)];
+  return [...related, ...(otherRows ?? []).map((r) => rowToProduct(r as unknown as ProductRow))];
+}
+
+/** Slug + updated_at of every visible product, for sitemap.xml. Paged in
+ *  1000-row chunks; cached 1h (tag "products"); throws on failure so the
+ *  sitemap is never published without its products. */
+export async function getSitemapProducts(): Promise<{ slug: string; updated_at: string | null }[]> {
+  return unstable_cache(fetchSitemapProducts, ["products:sitemap"], {
+    revalidate: CACHE_SECONDS,
+    tags: [PRODUCTS_TAG],
+  })();
+}
+
+async function fetchSitemapProducts(): Promise<{ slug: string; updated_at: string | null }[]> {
+  const client: SupabaseClient | null = getPublicSupabaseClient();
+  if (!client) return MOCK_PRODUCTS.map((p) => ({ slug: p.slug, updated_at: p.updatedAt }));
+
+  const rows: { slug: string; updated_at: string | null }[] = [];
+  for (let from = 0; from < FACET_ROW_LIMIT * 5; from += FACET_PAGE_SIZE) {
+    const { data, error } = await client
+      .from("products")
+      .select("slug, updated_at")
+      .eq("is_visible", true)
+      .order("id")
+      .range(from, from + FACET_PAGE_SIZE - 1);
+    if (error) throw queryFailed("sitemap products", error);
+    if (!data?.length) break;
+    rows.push(...data);
+    if (data.length < FACET_PAGE_SIZE) break;
+  }
+  return rows;
 }
 
 function getRelatedFromMock(product: Product, limit: number): Product[] {

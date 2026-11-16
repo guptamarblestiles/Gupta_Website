@@ -6,9 +6,11 @@
  * Vercel); falls back to localhost for local builds.
  */
 import type { MetadataRoute } from "next";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { getSitemapProducts } from "@/lib/products/queries";
 import { SITE_URL } from "@/lib/site";
 import { COLLECTIONS } from "@/lib/collections";
+
+export const revalidate = 86400;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -21,28 +23,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),
-    { url: `${SITE_URL}/visualizer`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/contact`, changeFrequency: "monthly", priority: 0.6 },
   ];
 
-  const client = getSupabaseServerClient();
-  if (!client) return staticRoutes;
-
-  // Page through in chunks rather than one unbounded select — Supabase caps
-  // an unpaged select at 1000 rows, and the catalogue is already well past
-  // half that, so this keeps the sitemap complete as it grows.
-  const PAGE_SIZE = 1000;
-  const rows: { slug: string; updated_at: string | null }[] = [];
-  for (let from = 0; ; from += PAGE_SIZE) {
-    const { data } = await client
-      .from("products")
-      .select("slug, updated_at")
-      .eq("is_visible", true)
-      .range(from, from + PAGE_SIZE - 1);
-    if (!data || data.length === 0) break;
-    rows.push(...data);
-    if (data.length < PAGE_SIZE) break;
-  }
+  // Throws on a Supabase failure (never publishes a product-less sitemap
+  // during an outage); the listing is paged and cached in getSitemapProducts.
+  const rows = await getSitemapProducts();
 
   const productRoutes: MetadataRoute.Sitemap = rows.map((p) => ({
     url: `${SITE_URL}/products/${p.slug}`,
