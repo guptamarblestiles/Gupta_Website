@@ -61,7 +61,14 @@ export function ImageGallery({ stone, productName, images }: ImageGalleryProps) 
                     : "border-transparent hover:border-outline-variant",
                 )}
               >
-                <Image src={image.url} alt="" fill sizes="120px" className="object-cover" />
+                <Image
+                  src={image.url}
+                  alt=""
+                  fill
+                  sizes="120px"
+                  loading="lazy"
+                  className="object-cover"
+                />
               </button>
             ))}
           </div>
