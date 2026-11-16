@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { refreshPublicSite } from "@admin/lib/publicSite";
 import { z } from "zod";
 import { runAction } from "@admin/lib/run";
 import { fail, type ActionResult } from "@admin/lib/actionResult";
@@ -151,6 +152,7 @@ export async function approveCandidate(id: string, input: z.input<typeof approve
       }
       await db.from("pdf_import_candidates").update({ status: "created", product_id: existing.id }).eq("id", id);
       revalidatePath(`/admin/products/${existing.id}`);
+      await refreshPublicSite(); // existing product may be live: drop the 1h public cache
       return {
         ok: true,
         message: `Added to “${existing.name}”. Only empty fields were filled; nothing was overwritten.`,

@@ -174,6 +174,13 @@ function filtersKey(filters: ProductFilters): string {
   for (const key of Object.keys(filters).sort() as (keyof ProductFilters)[]) {
     const v = filters[key];
     if (v === undefined || v === null) continue;
+    // Search text is trimmed/lowercased/capped like the query itself, so
+    // junk variants of one search (bots) cannot mint unlimited cache entries.
+    if (key === "search") {
+      const term = String(v).trim().toLowerCase().slice(0, 80);
+      if (term) out[key] = term;
+      continue;
+    }
     out[key] = Array.isArray(v) ? [...v].sort() : v;
   }
   return JSON.stringify(out);
@@ -221,6 +228,11 @@ async function fetchProducts(
     .order("id") // tiebreaker: equal created_at must not duplicate/skip rows across pages
     .range(start, start + pageSize - 1);
 
+  // PostgREST answers 416 / PGRST103 when the page is past the last row
+  // (stale ?page=N links): show an empty page instead of an error screen.
+  if (error && (error as { code?: string }).code === "PGRST103") {
+    return { products: [], total: 0, page: safePage, pageSize, hasMore: false };
+  }
   if (error) throw queryFailed("products", error);
 
   const products = (data ?? []).map((r) => rowToProduct(r as unknown as ProductRow));

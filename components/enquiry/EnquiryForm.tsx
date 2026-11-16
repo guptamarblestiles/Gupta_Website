@@ -70,7 +70,16 @@ export function EnquiryForm({ product }: EnquiryFormProps) {
 
     setFieldErrors({});
     startTransition(async () => {
-      const result = await submitEnquiry({ ...values, website });
+      let result: Awaited<ReturnType<typeof submitEnquiry>>;
+      try {
+        result = await submitEnquiry({ ...values, website });
+      } catch {
+        setBanner({
+          tone: "error",
+          message: "Something went wrong sending your enquiry. Please try again, or call or email us directly.",
+        });
+        return;
+      }
 
       if (result.status === "success") {
         setBanner({ tone: "success", message: "Thank you — we'll be in touch shortly." });

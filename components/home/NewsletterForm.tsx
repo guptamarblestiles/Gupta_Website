@@ -27,7 +27,14 @@ export function NewsletterForm() {
       return;
     }
     startTransition(async () => {
-      const result = await subscribeNewsletter({ email, website });
+      let result: Awaited<ReturnType<typeof subscribeNewsletter>>;
+      try {
+        result = await subscribeNewsletter({ email, website });
+      } catch {
+        setErrorMessage("Something went wrong. Please try again in a moment.");
+        setStatus("error");
+        return;
+      }
       if (result.status === "success") {
         setStatus("success");
         return;
