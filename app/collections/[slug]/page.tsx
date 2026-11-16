@@ -15,6 +15,8 @@ type CollectionPageProps = {
   params: Promise<{ slug: string }>;
 };
 
+export const revalidate = 3600;
+
 export function generateStaticParams() {
   return COLLECTIONS.map((c) => ({ slug: c.slug }));
 }
