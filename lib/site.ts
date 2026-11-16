@@ -4,7 +4,28 @@
 
 export const SITE_NAME = "Gupta Interior";
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const PRODUCTION_FALLBACK_URL = "https://www.guptainterior.in";
+
+function resolveSiteUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (configured) return configured.replace(/\/+$/, "");
+
+  const isProduction =
+    process.env.VERCEL_ENV === "production" ||
+    (!process.env.VERCEL_ENV && process.env.NODE_ENV === "production");
+
+  if (isProduction) {
+    // Don't throw at import time (that would break the build for every
+    // route); fall back to the live host and make the misconfiguration loud.
+    console.warn(
+      `NEXT_PUBLIC_SITE_URL is not set in production; falling back to ${PRODUCTION_FALLBACK_URL}.`,
+    );
+    return PRODUCTION_FALLBACK_URL;
+  }
+  return "http://localhost:3000";
+}
+
+export const SITE_URL = resolveSiteUrl();
 
 export const BUSINESS_INFO = {
   name: SITE_NAME,

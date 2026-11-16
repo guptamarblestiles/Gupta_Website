@@ -2,15 +2,21 @@
  * Client-side email notification via EmailJS — sends directly from the
  * visitor's browser to Gupta Interior's inbox, no server SMTP credentials needed
  * (unlike lib/enquiry/email.ts's Gmail App Password route, which stays as
- * a fallback). Requires NEXT_PUBLIC_EMAILJS_SERVICE_ID,
- * NEXT_PUBLIC_EMAILJS_TEMPLATE_ID, NEXT_PUBLIC_EMAILJS_PUBLIC_KEY — if any
- * is unset, this quietly no-ops so a missing credential never blocks the
- * enquiry, which is already saved in Supabase by the time this runs.
+ * a fallback).
+ *
+ * OPT-IN ONLY. The server Gmail route is the primary notification, so
+ * running both would email the owner twice per enquiry. This does nothing
+ * unless NEXT_PUBLIC_EMAILJS_ENABLED is exactly "true" AND
+ * NEXT_PUBLIC_EMAILJS_SERVICE_ID, NEXT_PUBLIC_EMAILJS_TEMPLATE_ID and
+ * NEXT_PUBLIC_EMAILJS_PUBLIC_KEY are all set. The enquiry is already saved
+ * in Supabase by the time this runs.
  */
 import emailjs from "@emailjs/browser";
 import type { EnquiryInput } from "@/types/product";
 
 export async function sendEnquiryEmailJs(input: EnquiryInput): Promise<void> {
+  if (process.env.NEXT_PUBLIC_EMAILJS_ENABLED !== "true") return;
+
   const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
   const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
   const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;

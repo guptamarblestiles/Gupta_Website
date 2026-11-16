@@ -19,7 +19,7 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-export async function sendEnquiryNotification(input: EnquiryInput): Promise<void> {
+export async function sendEnquiryNotification(input: EnquiryInput, subject?: string): Promise<void> {
   const user = process.env.GMAIL_USER;
   const appPassword = process.env.GMAIL_APP_PASSWORD;
 
@@ -40,7 +40,7 @@ export async function sendEnquiryNotification(input: EnquiryInput): Promise<void
       from: `"Gupta Interior Website" <${user}>`,
       to: user,
       replyTo: input.email,
-      subject: `New enquiry from ${input.name}`,
+      subject: subject ?? `New enquiry from ${input.name}`,
       html: `
         <h2>New website enquiry</h2>
         <p><strong>Name:</strong> ${escapeHtml(input.name)}</p>
