@@ -1,34 +1,56 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { ArrowRight, Check } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
+import { subscribeNewsletter } from "@/lib/enquiry/actions";
 
 /**
- * Email-capture control for the CTA band. UI-complete and validated, but
- * intentionally not wired to a backend yet — Supabase isn't connected
- * until task 8/11 (this isn't the product-enquiry flow, brief section 40,
- * which gets its own form later). Swapping the TODO for a real insert is a
- * one-line change once `lib/supabase/client.ts` exists.
+ * Email-capture control for the CTA band. Submits through the
+ * subscribeNewsletter server action, which stores the address as a labelled
+ * row in the enquiries table and emails the owner. Success is only shown
+ * once the address has actually been saved.
  */
 export function NewsletterForm() {
   const [email, setEmail] = useState("");
+  const [website, setWebsite] = useState("");
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("Please enter a valid email address.");
+  const [isPending, startTransition] = useTransition();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim() || !email.includes("@")) {
+      setErrorMessage("Please enter a valid email address.");
       setStatus("error");
       return;
     }
-    // TODO(task 8): insert into a Supabase `subscribers` table once connected.
-    setStatus("success");
+    startTransition(async () => {
+      let result: Awaited<ReturnType<typeof subscribeNewsletter>>;
+      try {
+        result = await subscribeNewsletter({ email, website });
+      } catch {
+        setErrorMessage("Something went wrong. Please try again in a moment.");
+        setStatus("error");
+        return;
+      }
+      if (result.status === "success") {
+        setStatus("success");
+        return;
+      }
+      setErrorMessage(
+        result.status === "error" && result.fieldErrors?.email
+          ? result.fieldErrors.email
+          : result.message,
+      );
+      setStatus("error");
+    });
   }
 
   if (status === "success") {
     return (
-      <p className="flex items-center gap-2 font-body text-body-lg text-hero-foreground">
+      <p role="status" className="flex items-center gap-2 font-body text-body-lg text-hero-foreground">
         <Check size={18} className="text-secondary" aria-hidden="true" />
         Thank you — we&apos;ll be in touch.
       </p>
@@ -37,6 +59,17 @@ export function NewsletterForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full max-w-md flex-col sm:flex-row gap-3" noValidate>
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor="newsletter-website">Leave this field empty</label>
+        <input
+          id="newsletter-website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
       <div className="flex-1">
         <label htmlFor="newsletter-email" className="sr-only">
           Email address
@@ -45,6 +78,7 @@ export function NewsletterForm() {
           id="newsletter-email"
           type="email"
           required
+          maxLength={254}
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -59,13 +93,13 @@ export function NewsletterForm() {
           aria-describedby={status === "error" ? "newsletter-error" : undefined}
         />
         {status === "error" && (
-          <p id="newsletter-error" className="mt-2 font-body text-sm text-error">
-            Please enter a valid email address.
+          <p id="newsletter-error" role="alert" className="mt-2 font-body text-sm text-error">
+            {errorMessage}
           </p>
         )}
       </div>
-      <Button type="submit" variant="hero-primary">
-        Subscribe
+      <Button type="submit" variant="hero-primary" disabled={isPending}>
+        {isPending ? "Sending..." : "Subscribe"}
         <ArrowRight size={16} aria-hidden="true" />
       </Button>
     </form>

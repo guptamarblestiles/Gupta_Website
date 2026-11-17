@@ -1,0 +1,8 @@
+# Not needed by `next build` / runtime. Everything the build uses (app/,
+# components/, lib/, public/, admin-src/, types/, scripts/, supabase/,
+# proxy.ts, configs, package files, README.md) is deliberately NOT listed.
+assets-source/
+docs/
+SEO_CHECKLIST.md
+AGENTS.md
+CLAUDE.md

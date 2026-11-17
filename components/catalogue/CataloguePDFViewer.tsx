@@ -1,25 +1,42 @@
 "use client";
 
 /**
- * Full-screen in-page PDF viewer. Uses the browser's native PDF renderer
+ * Full-screen in-page PDF viewer. The PDF is large (tens of MB), so the
+ * <iframe> is NOT mounted until the user clicks "Open preview" — merely
+ * opening the modal costs nothing. Uses the browser's native PDF renderer
  * via an <iframe> rather than pulling in pdf.js — every target browser
  * (Chrome/Firefox/Safari/Edge, desktop and mobile) already ships one, so
  * this gets scrolling, zoom, search, and text selection for free with zero
  * extra JS weight. Body scroll is locked while open and restored to
  * exactly where the user was on close (no scroll-jump back to top).
  */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Download } from "lucide-react";
+import { X, Download, Eye } from "lucide-react";
 
 type CataloguePDFViewerProps = {
   title: string;
   pdfUrl: string;
+  /** Optional file size in bytes, shown in the pre-preview state when known. */
+  fileSizeBytes?: number;
   onClose: () => void;
 };
 
-export function CataloguePDFViewer({ title, pdfUrl, onClose }: CataloguePDFViewerProps) {
+function formatSize(bytes?: number): string | undefined {
+  if (!bytes) return undefined;
+  const mb = bytes / (1024 * 1024);
+  return mb >= 1 ? `${mb.toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
+export function CataloguePDFViewer({ title, pdfUrl, fileSizeBytes, onClose }: CataloguePDFViewerProps) {
   const scrollYRef = useRef(0);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const size = formatSize(fileSizeBytes);
+
+  useEffect(() => {
+    closeRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     scrollYRef.current = window.scrollY;
@@ -77,6 +94,7 @@ export function CataloguePDFViewer({ title, pdfUrl, onClose }: CataloguePDFViewe
                 <span className="hidden sm:inline">Download</span>
               </a>
               <button
+                ref={closeRef}
                 type="button"
                 onClick={onClose}
                 aria-label="Close catalogue viewer"
@@ -88,7 +106,38 @@ export function CataloguePDFViewer({ title, pdfUrl, onClose }: CataloguePDFViewe
           </header>
 
           <div className="min-h-0 flex-1 bg-neutral-900">
-            <iframe src={`${pdfUrl}#view=FitH`} title={title} className="h-full w-full" />
+            {previewOpen ? (
+              <iframe src={`${pdfUrl}#view=FitH`} title={title} className="h-full w-full" />
+            ) : (
+              <div className="flex h-full flex-col items-center justify-center gap-6 px-6 text-center">
+                <div>
+                  <p className="font-display text-xl text-hero-foreground">{title}</p>
+                  <p className="mt-2 font-body text-sm text-hero-muted">
+                    {size ? `PDF · ${size} — ` : "Large PDF — "}
+                    preview loads the whole file, so it is opened only on request.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewOpen(true)}
+                    className="flex items-center gap-2 border border-hero-border px-5 py-3 font-body text-label uppercase text-hero-foreground transition-colors duration-500 ease-luxury hover:border-secondary hover:text-secondary"
+                  >
+                    <Eye size={16} aria-hidden="true" />
+                    Open preview
+                  </button>
+                  <a
+                    href={pdfUrl}
+                    download
+                    rel="nofollow noopener noreferrer"
+                    className="flex items-center gap-2 border border-hero-border px-5 py-3 font-body text-label uppercase text-hero-foreground transition-colors duration-500 ease-luxury hover:border-secondary hover:text-secondary"
+                  >
+                    <Download size={16} aria-hidden="true" />
+                    Download
+                  </a>
+                </div>
+              </div>
+            )}
           </div>
         </motion.div>
       </motion.div>

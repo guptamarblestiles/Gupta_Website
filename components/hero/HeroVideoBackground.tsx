@@ -63,7 +63,7 @@ export function HeroVideoBackground() {
         alt=""
         aria-hidden="true"
         fill
-        priority
+        preload
         sizes="100vw"
         className="object-cover"
       />
@@ -79,7 +79,7 @@ export function HeroVideoBackground() {
       autoPlay
       muted
       playsInline
-      preload="auto"
+      preload="metadata"
       onEnded={() => setIndex((i) => (i + 1) % PLAYLIST.length)}
       className="absolute inset-0 h-full w-full object-cover"
       aria-hidden="true"

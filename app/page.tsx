@@ -13,6 +13,9 @@ import { CtaBand } from "@/components/home/CtaBand";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { BUSINESS_INFO, SITE_NAME, SITE_URL, socialLinks } from "@/lib/site";
 
+// Static shell + cached catalogue data: regenerate hourly (ISR).
+export const revalidate = 3600;
+
 function localBusinessJsonLd() {
   return {
     "@context": "https://schema.org",

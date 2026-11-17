@@ -6,6 +6,7 @@ import { z } from "zod";
 import { createClient } from "@admin/lib/supabase/server";
 import { ADMIN_URL, isSupabaseConfigured } from "@admin/lib/env";
 import { getAdminSession } from "@admin/lib/auth";
+import { SITE_URL } from "@/lib/site";
 
 export type FormState = { ok?: boolean; message?: string; fieldErrors?: Record<string, string> } | undefined;
 
@@ -16,6 +17,9 @@ function safeNext(value: FormDataEntryValue | null): string {
 
 async function siteOrigin(): Promise<string> {
   if (ADMIN_URL) return ADMIN_URL;
+  // Never trust request headers in production (host-header poisoning of the
+  // password-reset link); use the configured canonical site URL instead.
+  if (process.env.NODE_ENV === "production") return SITE_URL;
   const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host");
   const proto = h.get("x-forwarded-proto") ?? "https";

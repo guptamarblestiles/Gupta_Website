@@ -8,6 +8,7 @@
  * design system, not a bolted-on new pattern.
  */
 import { useState } from "react";
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { FileText, ArrowRight } from "lucide-react";
 import type { Catalogue } from "@/lib/catalogues/queries";
@@ -42,11 +43,14 @@ export function CatalogueCard({ catalogue }: { catalogue: Catalogue }) {
         >
           <div className="relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-hero-bg">
             {catalogue.thumbnailUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- external Supabase Storage URL, no next/image loader configured for it
-              <img
+              <Image
                 src={catalogue.thumbnailUrl}
                 alt=""
-                className="grayscale-reveal h-full w-full object-cover group-hover:scale-105"
+                fill
+                sizes="(min-width: 1024px) 33vw, 100vw"
+                quality={75}
+                loading="lazy"
+                className="grayscale-reveal object-cover group-hover:scale-105"
               />
             ) : (
               <FileText

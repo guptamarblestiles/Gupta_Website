@@ -18,8 +18,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/visualizer" },
 };
 
+export const revalidate = 3600;
+
 export default async function VisualizerPage() {
-  const { products } = await getProducts({}, 1, 60);
+  const { products } = await getProducts({}, 1, 12);
 
   return (
     <>

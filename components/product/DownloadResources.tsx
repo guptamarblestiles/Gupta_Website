@@ -43,18 +43,22 @@ export function DownloadResources({ product }: { product: Product }) {
             <p className="font-body text-body text-on-surface">{pdf.title}</p>
             <p className="font-body text-sm text-on-surface-variant">
               Full catalogue PDF{product.sourcePage ? ` · this tile on page ${product.sourcePage}` : ""}
-              {size ? ` · ${size}` : ""}
             </p>
+            {size && (
+              <p className="font-body text-sm font-medium text-on-surface">
+                File size: {size} — large download
+              </p>
+            )}
           </div>
         </div>
 
         {viewHref && pdf.fileUrl ? (
           <div className="flex flex-wrap gap-3">
-            <a href={viewHref} target="_blank" rel="noopener noreferrer" className={actionClass}>
+            <a href={viewHref} target="_blank" rel="nofollow noopener noreferrer" className={actionClass}>
               <ExternalLink size={16} aria-hidden="true" />
               View PDF
             </a>
-            <a href={pdf.fileUrl} download={pdf.originalFilename} className={actionClass}>
+            <a href={pdf.fileUrl} download={pdf.originalFilename} rel="nofollow noopener noreferrer" className={actionClass}>
               <Download size={16} aria-hidden="true" />
               Download
             </a>

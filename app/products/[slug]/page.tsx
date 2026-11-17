@@ -23,6 +23,16 @@ type ProductPageProps = {
   params: Promise<{ slug: string }>;
 };
 
+// ISR: no pages are prebuilt (no build-time Supabase dependence); each is
+// generated on first request, then cached and revalidated hourly. If a
+// regeneration fails, Next keeps serving the last good page.
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);

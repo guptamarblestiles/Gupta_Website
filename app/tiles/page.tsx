@@ -33,6 +33,8 @@ export async function generateMetadata({ searchParams }: TilesPageProps): Promis
       description: TILES_DESCRIPTION,
     },
     ...catalogueCanonicalMetadata("/tiles", params),
+    // /tiles renders the same CatalogueBrowser as /products: canonicalise to it.
+    alternates: { canonical: "/products" },
   };
 }
 

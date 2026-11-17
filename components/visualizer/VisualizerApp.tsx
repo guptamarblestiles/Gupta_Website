@@ -13,6 +13,7 @@
  */
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import {
   VISUALIZER_PRESETS,
@@ -148,13 +149,20 @@ export function VisualizerApp({ products }: VisualizerAppProps) {
                       }
                       title={p.name}
                       className={cn(
-                        "aspect-square overflow-hidden border-2 transition-colors",
+                        "relative aspect-square overflow-hidden border-2 transition-colors",
                         tileByZone[zone.kind] === p.id ? "border-secondary" : "border-transparent",
                       )}
                     >
                       {p.imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={p.imageUrl} alt={p.name} className="h-full w-full object-cover" />
+                        <Image
+                          src={p.imageUrl}
+                          alt={p.name}
+                          fill
+                          sizes="96px"
+                          quality={60}
+                          loading="lazy"
+                          className="object-cover"
+                        />
                       ) : (
                         <div className="h-full w-full bg-neutral-800" />
                       )}

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Button } from "@/components/ui/Button";
 import { Field, inputClasses, textareaClasses } from "@/components/ui/Field";
-import { enquirySchema } from "@/lib/enquiry/schema";
+import { ENQUIRY_LIMITS, enquirySchema } from "@/lib/enquiry/schema";
 import { submitEnquiry } from "@/lib/enquiry/actions";
 import { sendEnquiryEmailJs } from "@/lib/enquiry/emailjs";
 import type { EnquiryInput } from "@/types/product";
@@ -38,7 +38,14 @@ export function EnquiryForm({ product }: EnquiryFormProps) {
   const [banner, setBanner] = useState<{ tone: "success" | "notice" | "error"; message: string } | null>(
     null,
   );
+  const [website, setWebsite] = useState("");
   const [isPending, startTransition] = useTransition();
+  const successRef = useRef<HTMLParagraphElement>(null);
+
+  const isSuccess = banner?.tone === "success";
+  useEffect(() => {
+    if (isSuccess) successRef.current?.focus();
+  }, [isSuccess]);
 
   function setField<K extends keyof EnquiryInput>(key: K, value: EnquiryInput[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -63,12 +70,22 @@ export function EnquiryForm({ product }: EnquiryFormProps) {
 
     setFieldErrors({});
     startTransition(async () => {
-      const result = await submitEnquiry(values);
+      let result: Awaited<ReturnType<typeof submitEnquiry>>;
+      try {
+        result = await submitEnquiry({ ...values, website });
+      } catch {
+        setBanner({
+          tone: "error",
+          message: "Something went wrong sending your enquiry. Please try again, or call or email us directly.",
+        });
+        return;
+      }
 
       if (result.status === "success") {
         setBanner({ tone: "success", message: "Thank you — we'll be in touch shortly." });
         setValues({ ...EMPTY_VALUES, productId: product?.id, productName: product?.name });
-        void sendEnquiryEmailJs(values);
+        // Opt-in only (no-op unless EmailJS is explicitly enabled); never for honeypot hits.
+        if (!website) void sendEnquiryEmailJs(values);
         return;
       }
 
@@ -84,7 +101,13 @@ export function EnquiryForm({ product }: EnquiryFormProps) {
 
   if (banner?.tone === "success") {
     return (
-      <p className="flex items-center gap-3 font-body text-body-lg text-on-surface">
+      <p
+        ref={successRef}
+        role="status"
+        aria-live="polite"
+        tabIndex={-1}
+        className="flex items-center gap-3 font-body text-body-lg text-on-surface focus-visible:outline-none"
+      >
         <CheckCircle2 size={22} className="text-secondary shrink-0" aria-hidden="true" />
         {banner.message}
       </p>
@@ -93,6 +116,20 @@ export function EnquiryForm({ product }: EnquiryFormProps) {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
+      {/* Honeypot: hidden from people and assistive tech; bots fill it. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor="enquiry-website">Leave this field empty</label>
+        <input
+          id="enquiry-website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
+
       {banner && (
         <p
           role="alert"
@@ -139,6 +176,7 @@ export function EnquiryForm({ product }: EnquiryFormProps) {
           id="enquiry-phone"
           name="phone"
           type="tel"
+          maxLength={ENQUIRY_LIMITS.phone}
           value={values.phone ?? ""}
           onChange={(e) => setField("phone", e.target.value)}
           aria-invalid={Boolean(fieldErrors.phone)}
