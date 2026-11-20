@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import { TileImage } from "@/components/ui/TileImage";
 import { StoneSwatch, type StoneType } from "@/components/ui/StoneSwatch";
 import { cn } from "@/lib/utils/cn";
 
@@ -35,7 +35,8 @@ export function ImageGallery({ stone, productName, images }: ImageGalleryProps) 
     return (
       <div className="flex flex-col gap-4">
         <div className="relative aspect-square overflow-hidden bg-surface-variant shadow-feature-framed">
-          <Image
+          <TileImage
+            variant="gallery"
             src={current.url}
             alt={current.alt || productName}
             fill
@@ -61,7 +62,8 @@ export function ImageGallery({ stone, productName, images }: ImageGalleryProps) 
                     : "border-transparent hover:border-outline-variant",
                 )}
               >
-                <Image
+                <TileImage
+                  variant="thumb"
                   src={image.url}
                   alt=""
                   fill

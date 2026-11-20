@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { TileImage } from "@/components/ui/TileImage";
 import Link from "next/link";
 import { StoneSwatch } from "@/components/ui/StoneSwatch";
 import { PriceDisplay } from "@/components/product/PriceDisplay";
@@ -32,7 +32,8 @@ export function TileCard({ product, preload = false }: TileCardProps) {
     >
       <div className="relative aspect-square overflow-hidden">
         {product.imageUrl ? (
-          <Image
+          <TileImage
+            variant="card"
             src={product.imageUrl}
             alt={buildImageAlt(product)}
             fill
