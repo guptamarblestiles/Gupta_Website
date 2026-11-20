@@ -50,6 +50,8 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 2678400,
     formats: ["image/webp"],
     qualities: [60, 75],
+    // 384 / 828 / 1080 are the buckets used by lib/images/bucketLoader.ts for
+    // Supabase tile photos; keep them listed here or /_next/image rejects them.
     deviceSizes: [640, 828, 1080, 1280, 1920],
     imageSizes: [96, 128, 256, 384],
   },
