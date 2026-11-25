@@ -152,6 +152,12 @@ export function Footer() {
           </p>
           <div className="flex items-center gap-6">
             <p className="font-body text-sm text-hero-muted">Premium Marble &amp; Tile Curation</p>
+            <Link
+              href="/admin/login"
+              className="font-body text-sm text-hero-muted/60 transition-colors duration-500 ease-luxury hover:text-secondary"
+            >
+              Admin
+            </Link>
           </div>
         </div>
       </Container>
